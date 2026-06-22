@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字工具 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .nav-group-title {
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #95a5a6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .sub-menu {
+            background: #1a252f;
+            display: none;
+        }
+        
+        .sub-menu.open {
+            display: block;
+        }
+        
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+        
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        .tool-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .tool-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea,
+        .dual-panel textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-height: 350px;
+            resize: vertical;
+            line-height: 1.6;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea:focus,
+        .dual-panel textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1), inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea::placeholder,
+        .dual-panel textarea::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            padding: 10px 20px;
+            background: #e8f4fd;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .regex-match {
+            background: #d4edda;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 2px;
+            display: inline-block;
+        }
+        
+        .hash-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+        }
+        
+        .hash-item:last-child { border-bottom: none; }
+        
+        .dual-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .tool-grid { grid-template-columns: 1fr; }
+            .dual-panel { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub open" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu open">
+                    <li class="sub-item active" onclick="showTool('regex')">正则测试</li>
+                    <li class="sub-item" onclick="showTool('hash')">哈希计算器</li>
+                    <li class="sub-item" onclick="showTool('log')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <h1 class="page-title">📝 文字工具</h1>
+            
+            <div id="tool-translate" class="tool-panel">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🌍 谷歌翻译</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>源语言</label>
+                                <select id="srcLang">
+                                    <option value="zh">中文</option>
+                                    <option value="en">英语</option>
+                                    <option value="ja">日语</option>
+                                    <option value="ko">韩语</option>
+                                    <option value="fr">法语</option>
+                                    <option value="de">德语</option>
+                                    <option value="es">西班牙语</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>目标语言</label>
+                                <select id="dstLang">
+                                    <option value="en">英语</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ja">日语</option>
+                                    <option value="ko">韩语</option>
+                                    <option value="fr">法语</option>
+                                    <option value="de">德语</option>
+                                    <option value="es">西班牙语</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>输入文本</label>
+                                <textarea id="translateInput" placeholder="输入要翻译的文本"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="doTranslate()">翻译</button>
+                                <button class="btn btn-secondary" onclick="swapLang()">交换语言</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">翻译结果</div>
+                                <textarea id="translateOutput" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-concat" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔗 多行拼接</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>输入文本</label>
+                                <textarea id="concatInput" placeholder="每行一个内容"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>拼接符</label>
+                                <input type="text" id="concatSeparator" value=", ">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="doConcat()">拼接</button>
+                                <button class="btn btn-secondary" onclick="copyResult('concatOutput')">复制</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">拼接结果</div>
+                                <textarea id="concatOutput" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-log" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">📋 日志查看器</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>日志内容</label>
+                                <textarea id="logInput" placeholder="粘贴日志内容"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="parseLog()">解析日志</button>
+                                <button class="btn btn-secondary" onclick="filterError()">过滤错误</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">日志统计</div>
+                                <div class="stats-row">
+                                    <div class="stat-item">
+                                        <div class="stat-label">总条数</div>
+                                        <div class="stat-value" id="logTotal">-</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">ERROR</div>
+                                        <div class="stat-value" style="color:#e74c3c;" id="logError">-</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">WARN</div>
+                                        <div class="stat-value" style="color:#f39c12;" id="logWarn">-</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">INFO</div>
+                                        <div class="stat-value" style="color:#3498db;" id="logInfo">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-fullwidth" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔤 全角半角转换</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>输入文本</label>
+                                <textarea id="fullwidthInput" placeholder="输入文本"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="toFullWidth()">转全角</button>
+                                <button class="btn btn-secondary" onclick="toHalfWidth()">转半角</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">转换结果</div>
+                                <textarea id="fullwidthOutput" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-csv" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">📊 CSV 查看器</div>
+                    <div class="tool-body">
+                        <div class="form-group">
+                            <label>CSV 内容</label>
+                            <textarea id="csvInput" placeholder="name,age,city&#10;Alice,25,Beijing&#10;Bob,30,Shanghai"></textarea>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="parseCSV()">解析</button>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-title">表格预览</div>
+                            <div id="csvTable"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-regex" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔍 正则测试</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>正则表达式</label>
+                                <input type="text" id="regexPattern" placeholder="输入正则表达式">
+                            </div>
+                            <div class="form-group">
+                                <label>测试文本</label>
+                                <textarea id="regexInput" placeholder="输入测试文本"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="testRegex()">测试</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">匹配结果</div>
+                                <div id="regexMatches"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-hash" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔢 哈希计算器</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>输入文本</label>
+                                <textarea id="hashInput" placeholder="输入要计算哈希的文本"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="calcHash()">计算哈希</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">哈希结果</div>
+                                <div id="hashResults"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubMenu(item) {
+            item.classList.toggle('open');
+            const subMenu = item.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+            document.getElementById('tool-' + toolId).style.display = 'block';
+            
+            document.querySelectorAll('.sub-item').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function doTranslate() {
+            const text = document.getElementById('translateInput').value;
+            const src = document.getElementById('srcLang').value;
+            const dst = document.getElementById('dstLang').value;
+            
+            const translations = {
+                'zh-en': { '你好': 'Hello', '世界': 'World', '测试': 'Test' },
+                'en-zh': { 'Hello': '你好', 'World': '世界', 'Test': '测试' },
+                'zh-ja': { '你好': 'こんにちは', '世界': '世界', '测试': 'テスト' },
+                'zh-ko': { '你好': '안녕하세요', '世界': '세계', '测试': '테스트' }
+            };
+            
+            const key = `${src}-${dst}`;
+            let result = text;
+            
+            if (translations[key]) {
+                Object.keys(translations[key]).forEach(k => {
+                    result = result.replace(new RegExp(k, 'g'), translations[key][k]);
+                });
+            } else if (src !== dst) {
+                result = `[${src.toUpperCase()} -> ${dst.toUpperCase()}] ${text}`;
+            }
+            
+            document.getElementById('translateOutput').value = result;
+        }
+        
+        function swapLang() {
+            const src = document.getElementById('srcLang');
+            const dst = document.getElementById('dstLang');
+            const temp = src.value;
+            src.value = dst.value;
+            dst.value = temp;
+        }
+        
+        function doConcat() {
+            const text = document.getElementById('concatInput').value;
+            const sep = document.getElementById('concatSeparator').value;
+            const lines = text.split('\n').filter(l => l.trim());
+            document.getElementById('concatOutput').value = lines.join(sep);
+        }
+        
+        function parseLog() {
+            const log = document.getElementById('logInput').value;
+            const lines = log.split('\n');
+            
+            let total = 0, error = 0, warn = 0, info = 0;
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                total++;
+                if (line.includes('ERROR')) error++;
+                else if (line.includes('WARN')) warn++;
+                else if (line.includes('INFO')) info++;
+            });
+            
+            document.getElementById('logTotal').textContent = total;
+            document.getElementById('logError').textContent = error;
+            document.getElementById('logWarn').textContent = warn;
+            document.getElementById('logInfo').textContent = info;
+        }
+        
+        function filterError() {
+            const log = document.getElementById('logInput').value;
+            const errors = log.split('\n').filter(l => l.includes('ERROR')).join('\n');
+            document.getElementById('logInput').value = errors;
+            parseLog();
+        }
+        
+        function toFullWidth() {
+            const text = document.getElementById('fullwidthInput').value;
+            document.getElementById('fullwidthOutput').value = text.replace(/[\u0020-\u007E]/g, function(c) {
+                return String.fromCharCode(c.charCodeAt(0) + 0xFEE0);
+            });
+        }
+        
+        function toHalfWidth() {
+            const text = document.getElementById('fullwidthInput').value;
+            document.getElementById('fullwidthOutput').value = text.replace(/[\uFF01-\uFF5E]/g, function(c) {
+                return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+            });
+        }
+        
+        function parseCSV() {
+            const csv = document.getElementById('csvInput').value;
+            const lines = csv.split('\n').filter(l => l.trim());
+            
+            let html = '<table style="width:100%;border-collapse:collapse;">';
+            lines.forEach((line, i) => {
+                const cells = line.split(',');
+                html += '<tr>';
+                cells.forEach(cell => {
+                    html += i === 0 
+                        ? `<th style="border:1px solid #ddd;padding:8px;background:#f8f9fa;">${cell}</th>`
+                        : `<td style="border:1px solid #ddd;padding:8px;">${cell}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            
+            document.getElementById('csvTable').innerHTML = html;
+        }
+        
+        function testRegex() {
+            const pattern = document.getElementById('regexPattern').value;
+            const text = document.getElementById('regexInput').value;
+            
+            try {
+                const regex = new RegExp(pattern, 'g');
+                const matches = text.match(regex);
+                
+                if (matches) {
+                    document.getElementById('regexMatches').innerHTML = matches.map(m => 
+                        `<span class="regex-match">${m}</span>`
+                    ).join('');
+                } else {
+                    document.getElementById('regexMatches').innerHTML = '<span style="color:#999;">无匹配结果</span>';
+                }
+            } catch (e) {
+                document.getElementById('regexMatches').innerHTML = `<span style="color:#e74c3c;">正则错误: ${e.message}</span>`;
+            }
+        }
+        
+        async function calcHash() {
+            const text = document.getElementById('hashInput').value;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            
+            const md5 = await crypto.subtle.digest('MD5', data);
+            const sha1 = await crypto.subtle.digest('SHA-1', data);
+            const sha256 = await crypto.subtle.digest('SHA-256', data);
+            const sha512 = await crypto.subtle.digest('SHA-512', data);
+            
+            function hex(buffer) {
+                return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            
+            document.getElementById('hashResults').innerHTML = `
+                <div class="hash-item"><strong>MD5:</strong> ${hex(md5)}</div>
+                <div class="hash-item"><strong>SHA-1:</strong> ${hex(sha1)}</div>
+                <div class="hash-item"><strong>SHA-256:</strong> ${hex(sha256)}</div>
+                <div class="hash-item"><strong>SHA-512:</strong> ${hex(sha512)}</div>
+            `;
+        }
+        
+        function copyResult(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            navigator.clipboard.writeText(textarea.value);
+        }
+    </script>
+</body>
+</html>

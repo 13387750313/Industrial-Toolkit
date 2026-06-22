@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工控工具箱 - 工业自动化工程师工具集</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-text { font-size: 14px; }
+        
+        .nav-group-title {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+        
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+        
+        .sub-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: #1a252f;
+            display: none;
+        }
+        
+        .sub-menu.open {
+            display: block;
+        }
+        
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+        
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .section { margin-bottom: 50px; }
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: inline-block;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon { font-size: 40px; margin-bottom: 10px; }
+        .feature-name { font-size: 13px; color: #555; }
+        
+        .engineer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .engineer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .engineer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon { font-size: 45px; }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .card-list { list-style: none; }
+        .card-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-list li:last-child { border-bottom: none; }
+        
+        .core-feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .core-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+            transition: transform 0.3s;
+        }
+        
+        .core-card:hover { transform: translateY(-5px); }
+        
+        .core-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .core-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .tech-tag {
+            background: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #3498db;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .tech-tag:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="scrollToSection('overview')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <section class="section" id="overview">
+                <h2 class="section-title">🏭 产品概述</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔌</div>
+                        <div class="feature-name">串口通讯</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-name">工业以太网</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-name">系统监控</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧮</div>
+                        <div class="feature-name">计算工具</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📶</div>
+                        <div class="feature-name">无线通讯</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-name">USB通讯</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-name">协议解析</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-name">移动适配</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="engineer-tools">
+                <h2 class="section-title">👷 工程师工具分类</h2>
+                <div class="engineer-grid">
+                    <div class="engineer-card" onclick="navigateTo('plc-engineer.html')">
+                        <div class="card-header">
+                            <div class="card-icon">🔧</div>
+                            <div class="card-title">PLC工程师</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>WebSerial串口调试</li>
+                            <li>Modbus TCP/RTU</li>
+                            <li>国产PLC支持</li>
+                            <li>国外PLC支持</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="engineer-card" onclick="navigateTo('robot-engineer.html')">
+                        <div class="card-header">
+                            <div class="card-icon">🤖</div>
+                            <div class="card-title">机器人工程师</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>国产机器人</li>
+                            <li>国外机器人</li>
+                            <li>机器人TCP/IP通讯</li>
+                            <li>运动学计算工具</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="engineer-card" onclick="navigateTo('software-engineer.html')">
+                        <div class="card-header">
+                            <div class="card-icon">💻</div>
+                            <div class="card-title">软件工程师</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>CPU/内存实时监控</li>
+                            <li>线程数智能建议</li>
+                            <li>ASCII编解码器</li>
+                            <li>运动控制卡选型工具</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="engineer-card" onclick="navigateTo('structure-engineer.html')">
+                        <div class="card-header">
+                            <div class="card-icon">🏗️</div>
+                            <div class="card-title">结构工程师</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>螺栓强度计算</li>
+                            <li>齿轮传动计算</li>
+                            <li>材料参数查询</li>
+                            <li>轴承选型工具</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="engineer-card" onclick="navigateTo('electrician.html')">
+                        <div class="card-header">
+                            <div class="card-icon">🔌</div>
+                            <div class="card-title">电工</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>电阻/色环计算</li>
+                            <li>IP子网掩码计算</li>
+                            <li>电缆载流量计算</li>
+                            <li>继电器选型工具</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="engineer-card" onclick="navigateTo('communication-tools.html')">
+                        <div class="card-header">
+                            <div class="card-icon">📡</div>
+                            <div class="card-title">通讯工具</div>
+                        </div>
+                        <ul class="card-list">
+                            <li>WebUSB设备枚举</li>
+                            <li>Web Bluetooth扫描</li>
+                            <li>网络TCP/UDP调试</li>
+                            <li>CRC校验计算</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="core-features">
+                <h2 class="section-title">⭐ 核心功能详解</h2>
+                <div class="core-feature-grid">
+                    <div class="core-card">
+                        <div class="core-title">🔌 WebSerial串口通讯</div>
+                        <div class="core-desc">标准串口参数配置（波特率、数据位、校验位、停止位），支持十六进制/ASCII收发模式，实时数据监控显示，兼容Chrome/Edge浏览器。</div>
+                    </div>
+                    
+                    <div class="core-card">
+                        <div class="core-title">📋 Modbus协议调试</div>
+                        <div class="core-desc">支持Modbus TCP客户端和RTU串口模式，批量寄存器读写操作，自动CRC校验计算，协议报文解析显示。</div>
+                    </div>
+                    
+                    <div class="core-card">
+                        <div class="core-title">📊 系统信息监控</div>
+                        <div class="core-desc">CPU使用率实时监控，内存使用状态检测，硬盘空间检测，根据CPU核心数智能建议线程数。</div>
+                    </div>
+                    
+                    <div class="core-card">
+                        <div class="core-title">🏠 本地IIS部署</div>
+                        <div class="core-desc">内网PLC直接访问，无跨域限制，WebSerial原生放行，离线可用，安全可靠的本地部署方案。</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="tech-stack">
+                <h2 class="section-title">🛠️ 技术栈展示</h2>
+                <div class="tech-stack">
+                    <div class="tech-tag">HTML5</div>
+                    <div class="tech-tag">CSS3</div>
+                    <div class="tech-tag">JavaScript</div>
+                    <div class="tech-tag">.NET 10</div>
+                    <div class="tech-tag">Web Serial</div>
+                    <div class="tech-tag">Web USB</div>
+                    <div class="tech-tag">Web Bluetooth</div>
+                    <div class="tech-tag">Windows IIS</div>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+    
+    <script>
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                navItems.forEach(item => item.classList.remove('active'));
+                event.target.closest('.nav-item').classList.add('active');
+            }
+        }
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+        
+        function toggleSubMenu(el) {
+            const subMenu = el.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                el.classList.toggle('open');
+                subMenu.classList.toggle('open');
+            }
+        }
+    </script>
+</body>
+</html>

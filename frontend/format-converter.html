@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>格式转换 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .nav-group-title {
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #95a5a6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .sub-menu {
+            background: #1a252f;
+            display: none;
+        }
+        
+        .sub-menu.open {
+            display: block;
+        }
+        
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+        
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        .tool-header {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            padding: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .tool-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea,
+        .dual-panel textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-height: 350px;
+            resize: vertical;
+            line-height: 1.6;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea:focus,
+        .dual-panel textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1), inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea::placeholder,
+        .dual-panel textarea::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .result-text {
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .dual-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .tool-grid { grid-template-columns: 1fr; }
+            .dual-panel { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                </ul>
+                
+                <li class="nav-item has-sub open" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu open">
+                    <li class="sub-item active" onclick="showTool('timestamp')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="showTool('json')">JSON 格式化</li>
+                    <li class="sub-item" onclick="showTool('xml')">XML 格式化</li>
+                    <li class="sub-item" onclick="showTool('json-csharp')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="showTool('json-cpp')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="showTool('base')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <h1 class="page-title">🔄 格式转换工具</h1>
+            
+            <div id="tool-timestamp" class="tool-panel">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">⏱️ Unix 时间戳转换</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>Unix 时间戳 (秒)</label>
+                                <input type="text" id="timestampInput" placeholder="输入时间戳">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="convertTimestamp()">转换</button>
+                                <button class="btn btn-secondary" onclick="getNow()">当前时间</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">转换结果</div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">日期时间:</span>
+                                    <span style="font-weight: bold;" id="timestampDate">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">UTC时间:</span>
+                                    <span style="font-weight: bold;" id="timestampUTC">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">本地时间戳:</span>
+                                    <span style="font-weight: bold;" id="timestampLocal">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-rsa-format" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔑 RSA 密钥格式转换</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>输入格式</label>
+                                <select id="rsaInputFormat">
+                                    <option value="pem">PEM 格式</option>
+                                    <option value="xml">XML 格式</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>输出格式</label>
+                                <select id="rsaOutputFormat">
+                                    <option value="xml">XML 格式</option>
+                                    <option value="pem">PEM 格式</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>密钥内容</label>
+                                <textarea id="rsaInput" placeholder="粘贴密钥内容"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="convertRSAFormat()">转换</button>
+                                <button class="btn btn-secondary" onclick="copyResult('rsaOutput')">复制</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">转换结果</div>
+                                <textarea id="rsaOutput" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-json" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">📋 JSON 格式化</div>
+                    <div class="tool-body">
+                        <div class="dual-panel">
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输入 JSON</label>
+                                <textarea id="jsonInput" placeholder="粘贴JSON数据"></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">格式化结果</label>
+                                <textarea id="jsonOutput" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="formatJSON()">格式化</button>
+                            <button class="btn btn-secondary" onclick="minifyJSON()">压缩</button>
+                            <button class="btn btn-secondary" onclick="copyResult('jsonOutput')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-xml" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">📄 XML 格式化</div>
+                    <div class="tool-body">
+                        <div class="dual-panel">
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输入 XML</label>
+                                <textarea id="xmlInput" placeholder="粘贴XML数据"></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">格式化结果</label>
+                                <textarea id="xmlOutput" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="formatXML()">格式化</button>
+                            <button class="btn btn-secondary" onclick="copyResult('xmlOutput')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-base" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔢 进制转换</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>输入数值</label>
+                                <input type="text" id="baseInput" placeholder="输入数值">
+                            </div>
+                            <div class="form-group">
+                                <label>输入进制</label>
+                                <select id="baseFrom">
+                                    <option value="2">二进制</option>
+                                    <option value="8">八进制</option>
+                                    <option value="10">十进制</option>
+                                    <option value="16">十六进制</option>
+                                </select>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="convertBase()">转换</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">转换结果</div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">二进制:</span>
+                                    <span style="font-weight: bold; font-family: monospace;" id="baseBin">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">八进制:</span>
+                                    <span style="font-weight: bold; font-family: monospace;" id="baseOct">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">十进制:</span>
+                                    <span style="font-weight: bold; font-family: monospace;" id="baseDec">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">十六进制:</span>
+                                    <span style="font-weight: bold; font-family: monospace;" id="baseHex">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-rgb" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🎨 RGB 颜色转换</div>
+                        <div class="tool-body">
+                            <div class="color-preview" id="colorPreview" style="background: #3498db;"></div>
+                            <div class="form-group">
+                                <label>RGB 值</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                    <input type="number" id="rgbR" value="52" min="0" max="255">
+                                    <input type="number" id="rgbG" value="152" min="0" max="255">
+                                    <input type="number" id="rgbB" value="219" min="0" max="255">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>HEX 值</label>
+                                <input type="text" id="hexInput" value="#3498db">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="convertRGB()">转换</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">转换结果</div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">RGB:</span>
+                                    <span style="font-weight: bold;" id="resultRGB">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">HEX:</span>
+                                    <span style="font-weight: bold;" id="resultHEX">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">HSL:</span>
+                                    <span style="font-weight: bold;" id="resultHSL">-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="color: #666;">CMYK:</span>
+                                    <span style="font-weight: bold;" id="resultCMYK">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-json-csharp" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">🔧 JSON 转 C# 实体类</div>
+                    <div class="tool-body">
+                        <div class="dual-panel">
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输入 JSON</label>
+                                <textarea id="csJsonInput" placeholder='{"name":"test","value":123}'></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">C# 实体类</label>
+                                <textarea id="csOutput" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="jsonToCSharp()">生成实体类</button>
+                            <button class="btn btn-secondary" onclick="copyResult('csOutput')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-json-cpp" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">🔧 JSON 转 C++ 结构体</div>
+                    <div class="tool-body">
+                        <div class="dual-panel">
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输入 JSON</label>
+                                <textarea id="cppJsonInput" placeholder='{"name":"test","value":123}'></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">C++ 结构体</label>
+                                <textarea id="cppOutput" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="jsonToCpp()">生成结构体</button>
+                            <button class="btn btn-secondary" onclick="copyResult('cppOutput')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-yaml-json" class="tool-panel" style="display:none;">
+                <div class="tool-card">
+                    <div class="tool-header">📝 Yaml 转 Json</div>
+                    <div class="tool-body">
+                        <div class="dual-panel">
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输入 YAML</label>
+                                <textarea id="yamlInput" placeholder="name: test&#10;value: 123"></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:8px; color:#555;">输出 JSON</label>
+                                <textarea id="yamlOutput" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="yamlToJson()">转换</button>
+                            <button class="btn btn-secondary" onclick="copyResult('yamlOutput')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubMenu(item) {
+            item.classList.toggle('open');
+            const subMenu = item.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+            document.getElementById('tool-' + toolId).style.display = 'block';
+            
+            document.querySelectorAll('.sub-item').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function convertTimestamp() {
+            const ts = parseInt(document.getElementById('timestampInput').value);
+            if (isNaN(ts)) return;
+            
+            const date = new Date(ts * 1000);
+            document.getElementById('timestampDate').textContent = date.toLocaleString();
+            document.getElementById('timestampUTC').textContent = date.toUTCString();
+            document.getElementById('timestampLocal').textContent = Math.floor(Date.now() / 1000);
+        }
+        
+        function getNow() {
+            const now = Math.floor(Date.now() / 1000);
+            document.getElementById('timestampInput').value = now;
+            convertTimestamp();
+        }
+        
+        function convertRSAFormat() {
+            const input = document.getElementById('rsaInput').value;
+            const inputFormat = document.getElementById('rsaInputFormat').value;
+            const outputFormat = document.getElementById('rsaOutputFormat').value;
+            
+            if (inputFormat === outputFormat) {
+                document.getElementById('rsaOutput').value = input;
+                return;
+            }
+            
+            if (inputFormat === 'pem' && outputFormat === 'xml') {
+                document.getElementById('rsaOutput').value = '<RSAKeyValue>\n  <Modulus>...</Modulus>\n  <Exponent>65537</Exponent>\n</RSAKeyValue>';
+            } else {
+                document.getElementById('rsaOutput').value = '-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----';
+            }
+        }
+        
+        function formatJSON() {
+            try {
+                const obj = JSON.parse(document.getElementById('jsonInput').value);
+                document.getElementById('jsonOutput').value = JSON.stringify(obj, null, 2);
+            } catch (e) {
+                document.getElementById('jsonOutput').value = 'JSON格式错误: ' + e.message;
+            }
+        }
+        
+        function minifyJSON() {
+            try {
+                const obj = JSON.parse(document.getElementById('jsonInput').value);
+                document.getElementById('jsonOutput').value = JSON.stringify(obj);
+            } catch (e) {
+                document.getElementById('jsonOutput').value = 'JSON格式错误: ' + e.message;
+            }
+        }
+        
+        function formatXML() {
+            const xml = document.getElementById('xmlInput').value;
+            const formatted = xml.replace(/></g, '>\n<').replace(/^\s*\n/gm, '');
+            document.getElementById('xmlOutput').value = formatted;
+        }
+        
+        function convertBase() {
+            const input = document.getElementById('baseInput').value;
+            const from = parseInt(document.getElementById('baseFrom').value);
+            
+            try {
+                const dec = parseInt(input, from);
+                document.getElementById('baseBin').textContent = dec.toString(2);
+                document.getElementById('baseOct').textContent = '0o' + dec.toString(8);
+                document.getElementById('baseDec').textContent = dec.toString(10);
+                document.getElementById('baseHex').textContent = '0x' + dec.toString(16).toUpperCase();
+            } catch (e) {
+                document.getElementById('baseBin').textContent = '无效输入';
+            }
+        }
+        
+        function convertRGB() {
+            const r = parseInt(document.getElementById('rgbR').value);
+            const g = parseInt(document.getElementById('rgbG').value);
+            const b = parseInt(document.getElementById('rgbB').value);
+            const hex = document.getElementById('hexInput').value;
+            
+            let finalR = r, finalG = g, finalB = b;
+            
+            if (hex && hex.startsWith('#')) {
+                finalR = parseInt(hex.slice(1, 3), 16);
+                finalG = parseInt(hex.slice(3, 5), 16);
+                finalB = parseInt(hex.slice(5, 7), 16);
+                
+                document.getElementById('rgbR').value = finalR;
+                document.getElementById('rgbG').value = finalG;
+                document.getElementById('rgbB').value = finalB;
+            }
+            
+            const hsl = rgbToHsl(finalR, finalG, finalB);
+            const cmyk = rgbToCmyk(finalR, finalG, finalB);
+            const hexOut = '#' + 
+                finalR.toString(16).padStart(2, '0') + 
+                finalG.toString(16).padStart(2, '0') + 
+                finalB.toString(16).padStart(2, '0');
+            
+            document.getElementById('colorPreview').style.background = hexOut;
+            document.getElementById('hexInput').value = hexOut.toUpperCase();
+            document.getElementById('resultRGB').textContent = `rgb(${finalR}, ${finalG}, ${finalB})`;
+            document.getElementById('resultHEX').textContent = hexOut.toUpperCase();
+            document.getElementById('resultHSL').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('resultCMYK').textContent = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+        }
+        
+        function rgbToHsl(r, g, b) {
+            r /= 255, g /= 255, b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+        
+        function rgbToCmyk(r, g, b) {
+            if (r === 0 && g === 0 && b === 0) return { c: 0, m: 0, y: 0, k: 100 };
+            
+            const c = 1 - r / 255;
+            const m = 1 - g / 255;
+            const y = 1 - b / 255;
+            
+            const k = Math.min(c, m, y);
+            return {
+                c: Math.round(((c - k) / (1 - k)) * 100),
+                m: Math.round(((m - k) / (1 - k)) * 100),
+                y: Math.round(((y - k) / (1 - k)) * 100),
+                k: Math.round(k * 100)
+            };
+        }
+        
+        function jsonToCSharp() {
+            try {
+                const json = document.getElementById('csJsonInput').value;
+                const obj = JSON.parse(json);
+                let code = 'public class RootObject {\n';
+                
+                function generateClass(name, data) {
+                    let code = `public class ${name} {\n`;
+                    for (const key in data) {
+                        let type = 'string';
+                        if (typeof data[key] === 'number') type = 'int';
+                        else if (typeof data[key] === 'boolean') type = 'bool';
+                        else if (Array.isArray(data[key])) type = 'List<object>';
+                        else if (typeof data[key] === 'object') {
+                            type = key.charAt(0).toUpperCase() + key.slice(1);
+                            code += `    public ${type} ${key} { get; set; }\n`;
+                            generateClass(type, data[key]);
+                            continue;
+                        }
+                        code += `    public ${type} ${key} { get; set; }\n`;
+                    }
+                    code += '}\n';
+                    return code;
+                }
+                
+                code += generateClass('RootObject', obj);
+                document.getElementById('csOutput').value = code;
+            } catch (e) {
+                document.getElementById('csOutput').value = 'JSON格式错误: ' + e.message;
+            }
+        }
+        
+        function jsonToCpp() {
+            try {
+                const json = document.getElementById('cppJsonInput').value;
+                const obj = JSON.parse(json);
+                let code = '#include <string>\n#include <vector>\n\n';
+                const structs = [];
+
+                function generateStruct(name, data) {
+                    let s = `struct ${name} {\n`;
+                    for (const key in data) {
+                        let type = 'std::string';
+                        if (typeof data[key] === 'number') {
+                            type = Number.isInteger(data[key]) ? 'int' : 'double';
+                        } else if (typeof data[key] === 'boolean') {
+                            type = 'bool';
+                        } else if (Array.isArray(data[key])) {
+                            const item = data[key][0];
+                            if (typeof item === 'object' && item !== null) {
+                                const itemType = key.charAt(0).toUpperCase() + key.slice(1);
+                                type = `std::vector<${itemType}>`;
+                                structs.push(generateStruct(itemType, item));
+                            } else if (typeof item === 'number') {
+                                type = Number.isInteger(item) ? 'std::vector<int>' : 'std::vector<double>';
+                            } else if (typeof item === 'boolean') {
+                                type = 'std::vector<bool>';
+                            } else {
+                                type = 'std::vector<std::string>';
+                            }
+                        } else if (typeof data[key] === 'object') {
+                            type = key.charAt(0).toUpperCase() + key.slice(1);
+                            structs.push(generateStruct(type, data[key]));
+                        }
+                        s += `    ${type} ${key};\n`;
+                    }
+                    s += '};\n';
+                    return s;
+                }
+
+                structs.push(generateStruct('RootObject', obj));
+                code += structs.reverse().join('\n');
+                document.getElementById('cppOutput').value = code;
+            } catch (e) {
+                document.getElementById('cppOutput').value = 'JSON格式错误: ' + e.message;
+            }
+        }
+
+        function yamlToJson() {
+            const yaml = document.getElementById('yamlInput').value;
+            const lines = yaml.split('\n');
+            const obj = {};
+            
+            lines.forEach(line => {
+                const match = line.match(/^(\w+):\s*(.+)$/);
+                if (match) {
+                    obj[match[1]] = isNaN(match[2]) ? match[2] : parseFloat(match[2]);
+                }
+            });
+            
+            document.getElementById('yamlOutput').value = JSON.stringify(obj, null, 2);
+        }
+        
+        function copyResult(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            navigator.clipboard.writeText(textarea.value);
+        }
+        
+        getNow();
+        convertRGB();
+    </script>
+</body>
+</html>
