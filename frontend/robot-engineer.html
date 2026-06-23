@@ -855,6 +855,8 @@
     </div>
     
     <script>
+        const API_BASE = 'http://localhost:5180/api';
+        
         function navigateTo(page) {
             window.location.href = page;
         }
@@ -867,11 +869,9 @@
             }
         }
         
-        let socket;
-        
-        function connectRobot() {
+        async function connectRobot() {
             const host = document.getElementById('hostAddr').value;
-            const port = document.getElementById('portNum').value;
+            const port = parseInt(document.getElementById('portNum').value);
             const type = document.getElementById('connType').value;
             
             if (!host || !port) {
@@ -879,64 +879,149 @@
                 return;
             }
             
-            if (type === 'client') {
-                socket = new WebSocket(`ws://${host}:${port}`);
+            try {
+                let response;
+                if (type === 'client') {
+                    response = await fetch(`${API_BASE}/robot/connect/tcp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ipAddress: host, port })
+                    });
+                } else if (type === 'udp') {
+                    response = await fetch(`${API_BASE}/robot/connect/udp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ localPort: port })
+                    });
+                } else {
+                    alert('服务端模式开发中...');
+                    return;
+                }
                 
-                socket.onopen = () => {
+                const result = await response.json();
+                
+                if (result.status === 'success') {
                     document.getElementById('commStatusText').textContent = '已连接';
                     document.getElementById('commStatusText').className = 'status-online';
-                };
-                
-                socket.onmessage = (event) => {
-                    const receiveArea = document.getElementById('commReceiveArea');
-                    const hexReceive = document.getElementById('commHexReceive').checked;
-                    
-                    if (hexReceive) {
-                        const data = new Uint8Array(event.data);
-                        const hex = Array.from(data).map(b => b.toString(16).padStart(2, '0')).join(' ');
-                        receiveArea.value += hex + ' ';
-                    } else {
-                        receiveArea.value += event.data;
-                    }
-                };
-                
-                socket.onclose = () => {
-                    document.getElementById('commStatusText').textContent = '已断开';
-                    document.getElementById('commStatusText').className = 'status-offline';
-                };
-                
-                socket.onerror = () => {
-                    alert('连接失败');
-                };
-            } else {
-                alert('服务端和UDP模式开发中...');
+                    loadRobotLogs();
+                } else {
+                    alert('连接失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('连接失败:', err);
+                alert('连接失败: ' + err.message);
             }
         }
         
-        function disconnectRobot() {
-            if (socket) {
-                socket.close();
-                socket = null;
+        async function disconnectRobot() {
+            const host = document.getElementById('hostAddr').value;
+            const port = parseInt(document.getElementById('portNum').value);
+            const type = document.getElementById('connType').value;
+            
+            try {
+                let response;
+                if (type === 'client') {
+                    response = await fetch(`${API_BASE}/robot/disconnect/tcp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ipAddress: host, port })
+                    });
+                } else if (type === 'udp') {
+                    response = await fetch(`${API_BASE}/robot/disconnect/udp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ localPort: port })
+                    });
+                } else {
+                    alert('服务端模式开发中...');
+                    return;
+                }
+                
+                const result = await response.json();
+                document.getElementById('commStatusText').textContent = '未连接';
+                document.getElementById('commStatusText').className = 'status-offline';
+                
+                if (result.status !== 'success') {
+                    alert(result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
             }
-            document.getElementById('commStatusText').textContent = '未连接';
-            document.getElementById('commStatusText').className = 'status-offline';
         }
         
-        function sendCommData() {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                alert('请先连接');
+        async function sendCommData() {
+            const host = document.getElementById('hostAddr').value;
+            const port = parseInt(document.getElementById('portNum').value);
+            const type = document.getElementById('connType').value;
+            const data = document.getElementById('commSendArea').value;
+            const hexSend = document.getElementById('commHexSend').checked;
+            
+            if (!host || !port) {
+                alert('请输入主机地址和端口号');
                 return;
             }
             
-            const data = document.getElementById('commSendArea').value;
-            socket.send(data);
+            let byteData;
+            if (hexSend) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                let response;
+                if (type === 'client') {
+                    response = await fetch(`${API_BASE}/robot/send/tcp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ipAddress: host, port, data: byteData })
+                    });
+                } else if (type === 'udp') {
+                    response = await fetch(`${API_BASE}/robot/send/udp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ localPort: port, remoteIp: host, remotePort: port, data: byteData })
+                    });
+                } else {
+                    alert('服务端模式开发中...');
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const receiveArea = document.getElementById('commReceiveArea');
+                    const hexReceive = document.getElementById('commHexReceive').checked;
+                    
+                    if (result.response && result.response.length > 0) {
+                        if (hexReceive) {
+                            const hex = result.response.map(b => b.toString(16).padStart(2, '0')).join(' ');
+                            receiveArea.value += hex + ' ';
+                        } else {
+                            receiveArea.value += new TextDecoder().decode(new Uint8Array(result.response));
+                        }
+                    }
+                    
+                    loadRobotLogs();
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('发送失败:', err);
+                alert('发送失败: ' + err.message);
+            }
         }
         
         function clearCommReceive() {
             document.getElementById('commReceiveArea').value = '';
         }
         
-        function calculateKinematics() {
+        async function calculateKinematics() {
             const j1 = parseFloat(document.getElementById('joint1').value) || 0;
             const j2 = parseFloat(document.getElementById('joint2').value) || 0;
             const j3 = parseFloat(document.getElementById('joint3').value) || 0;
@@ -944,27 +1029,50 @@
             const j5 = parseFloat(document.getElementById('joint5').value) || 0;
             const j6 = parseFloat(document.getElementById('joint6').value) || 0;
             
-            const result = `正向运动学计算结果:\n\n` +
-                `关节角度:\n` +
-                `  J1: ${j1}°\n` +
-                `  J2: ${j2}°\n` +
-                `  J3: ${j3}°\n` +
-                `  J4: ${j4}°\n` +
-                `  J5: ${j5}°\n` +
-                `  J6: ${j6}°\n\n` +
-                `末端执行器位置(假设):\n` +
-                `  X: ${(j1 * 0.5).toFixed(2)} mm\n` +
-                `  Y: ${(j2 * 0.3).toFixed(2)} mm\n` +
-                `  Z: ${(j3 * 0.4).toFixed(2)} mm\n` +
-                `  A: ${j4}°\n` +
-                `  B: ${j5}°\n` +
-                `  C: ${j6}°`;
-            
-            document.getElementById('kinematicsResult').textContent = result;
+            try {
+                const response = await fetch(`${API_BASE}/robot/kinematics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ joints: [j1, j2, j3, j4, j5, j6] })
+                });
+                const result = await response.json();
+                
+                const output = `正向运动学计算结果:\n\n` +
+                    `关节角度:\n` +
+                    `  J1: ${result.inputJoints[0]}°\n` +
+                    `  J2: ${result.inputJoints[1]}°\n` +
+                    `  J3: ${result.inputJoints[2]}°\n` +
+                    `  J4: ${result.inputJoints[3]}°\n` +
+                    `  J5: ${result.inputJoints[4]}°\n` +
+                    `  J6: ${result.inputJoints[5]}°\n\n` +
+                    `末端执行器位置:\n` +
+                    `  X: ${result.position.x.toFixed(2)} mm\n` +
+                    `  Y: ${result.position.y.toFixed(2)} mm\n` +
+                    `  Z: ${result.position.z.toFixed(2)} mm\n` +
+                    `  A: ${result.orientation.a}°\n` +
+                    `  B: ${result.orientation.b}°\n` +
+                    `  C: ${result.orientation.c}°\n\n` +
+                    `时间: ${result.timestamp}`;
+                
+                document.getElementById('kinematicsResult').textContent = output;
+            } catch (err) {
+                console.error('计算失败:', err);
+                alert('计算失败: ' + err.message);
+            }
         }
         
         function calculateInverse() {
             alert('逆向运动学计算功能开发中...');
+        }
+        
+        async function loadRobotLogs() {
+            try {
+                const response = await fetch(`${API_BASE}/robot/logs`);
+                const logs = await response.json();
+                console.log('机器人日志:', logs);
+            } catch (err) {
+                console.error('加载日志失败:', err);
+            }
         }
         
         const jointValues = { J1: 0, J2: 0, J3: 0, J4: 0, J5: 0, J6: 0 };

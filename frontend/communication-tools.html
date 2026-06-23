@@ -645,6 +645,67 @@
             </section>
             
             <section class="section">
+                <h2 class="section-title">🚜 CAN总线调试</h2>
+                <div class="network-container">
+                    <div class="network-status" id="canStatus">
+                        <span>🟡</span>
+                        <span class="status-disconnected">未连接</span>
+                    </div>
+                    
+                    <div class="network-controls">
+                        <div class="control-group">
+                            <label>CAN通道</label>
+                            <select id="canChannel">
+                                <option value="">请选择通道</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="canBaudRate">
+                                <option value="125000">125 kbps</option>
+                                <option value="250000">250 kbps</option>
+                                <option value="500000">500 kbps</option>
+                                <option value="1000000">1 Mbps</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="refreshCanChannels()">刷新通道</button>
+                        <button class="btn btn-primary" onclick="connectCan()">连接</button>
+                        <button class="btn btn-danger" onclick="disconnectCan()">断开</button>
+                    </div>
+                    
+                    <div class="network-controls">
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" id="canHex" checked> 十六进制模式
+                        </label>
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" id="canExtendedId"> 扩展ID
+                        </label>
+                        <button class="btn btn-warning" onclick="clearCanReceive()">清空接收</button>
+                    </div>
+                    
+                    <div class="network-controls">
+                        <div class="control-group">
+                            <label>CAN ID</label>
+                            <input type="text" id="canId" placeholder="0x123" value="0x123">
+                        </div>
+                    </div>
+                    
+                    <div class="network-area">
+                        <div class="area-group">
+                            <label>发送数据</label>
+                            <textarea id="canSend" placeholder="输入要发送的数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>接收数据</label>
+                            <textarea id="canReceive" placeholder="接收的数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="sendCanData()" style="width: 100%; padding: 12px;">发送数据</button>
+                </div>
+            </section>
+            
+            <section class="section">
                 <h2 class="section-title">🔍 协议解析</h2>
                 <div class="protocol-container">
                     <div class="protocol-form">
@@ -951,6 +1012,134 @@
         function clearProtocol() {
             document.getElementById('protocolInput').value = '';
             document.getElementById('protocolResult').textContent = '解析结果将显示在这里...';
+        }
+        
+        async function refreshCanChannels() {
+            try {
+                const response = await fetch(`${API_BASE}/can/channels`);
+                const data = await response.json();
+                const channelSelect = document.getElementById('canChannel');
+                channelSelect.innerHTML = '<option value="">请选择通道</option>';
+                data.channels.forEach(channel => {
+                    channelSelect.innerHTML += `<option value="${channel}">${channel}</option>`;
+                });
+            } catch (err) {
+                console.error('刷新CAN通道失败:', err);
+                alert('刷新CAN通道失败: ' + err.message);
+            }
+        }
+        
+        async function connectCan() {
+            const channelName = document.getElementById('canChannel').value;
+            const baudRate = parseInt(document.getElementById('canBaudRate').value);
+            
+            if (!channelName) {
+                alert('请选择CAN通道');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/can/open`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName, baudRate })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const statusElement = document.getElementById('canStatus');
+                    statusElement.innerHTML = '<span>🟢</span><span class="status-connected">已连接</span>';
+                    alert('连接成功');
+                } else {
+                    alert('连接失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('连接失败:', err);
+                alert('连接失败: ' + err.message);
+            }
+        }
+        
+        async function disconnectCan() {
+            const channelName = document.getElementById('canChannel').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/can/close`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const statusElement = document.getElementById('canStatus');
+                    statusElement.innerHTML = '<span>🟡</span><span class="status-disconnected">未连接</span>';
+                    alert('断开成功');
+                } else {
+                    alert('断开失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
+                alert('断开失败: ' + err.message);
+            }
+        }
+        
+        async function sendCanData() {
+            const channelName = document.getElementById('canChannel').value;
+            const id = document.getElementById('canId').value;
+            const data = document.getElementById('canSend').value;
+            const isExtendedId = document.getElementById('canExtendedId').checked;
+            const hexMode = document.getElementById('canHex').checked;
+            
+            if (!channelName) {
+                alert('请选择CAN通道');
+                return;
+            }
+            
+            let canId;
+            try {
+                canId = parseInt(id, id.startsWith('0x') ? 16 : 10);
+            } catch {
+                alert('请输入有效的CAN ID');
+                return;
+            }
+            
+            let byteData;
+            if (hexMode) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/can/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName, id: canId, data: byteData, isExtendedId })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const receiveArea = document.getElementById('canReceive');
+                    if (result.frame) {
+                        receiveArea.value += `ID: 0x${result.frame.id.toString(16).toUpperCase().padStart(3, '0')}  `;
+                        receiveArea.value += result.frame.data + '\n';
+                    }
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('发送失败:', err);
+                alert('发送失败: ' + err.message);
+            }
+        }
+        
+        function clearCanReceive() {
+            document.getElementById('canReceive').value = '';
         }
     </script>
 </body>

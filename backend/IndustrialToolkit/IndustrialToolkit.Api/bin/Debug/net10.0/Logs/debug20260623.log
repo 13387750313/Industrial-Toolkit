@@ -1,0 +1,58 @@
+[2026-06-23 14:32:23.355]# Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ByteArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormFileModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormCollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.KeyValuePairModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DictionaryModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ComplexObjectModelBinderProvider"]
+[2026-06-23 14:32:23.428]# Hosting starting
+[2026-06-23 14:32:23.469]# Middleware configuration started with options: {AllowedHosts = *, AllowEmptyHosts = True, IncludeFailureMessage = True}
+[2026-06-23 14:32:23.473]# Wildcard detected, all requests with hosts will be allowed.
+[2026-06-23 14:32:23.490]# Now listening on: http://localhost:5180
+[2026-06-23 14:32:23.491]# Loaded hosting startup assembly IndustrialToolkit.Api
+[2026-06-23 14:32:23.491]# Application started. Press Ctrl+C to shut down.
+[2026-06-23 14:32:23.491]# Hosting environment: Development
+[2026-06-23 14:32:23.491]# Content root path: C:\Users\W1338\Desktop\Industrial-Toolkit\backend\IndustrialToolkit\IndustrialToolkit.Api
+[2026-06-23 14:32:23.491]# Hosting started
+[2026-06-23 14:32:33.575]# Connection id "0HNMGU4QN9PBM" accepted.
+[2026-06-23 14:32:33.576]# Connection id "0HNMGU4QN9PBM" started.
+[2026-06-23 14:32:33.644]# Request starting HTTP/1.1 GET http://localhost:5180/api/protocol/logs - null null
+[2026-06-23 14:32:33.734]# 1 candidate(s) found for the request path '/api/protocol/logs'
+[2026-06-23 14:32:33.741]# Endpoint 'IndustrialToolkit.Api.Controllers.ProtocolController.GetLogs (IndustrialToolkit.Api)' with route pattern 'api/protocol/logs' is valid for the request path '/api/protocol/logs'
+[2026-06-23 14:32:33.742]# Request matched endpoint 'IndustrialToolkit.Api.Controllers.ProtocolController.GetLogs (IndustrialToolkit.Api)'
+[2026-06-23 14:32:33.758]# The request has an origin header: 'null'.
+[2026-06-23 14:32:33.759]# CORS policy execution successful.
+[2026-06-23 14:32:33.762]# Failed to determine the https port for redirect.
+[2026-06-23 14:32:33.768]# Executing endpoint 'IndustrialToolkit.Api.Controllers.ProtocolController.GetLogs (IndustrialToolkit.Api)'
+[2026-06-23 14:32:33.799]# Route matched with {action = "GetLogs", controller = "Protocol"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult GetLogs() on controller IndustrialToolkit.Api.Controllers.ProtocolController (IndustrialToolkit.Api).
+[2026-06-23 14:32:33.808]# Execution plan of authorization filters (in the following order): ["None"]
+[2026-06-23 14:32:33.809]# Execution plan of resource filters (in the following order): ["None"]
+[2026-06-23 14:32:33.809]# Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)","Microsoft.AspNetCore.Mvc.Infrastructure.ModelStateInvalidFilter (Order: -2000)"]
+[2026-06-23 14:32:33.810]# Execution plan of exception filters (in the following order): ["None"]
+[2026-06-23 14:32:33.810]# Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)"]
+[2026-06-23 14:32:33.816]# Executing controller factory for controller IndustrialToolkit.Api.Controllers.ProtocolController (IndustrialToolkit.Api)
+[2026-06-23 14:32:33.820]# Executed controller factory for controller IndustrialToolkit.Api.Controllers.ProtocolController (IndustrialToolkit.Api)
+[2026-06-23 14:32:33.827]# List of registered output formatters, in the following order: ["Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+[2026-06-23 14:32:33.832]# No information found on request to perform content negotiation.
+[2026-06-23 14:32:33.833]# Attempting to select an output formatter without using a content type as no explicit content types were specified for the response.
+[2026-06-23 14:32:33.833]# Attempting to select the first formatter in the output formatters list which can write the result.
+[2026-06-23 14:32:33.835]# Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+[2026-06-23 14:32:33.836]# Executing OkObjectResult, writing value of type '<>f__AnonymousType6`3[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List`1[[IndustrialToolkit.Services.LogEntry, IndustrialToolkit.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+[2026-06-23 14:32:33.943]# Executed action IndustrialToolkit.Api.Controllers.ProtocolController.GetLogs (IndustrialToolkit.Api) in 121.9847ms
+[2026-06-23 14:32:33.945]# Executed endpoint 'IndustrialToolkit.Api.Controllers.ProtocolController.GetLogs (IndustrialToolkit.Api)'
+[2026-06-23 14:32:33.945]# Connection id "0HNMGU4QN9PBM" completed keep alive response.
+[2026-06-23 14:32:33.947]# Request finished HTTP/1.1 GET http://localhost:5180/api/protocol/logs - 200 null application/json; charset=utf-8 309.6766ms
+[2026-06-23 14:34:44.888]# Connection id "0HNMGU4QN9PBM" disconnecting.
+[2026-06-23 14:34:44.893]# Connection id "0HNMGU4QN9PBM" stopped.
+[2026-06-23 14:34:44.896]# Connection id "0HNMGU4QN9PBM" sending FIN because: "The Socket transport's send loop completed gracefully."
+[2026-06-23 14:58:25.901]# Connection id "0HNMGU4QN9PBN" accepted.
+[2026-06-23 14:58:25.903]# Connection id "0HNMGU4QN9PBN" started.
+[2026-06-23 14:58:25.903]# Connection id "0HNMGU4QN9PBO" accepted.
+[2026-06-23 14:58:25.904]# Connection id "0HNMGU4QN9PBO" started.
+[2026-06-23 14:58:25.905]# Request starting HTTP/1.1 GET http://localhost:5180/ - null null
+[2026-06-23 14:58:25.906]# No candidates found for the request path '/'
+[2026-06-23 14:58:25.906]# Request did not match any endpoints
+[2026-06-23 14:58:25.909]# Connection id "0HNMGU4QN9PBN" completed keep alive response.
+[2026-06-23 14:58:25.911]# Request finished HTTP/1.1 GET http://localhost:5180/ - 404 0 null 4.5645ms
+[2026-06-23 14:58:25.916]# Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5180/, Response status code: 404
+[2026-06-23 14:59:47.229]# Connection id "0HNMGU4QN9PBO" received FIN.
+[2026-06-23 14:59:47.230]# Connection id "0HNMGU4QN9PBO" disconnecting.
+[2026-06-23 14:59:47.230]# Connection id "0HNMGU4QN9PBO" sending FIN because: "The Socket transport's send loop completed gracefully."
+[2026-06-23 14:59:47.244]# Connection id "0HNMGU4QN9PBO" stopped.
+[2026-06-23 15:00:37.753]# Connection id "0HNMGU4QN9PBN" disconnecting.
+[2026-06-23 15:00:37.754]# Connection id "0HNMGU4QN9PBN" stopped.
+[2026-06-23 15:00:37.754]# Connection id "0HNMGU4QN9PBN" sending FIN because: "The Socket transport's send loop completed gracefully."

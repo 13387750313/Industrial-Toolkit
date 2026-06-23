@@ -1,0 +1,8 @@
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.csproj.AssemblyReference.cache
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.AssemblyInfoInputs.cache
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.AssemblyInfo.cs
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.csproj.CoreCompileInputs.cache
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\W1338\Desktop\Industrial-Toolkit\backend\obj\Debug\net10.0\IndustrialToolkit.sourcelink.json

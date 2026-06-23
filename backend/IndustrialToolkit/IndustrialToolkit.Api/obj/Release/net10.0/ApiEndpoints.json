@@ -1,0 +1,988 @@
+[
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "GetAvailableChannels",
+    "RelativePath": "api/can/channels",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "CloseChannel",
+    "RelativePath": "api/can/close",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.CanCloseRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "GetLogs",
+    "RelativePath": "api/can/logs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "OpenChannel",
+    "RelativePath": "api/can/open",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.CanOpenRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "ReceiveMessage",
+    "RelativePath": "api/can/receive",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.CanReceiveRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "SendMessage",
+    "RelativePath": "api/can/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.CanSendRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.CanController",
+    "Method": "GetChannelStatus",
+    "RelativePath": "api/can/status/{channelName}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "channelName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.NetworkController",
+    "Method": "QueryIP",
+    "RelativePath": "api/network/ip/query",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ipOrDomain",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.NetworkController",
+    "Method": "ScanLan",
+    "RelativePath": "api/network/lan/scan",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ipRange",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.NetworkController",
+    "Method": "PingHost",
+    "RelativePath": "api/network/ping",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "host",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "count",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.NetworkController",
+    "Method": "ScanPorts",
+    "RelativePath": "api/network/port/scan",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ipAddress",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "startPort",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "endPort",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.NetworkController",
+    "Method": "QueryWhois",
+    "RelativePath": "api/network/whois",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "domain",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetCommands",
+    "RelativePath": "api/plc/commands",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "ConnectSerial",
+    "RelativePath": "api/plc/connect/serial",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BSerialConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "ConnectTcp",
+    "RelativePath": "api/plc/connect/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BTcpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "CalculateCrc",
+    "RelativePath": "api/plc/crc",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BCrcRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "DisconnectSerial",
+    "RelativePath": "api/plc/disconnect/serial",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BPortRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "DisconnectTcp",
+    "RelativePath": "api/plc/disconnect/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BTcpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetDomesticPlc",
+    "RelativePath": "api/plc/domestic",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetForeignPlc",
+    "RelativePath": "api/plc/foreign",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetLogs",
+    "RelativePath": "api/plc/logs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "ParseMessage",
+    "RelativePath": "api/plc/parse",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BParseRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetAvailablePorts",
+    "RelativePath": "api/plc/ports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "GetProtocols",
+    "RelativePath": "api/plc/protocols",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "SendSerialData",
+    "RelativePath": "api/plc/send/serial",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BSerialDataRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.PlcController",
+    "Method": "SendTcpData",
+    "RelativePath": "api/plc/send/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.PlcController\u002BTcpDataRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ASInterfaceConnect",
+    "RelativePath": "api/protocol/asinterface/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ASInterfaceConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ASInterfaceDisconnect",
+    "RelativePath": "api/protocol/asinterface/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ASInterfaceConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ASInterfaceSend",
+    "RelativePath": "api/protocol/asinterface/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ASInterfaceRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "CCLinkConnect",
+    "RelativePath": "api/protocol/cclink/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "CCLinkDisconnect",
+    "RelativePath": "api/protocol/cclink/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "CCLinkSend",
+    "RelativePath": "api/protocol/cclink/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.CCLinkRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "DeviceNetConnect",
+    "RelativePath": "api/protocol/devicenet/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.DeviceNetConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "DeviceNetDisconnect",
+    "RelativePath": "api/protocol/devicenet/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.DeviceNetConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "DeviceNetSend",
+    "RelativePath": "api/protocol/devicenet/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.DeviceNetRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "EipConnect",
+    "RelativePath": "api/protocol/ethernetip/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "EipDisconnect",
+    "RelativePath": "api/protocol/ethernetip/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "EipSend",
+    "RelativePath": "api/protocol/ethernetip/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.EipRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "FinsConnect",
+    "RelativePath": "api/protocol/fins/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "FinsDisconnect",
+    "RelativePath": "api/protocol/fins/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "FinsSend",
+    "RelativePath": "api/protocol/fins/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.FinsRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "GetLogs",
+    "RelativePath": "api/protocol/logs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ClearLogs",
+    "RelativePath": "api/protocol/logs",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "GetLogCount",
+    "RelativePath": "api/protocol/logs/count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ModbusConnect",
+    "RelativePath": "api/protocol/modbus/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ModbusDisconnect",
+    "RelativePath": "api/protocol/modbus/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ModbusSend",
+    "RelativePath": "api/protocol/modbus/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ModbusRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfibusConnect",
+    "RelativePath": "api/protocol/profibus/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProfibusConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfibusDisconnect",
+    "RelativePath": "api/protocol/profibus/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProfibusConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfibusSend",
+    "RelativePath": "api/protocol/profibus/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProfibusRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfinetConnect",
+    "RelativePath": "api/protocol/profinet/connect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfinetDisconnect",
+    "RelativePath": "api/protocol/profinet/disconnect",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProtocolConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.ProtocolController",
+    "Method": "ProfinetSend",
+    "RelativePath": "api/protocol/profinet/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Api.Controllers.ProfinetRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "ConnectTcp",
+    "RelativePath": "api/robot/connect/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BTcpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "ConnectUdp",
+    "RelativePath": "api/robot/connect/udp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BUdpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "DisconnectTcp",
+    "RelativePath": "api/robot/disconnect/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BTcpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "DisconnectUdp",
+    "RelativePath": "api/robot/disconnect/udp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BUdpConnectRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "GetDomesticRobots",
+    "RelativePath": "api/robot/domestic",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "GetForeignRobots",
+    "RelativePath": "api/robot/foreign",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "CalculateKinematics",
+    "RelativePath": "api/robot/kinematics",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BKinematicsRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "GetLogs",
+    "RelativePath": "api/robot/logs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "GetProtocols",
+    "RelativePath": "api/robot/protocols",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "SendFanucCommand",
+    "RelativePath": "api/robot/send/fanuc",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BFanucRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "SendTcpData",
+    "RelativePath": "api/robot/send/tcp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BTcpDataRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Controllers.RobotController",
+    "Method": "SendUdpData",
+    "RelativePath": "api/robot/send/udp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "IndustrialToolkit.Controllers.RobotController\u002BUdpDataRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IndustrialToolkit.Api.Controllers.WeatherForecastController",
+    "Method": "Get",
+    "RelativePath": "WeatherForecast",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[IndustrialToolkit.Api.WeatherForecast, IndustrialToolkit.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "EndpointName": "GetWeatherForecast"
+  }
+]

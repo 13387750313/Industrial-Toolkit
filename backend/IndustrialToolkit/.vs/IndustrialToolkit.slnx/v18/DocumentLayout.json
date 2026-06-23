@@ -1,7 +1,16 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{ED5DEFCB-BE78-68C3-7FF2-ECA47F8B8C5E}|IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj|c:\\users\\w1338\\desktop\\industrial-toolkit\\backend\\industrialtoolkit\\industrialtoolkit.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ED5DEFCB-BE78-68C3-7FF2-ECA47F8B8C5E}|IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj|solutionrelative:industrialtoolkit.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ED5DEFCB-BE78-68C3-7FF2-ECA47F8B8C5E}|IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj|c:\\users\\w1338\\desktop\\industrial-toolkit\\backend\\industrialtoolkit\\industrialtoolkit.api\\industrialtoolkit.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{ED5DEFCB-BE78-68C3-7FF2-ECA47F8B8C5E}|IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj|solutionrelative:industrialtoolkit.api\\industrialtoolkit.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +18,36 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\Program.cs",
+              "RelativeDocumentMoniker": "IndustrialToolkit.Api\\Program.cs",
+              "ToolTip": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\Program.cs",
+              "RelativeToolTip": "IndustrialToolkit.Api\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-23T02:39:53.919Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IndustrialToolkit.Api.csproj",
+              "DocumentMoniker": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
+              "RelativeDocumentMoniker": "IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
+              "ToolTip": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
+              "RelativeToolTip": "IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-06-23T01:50:11.758Z"
             }
           ]
         }

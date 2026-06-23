@@ -349,6 +349,69 @@
             margin-bottom: 20px;
         }
         
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .result-list {
+            list-style: none;
+        }
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { color: #666; }
+        .result-value { font-weight: 500; color: #333; }
+
+        .lan-device {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            margin: 4px 0;
+            border-radius: 4px;
+            border-left: 3px solid #27ae60;
+        }
+        .lan-device .ip { font-weight: bold; color: #2c3e50; }
+        .lan-device .hostname { color: #666; font-size: 13px; }
+        .lan-device .status { color: #27ae60; font-size: 12px; }
+
+        .port-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            margin: 2px 0;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .port-item.occupied {
+            background: #ffeaa7;
+            border-left: 3px solid #f39c12;
+        }
+        .port-item.free {
+            background: #dfe6e9;
+            border-left: 3px solid #74b9ff;
+        }
+
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
             .main-content { margin-left: 0; }
@@ -417,9 +480,11 @@
                     <span class="nav-text">网络工具</span>
                 </li>
                 <ul class="sub-menu">
-                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
-                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
-                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('lanScan')">局域网扫描</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ipScan')">IP占用检测</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ping')">Ping 检测</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ipQuery')">IP 查询</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('whois')">Whois 查询</li>
                 </ul>
                 
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
@@ -637,9 +702,56 @@
             </section>
             
             <section class="section">
+                <h2 class="section-title">🔗 TCP/IP通讯 - 以太网调试助手</h2>
+                <div class="serial-container">
+                    <div class="serial-header">
+                        <div class="serial-title">TCP客户端调试</div>
+                        <div class="serial-status" id="tcpStatus">
+                            <span class="status-indicator offline"></span>
+                            <span>未连接</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>主机地址</label>
+                            <input type="text" id="tcpIpAddress" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口号</label>
+                            <input type="number" id="tcpPort" placeholder="502" value="502">
+                        </div>
+                        <button class="btn btn-primary" onclick="connectTcp()">连接</button>
+                        <button class="btn btn-danger" onclick="disconnectTcp()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <label>
+                            <input type="checkbox" id="tcpHexSend"> 十六进制发送
+                        </label>
+                        <label>
+                            <input type="checkbox" id="tcpHexReceive"> 十六进制显示
+                        </label>
+                        <button class="btn btn-warning" onclick="clearTcpReceive()">清空接收</button>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>发送数据</label>
+                            <textarea id="tcpSendArea" placeholder="输入要发送的数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>接收数据</label>
+                            <textarea id="tcpReceiveArea" placeholder="接收的数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="sendTcpData()" style="width: 100%; padding: 12px;">发送数据</button>
+                </div>
+            </section>
+            
+            <section class="section">
                 <h2 class="section-title">🌐 以太网协议</h2>
                 <div class="protocol-grid">
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('modbusTcpPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">📡</div>
                             <div class="protocol-name">Modbus TCP</div>
@@ -651,7 +763,7 @@
                             <li>离散输入</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('ethernetIpPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">📡</div>
                             <div class="protocol-name">Ethernet/IP</div>
@@ -663,7 +775,7 @@
                             <li>罗克韦尔支持</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('profinetPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">📡</div>
                             <div class="protocol-name">Profinet</div>
@@ -675,7 +787,7 @@
                             <li>设备管理</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('finsTcpPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">📡</div>
                             <div class="protocol-name">FinsTCP</div>
@@ -688,12 +800,196 @@
                         </ul>
                     </div>
                 </div>
+                
+                <div id="modbusTcpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Modbus TCP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="modbusIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="modbusPort" value="502">
+                        </div>
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="modbusSlaveId" value="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="modbusConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="modbusDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>功能码</label>
+                            <select id="modbusFunction">
+                                <option value="3">读保持寄存器 (0x03)</option>
+                                <option value="4">读输入寄存器 (0x04)</option>
+                                <option value="6">写单个寄存器 (0x06)</option>
+                                <option value="16">写多个寄存器 (0x10)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="modbusAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="modbusCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>数据值</label>
+                            <textarea id="modbusData" placeholder="写多个寄存器时输入: 1 2 3 4"></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="modbusResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="modbusSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="ethernetIpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Ethernet/IP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="eipIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="eipPort" value="44818">
+                        </div>
+                        <button class="btn btn-primary" onclick="eipConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="eipDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>CIP服务</label>
+                            <select id="eipService">
+                                <option value="0x4C">读标签 (0x4C)</option>
+                                <option value="0x4D">写标签 (0x4D)</option>
+                                <option value="0x0E">读取服务 (0x0E)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>标签名</label>
+                            <input type="text" id="eipTag" value="Tag1">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="eipData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="eipResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="eipSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="profinetPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Profinet 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="pnIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="pnPort" value="34964">
+                        </div>
+                        <button class="btn btn-primary" onclick="pnConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="pnDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="pnOperation">
+                                <option value="read">读取数据</option>
+                                <option value="write">写入数据</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>槽位/索引</label>
+                            <input type="text" id="pnSlot" value="0/0">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="pnData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="pnResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="pnSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="finsTcpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 FinsTCP 通讯 (欧姆龙)</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="finsIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="finsPort" value="9600">
+                        </div>
+                        <button class="btn btn-primary" onclick="finsConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="finsDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>命令</label>
+                            <select id="finsCommand">
+                                <option value="0101">读取字 (0101)</option>
+                                <option value="0102">读取位 (0102)</option>
+                                <option value="0104">读取字块 (0104)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>存储区</label>
+                            <select id="finsArea">
+                                <option value="DM">DM区</option>
+                                <option value="WR">WR区</option>
+                                <option value="HR">HR区</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="finsAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="finsCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="finsData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="finsResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="finsSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
             </section>
             
             <section class="section">
                 <h2 class="section-title">🔗 现场总线</h2>
                 <div class="protocol-grid">
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('profibusDpPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">🔗</div>
                             <div class="protocol-name">Profibus DP</div>
@@ -705,7 +1001,7 @@
                             <li>西门子标准</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('deviceNetPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">🔗</div>
                             <div class="protocol-name">DeviceNet</div>
@@ -717,7 +1013,7 @@
                             <li>设备级网络</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('ccLinkPanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">🔗</div>
                             <div class="protocol-name">CC-Link</div>
@@ -729,7 +1025,7 @@
                             <li>设备互联</li>
                         </ul>
                     </div>
-                    <div class="protocol-card">
+                    <div class="protocol-card" onclick="scrollToPanel('asInterfacePanel')">
                         <div class="protocol-header">
                             <div class="protocol-icon">🔗</div>
                             <div class="protocol-name">AS-i</div>
@@ -741,6 +1037,205 @@
                             <li>AS-Interface</li>
                         </ul>
                     </div>
+                </div>
+                
+                <div id="profibusDpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 Profibus DP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>串口</label>
+                            <select id="pbPort">
+                                <option value="COM1">COM1</option>
+                                <option value="COM2">COM2</option>
+                                <option value="COM3">COM3</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="pbBaudRate">
+                                <option value="9600">9600</option>
+                                <option value="19200">19200</option>
+                                <option value="187500">187500</option>
+                                <option value="500000">500000</option>
+                                <option value="1500000">1500000</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="pbSlaveId" value="3">
+                        </div>
+                        <button class="btn btn-primary" onclick="pbConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="pbDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>功能码</label>
+                            <select id="pbFunction">
+                                <option value="read">读数据</option>
+                                <option value="write">写数据</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="pbAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数据长度</label>
+                            <input type="number" id="pbLength" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="pbData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="pbResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="pbSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="deviceNetPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 DeviceNet 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>CAN通道</label>
+                            <select id="dnChannel">
+                                <option value="can0">can0</option>
+                                <option value="can1">can1</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="dnBaudRate">
+                                <option value="125000">125 kbps</option>
+                                <option value="250000">250 kbps</option>
+                                <option value="500000">500 kbps</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>MAC ID</label>
+                            <input type="number" id="dnMacId" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="dnConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="dnDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>连接ID</label>
+                            <input type="text" id="dnConnectionId" value="0x01">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="dnData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="dnResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="dnSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="ccLinkPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 CC-Link 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="ccIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="ccPort" value="61451">
+                        </div>
+                        <div class="control-group">
+                            <label>站号</label>
+                            <input type="number" id="ccStation" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="ccConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="ccDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="ccOperation">
+                                <option value="read">读远程寄存器</option>
+                                <option value="write">写远程寄存器</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>地址</label>
+                            <input type="text" id="ccAddress" value="D0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="ccCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="ccData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="ccResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="ccSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                </div>
+                
+                <div id="asInterfacePanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 AS-i (AS-Interface) 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>串口</label>
+                            <select id="asiPort">
+                                <option value="COM1">COM1</option>
+                                <option value="COM2">COM2</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="asiBaudRate">
+                                <option value="19200">19200 (默认)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>主站地址</label>
+                            <input type="number" id="asiMasterAddr" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="asiConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="asiDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="asiSlaveAddr" value="1">
+                        </div>
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="asiOperation">
+                                <option value="read">读数据</option>
+                                <option value="write">写数据</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="asiData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="asiResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="asiSend()" style="width: 100%; padding: 12px;">发送请求</button>
                 </div>
             </section>
             
@@ -775,6 +1270,107 @@
                 </div>
             </section>
             
+            <section class="section" id="networkToolsSection" style="display: none;">
+                <h2 class="section-title">🌐 网络工具</h2>
+                
+                <div id="lanScanPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 局域网扫描</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP段</label>
+                            <input type="text" id="lanIpRange" value="192.168.1." placeholder="192.168.1.">
+                        </div>
+                        <button class="btn btn-primary" onclick="scanLan()">开始扫描</button>
+                        <button class="btn btn-secondary" onclick="clearLanResult()">清除结果</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">扫描结果</div>
+                        <div id="lanResult" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div id="ipScanPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 IP占用检测</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>目标IP</label>
+                            <input type="text" id="scanIpAddress" value="192.168.1.1" placeholder="IP地址">
+                        </div>
+                        <div class="control-group">
+                            <label>起始端口</label>
+                            <input type="number" id="startPort" value="1">
+                        </div>
+                        <div class="control-group">
+                            <label>结束端口</label>
+                            <input type="number" id="endPort" value="100">
+                        </div>
+                        <button class="btn btn-primary" onclick="scanPorts()">开始检测</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">端口检测结果</div>
+                        <div id="portResult" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div id="pingPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Ping 检测</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>目标地址</label>
+                            <input type="text" id="pingHost" value="127.0.0.1" placeholder="IP或域名">
+                        </div>
+                        <div class="control-group">
+                            <label>次数</label>
+                            <input type="number" id="pingCount" value="4" min="1" max="20">
+                        </div>
+                        <button class="btn btn-primary" onclick="pingTest()">开始Ping</button>
+                        <button class="btn btn-secondary" onclick="clearPingResult()">清除</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">Ping结果</div>
+                        <div id="pingResult"></div>
+                    </div>
+                </div>
+
+                <div id="ipQueryPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📍 IP 查询</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP/域名</label>
+                            <input type="text" id="queryIp" placeholder="输入IP地址或域名">
+                        </div>
+                        <button class="btn btn-primary" onclick="queryIP()">查询</button>
+                        <button class="btn btn-secondary" onclick="getLocalIP()">本机IP</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">查询结果</div>
+                        <ul class="result-list">
+                            <li class="result-item"><span class="result-label">IP地址</span><span class="result-value" id="qIpAddr">-</span></li>
+                            <li class="result-item"><span class="result-label">主机名</span><span class="result-value" id="qIpHost">-</span></li>
+                            <li class="result-item"><span class="result-label">所属地区</span><span class="result-value" id="qIpRegion">-</span></li>
+                            <li class="result-item"><span class="result-label">运营商</span><span class="result-value" id="qIpISP">-</span></li>
+                            <li class="result-item"><span class="result-label">子网掩码</span><span class="result-value" id="qIpMask">-</span></li>
+                            <li class="result-item"><span class="result-label">网关</span><span class="result-value" id="qIpGateway">-</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="whoisPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 Whois 查询</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>域名</label>
+                            <input type="text" id="whoisDomain" placeholder="输入域名">
+                        </div>
+                        <button class="btn btn-primary" onclick="queryWhois()">查询</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">Whois信息</div>
+                        <textarea id="whoisResult" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+                </div>
+            </section>
+
             <section class="section">
                 <h2 class="section-title">📖 PLC指令速查</h2>
                 <div class="command-tabs">
@@ -940,6 +1536,8 @@
     </div>
     
     <script>
+        const API_BASE = 'http://localhost:5180/api';
+        
         function navigateTo(page) {
             window.location.href = page;
         }
@@ -963,26 +1561,46 @@
             document.getElementById(tab + 'Commands').style.display = 'grid';
         }
         
-        let serialPort;
-        let reader;
+        async function loadPorts() {
+            try {
+                const response = await fetch(`${API_BASE}/plc/ports`);
+                const data = await response.json();
+                const portSelect = document.getElementById('portSelect');
+                portSelect.innerHTML = '<option value="">请选择串口</option>';
+                data.ports.forEach(port => {
+                    portSelect.innerHTML += `<option value="${port}">${port}</option>`;
+                });
+            } catch (err) {
+                console.error('加载端口失败:', err);
+            }
+        }
         
         async function connectSerial() {
+            const portName = document.getElementById('portSelect').value;
+            const baudRate = parseInt(document.getElementById('baudRate').value);
+            const dataBits = parseInt(document.getElementById('dataBits').value);
+            const parity = document.getElementById('parity').value;
+            const stopBits = document.getElementById('stopBits').value;
+            
+            if (!portName) {
+                alert('请选择串口');
+                return;
+            }
+            
             try {
-                if ('serial' in navigator) {
-                    serialPort = await navigator.serial.requestPort();
-                    await serialPort.open({
-                        baudRate: parseInt(document.getElementById('baudRate').value),
-                        dataBits: parseInt(document.getElementById('dataBits').value),
-                        parity: document.getElementById('parity').value,
-                        stopBits: parseInt(document.getElementById('stopBits').value)
-                    });
-                    
+                const response = await fetch(`${API_BASE}/plc/connect/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate, dataBits, parity, stopBits })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
                     document.getElementById('statusText').textContent = '已连接';
                     document.getElementById('statusText').className = 'status-online';
-                    
-                    readSerial();
+                    loadLogs();
                 } else {
-                    alert('您的浏览器不支持Web Serial API，请使用Chrome或Edge浏览器');
+                    alert('连接失败: ' + result.message);
                 }
             } catch (err) {
                 console.error('连接失败:', err);
@@ -990,85 +1608,864 @@
             }
         }
         
-        async function readSerial() {
-            if (!serialPort) return;
+        async function disconnectSerial() {
+            const portName = document.getElementById('portSelect').value;
             
-            const textDecoder = new TextDecoder();
+            try {
+                const response = await fetch(`${API_BASE}/plc/disconnect/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                
+                document.getElementById('statusText').textContent = '未连接';
+                document.getElementById('statusText').className = 'status-offline';
+                
+                if (result.status !== 'success') {
+                    alert(result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
+            }
+        }
+        
+        async function sendData() {
+            const portName = document.getElementById('portSelect').value;
+            const data = document.getElementById('sendArea').value;
+            const hexSend = document.getElementById('hexSend').checked;
             
-            while (serialPort.readable) {
-                try {
-                    reader = serialPort.readable.getReader();
-                    const { value, done } = await reader.read();
-                    
-                    if (done) {
-                        reader.releaseLock();
-                        break;
-                    }
-                    
+            if (!portName) {
+                alert('请选择串口');
+                return;
+            }
+            
+            let byteData;
+            if (hexSend) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/send/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, data: byteData })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
                     const receiveArea = document.getElementById('receiveArea');
                     const hexReceive = document.getElementById('hexReceive').checked;
                     
-                    if (hexReceive) {
-                        const hex = Array.from(value).map(b => b.toString(16).padStart(2, '0')).join(' ');
-                        receiveArea.value += hex + ' ';
-                    } else {
-                        receiveArea.value += textDecoder.decode(value);
+                    if (result.response && result.response.length > 0) {
+                        if (hexReceive) {
+                            const hex = result.response.map(b => b.toString(16).padStart(2, '0')).join(' ');
+                            receiveArea.value += hex + ' ';
+                        } else {
+                            receiveArea.value += new TextDecoder().decode(new Uint8Array(result.response));
+                        }
                     }
                     
                     if (document.getElementById('autoScroll').checked) {
                         receiveArea.scrollTop = receiveArea.scrollHeight;
                     }
-                } catch (err) {
-                    console.error('读取失败:', err);
-                    break;
-                }
-            }
-        }
-        
-        async function sendData() {
-            if (!serialPort || !serialPort.writable) {
-                alert('请先连接串口');
-                return;
-            }
-            
-            const data = document.getElementById('sendArea').value;
-            const hexSend = document.getElementById('hexSend').checked;
-            
-            const writer = serialPort.writable.getWriter();
-            const encoder = new TextEncoder();
-            
-            try {
-                if (hexSend) {
-                    const bytes = new Uint8Array(data.match(/[0-9a-fA-F]{2}/g).map(h => parseInt(h, 16)));
-                    await writer.write(bytes);
+                    
+                    loadLogs();
                 } else {
-                    await writer.write(encoder.encode(data));
+                    alert('发送失败: ' + result.message);
                 }
             } catch (err) {
                 console.error('发送失败:', err);
                 alert('发送失败: ' + err.message);
-            } finally {
-                writer.releaseLock();
             }
-        }
-        
-        async function disconnectSerial() {
-            if (reader) {
-                await reader.cancel();
-                reader.releaseLock();
-            }
-            
-            if (serialPort) {
-                await serialPort.close();
-                serialPort = null;
-            }
-            
-            document.getElementById('statusText').textContent = '未连接';
-            document.getElementById('statusText').className = 'status-offline';
         }
         
         function clearReceive() {
             document.getElementById('receiveArea').value = '';
+        }
+        
+        async function connectTcp() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            
+            if (!ipAddress || isNaN(port)) {
+                alert('请输入有效的IP地址和端口');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/connect/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const statusElement = document.getElementById('tcpStatus');
+                    statusElement.innerHTML = '<span class="status-indicator online"></span><span>已连接</span>';
+                    alert('连接成功');
+                } else {
+                    alert('连接失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('连接失败:', err);
+                alert('连接失败: ' + err.message);
+            }
+        }
+        
+        async function disconnectTcp() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/disconnect/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const statusElement = document.getElementById('tcpStatus');
+                    statusElement.innerHTML = '<span class="status-indicator offline"></span><span>未连接</span>';
+                    alert('断开成功');
+                } else {
+                    alert('断开失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
+                alert('断开失败: ' + err.message);
+            }
+        }
+        
+        async function sendTcpData() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            const data = document.getElementById('tcpSendArea').value;
+            const hexSend = document.getElementById('tcpHexSend').checked;
+            
+            if (!ipAddress || isNaN(port)) {
+                alert('请输入有效的IP地址和端口');
+                return;
+            }
+            
+            if (!data) {
+                alert('请输入要发送的数据');
+                return;
+            }
+            
+            let byteData;
+            if (hexSend) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                addLog(`发送数据到 ${ipAddress}:${port}: ${data}`, 'INFO');
+                
+                const response = await fetch(`${API_BASE}/plc/send/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port, data: byteData })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const hexReceive = document.getElementById('tcpHexReceive').checked;
+                    
+                    if (result.response && result.response.length > 0) {
+                        const responseStr = hexReceive 
+                            ? result.response.map(b => b.toString(16).padStart(2, '0')).join(' ')
+                            : new TextDecoder().decode(new Uint8Array(result.response));
+                        addLog(`从 ${ipAddress}:${port} 接收: ${responseStr}`, 'INFO');
+                    } else {
+                        addLog(`发送成功，无响应数据`, 'INFO');
+                    }
+                } else {
+                    addLog(`发送失败: ${result.message}`, 'ERROR');
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('发送失败:', err);
+                addLog(`发送异常: ${err.message}`, 'ERROR');
+                alert('发送失败: ' + err.message);
+            }
+        }
+        
+        function clearTcpReceive() {
+            document.getElementById('tcpReceiveArea').value = '';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPorts();
+            loadLogs();
+        });
+        
+        function scrollToPanel(panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        let receiveDataCount = 0;
+        const maxReceiveDataCount = 100;
+
+        function addLog(message, level = 'INFO') {
+            const receiveArea = document.getElementById('tcpReceiveArea');
+            if (!receiveArea) return;
+
+            const now = new Date();
+            const timestamp = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }) + '.' + now.getMilliseconds().toString().padStart(3, '0');
+
+            const logLine = `[${level}] [${timestamp}] ${message}\n`;
+            
+            const currentLines = receiveArea.value.split('\n').filter(line => line.trim());
+            if (currentLines.length >= 100) {
+                receiveArea.value = currentLines.slice(-99).join('\n') + '\n';
+                const warnLine = `[WARN] [${timestamp}] 日志已满100条，已自动清理\n`;
+                receiveArea.value += warnLine;
+            }
+            
+            receiveArea.value += logLine;
+            receiveArea.scrollTop = receiveArea.scrollHeight;
+        }
+
+        async function loadLogs() {
+            try {
+                const response = await fetch(`${API_BASE}/plc/logs`);
+                const logs = await response.json();
+                if (logs && logs.length > 0) {
+                    const receiveArea = document.getElementById('tcpReceiveArea');
+                    if (receiveArea) {
+                        receiveArea.value = '';
+                        logs.forEach(log => {
+                            const timestamp = new Date(log.timestamp).toLocaleString('zh-CN', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                            });
+                            receiveArea.value += `[${log.level}] [${timestamp}] [${log.source}] ${log.message}\n`;
+                        });
+                        receiveArea.scrollTop = receiveArea.scrollHeight;
+                    }
+                }
+            } catch (err) {
+                console.error('加载日志失败:', err);
+            }
+        }
+
+        async function clearLogs() {
+            try {
+                await fetch(`${API_BASE}/protocol/logs`, { method: 'DELETE' });
+                const logDisplay = document.getElementById('logDisplay');
+                if (logDisplay) {
+                    logDisplay.textContent = '';
+                }
+                addLog('日志已清空', 'INFO');
+            } catch (err) {
+                alert('清空日志失败: ' + err.message);
+            }
+        }
+
+        function appendReceiveData(data) {
+            receiveDataCount++;
+            if (receiveDataCount >= maxReceiveDataCount) {
+                document.getElementById('tcpReceiveArea')?.setValue('');
+                receiveDataCount = 0;
+                addLog('接收数据已满100条，已自动清空', 'WARN');
+            }
+            addLog(`接收数据: ${data}`, 'DEBUG');
+        }
+
+        // 页面加载时自动获取日志
+        setInterval(loadLogs, 3000);
+        
+        // Modbus TCP
+        async function modbusConnect() {
+            const ipAddress = document.getElementById('modbusIp').value;
+            const port = parseInt(document.getElementById('modbusPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function modbusDisconnect() {
+            const ipAddress = document.getElementById('modbusIp').value;
+            const port = parseInt(document.getElementById('modbusPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function modbusSend() {
+            const data = {
+                ipAddress: document.getElementById('modbusIp').value,
+                port: parseInt(document.getElementById('modbusPort').value),
+                slaveId: parseInt(document.getElementById('modbusSlaveId').value),
+                functionCode: parseInt(document.getElementById('modbusFunction').value),
+                address: parseInt(document.getElementById('modbusAddress').value),
+                count: parseInt(document.getElementById('modbusCount').value),
+                values: document.getElementById('modbusData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('modbusResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Ethernet/IP
+        async function eipConnect() {
+            const ipAddress = document.getElementById('eipIp').value;
+            const port = parseInt(document.getElementById('eipPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function eipDisconnect() {
+            const ipAddress = document.getElementById('eipIp').value;
+            const port = parseInt(document.getElementById('eipPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function eipSend() {
+            const data = {
+                ipAddress: document.getElementById('eipIp').value,
+                port: parseInt(document.getElementById('eipPort').value),
+                service: document.getElementById('eipService').value,
+                tag: document.getElementById('eipTag').value,
+                data: document.getElementById('eipData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('eipResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Profinet
+        async function pnConnect() {
+            const ipAddress = document.getElementById('pnIp').value;
+            const port = parseInt(document.getElementById('pnPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function pnDisconnect() {
+            const ipAddress = document.getElementById('pnIp').value;
+            const port = parseInt(document.getElementById('pnPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function pnSend() {
+            const data = {
+                ipAddress: document.getElementById('pnIp').value,
+                port: parseInt(document.getElementById('pnPort').value),
+                operation: document.getElementById('pnOperation').value,
+                slot: document.getElementById('pnSlot').value,
+                data: document.getElementById('pnData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('pnResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // FinsTCP
+        async function finsConnect() {
+            const ipAddress = document.getElementById('finsIp').value;
+            const port = parseInt(document.getElementById('finsPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function finsDisconnect() {
+            const ipAddress = document.getElementById('finsIp').value;
+            const port = parseInt(document.getElementById('finsPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + result.message); }
+        }
+        async function finsSend() {
+            const data = {
+                ipAddress: document.getElementById('finsIp').value,
+                port: parseInt(document.getElementById('finsPort').value),
+                command: document.getElementById('finsCommand').value,
+                area: document.getElementById('finsArea').value,
+                address: parseInt(document.getElementById('finsAddress').value),
+                count: parseInt(document.getElementById('finsCount').value)
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('finsResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Profibus DP
+        async function pbConnect() {
+            const portName = document.getElementById('pbPort').value;
+            const baudRate = parseInt(document.getElementById('pbBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function pbDisconnect() {
+            const portName = document.getElementById('pbPort').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function pbSend() {
+            const data = {
+                portName: document.getElementById('pbPort').value,
+                baudRate: parseInt(document.getElementById('pbBaudRate').value),
+                slaveId: parseInt(document.getElementById('pbSlaveId').value),
+                function: document.getElementById('pbFunction').value,
+                address: parseInt(document.getElementById('pbAddress').value),
+                length: parseInt(document.getElementById('pbLength').value),
+                data: document.getElementById('pbData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('pbResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // DeviceNet
+        async function dnConnect() {
+            const channelName = document.getElementById('dnChannel').value;
+            const baudRate = parseInt(document.getElementById('dnBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function dnDisconnect() {
+            const channelName = document.getElementById('dnChannel').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function dnSend() {
+            const data = {
+                channelName: document.getElementById('dnChannel').value,
+                macId: parseInt(document.getElementById('dnMacId').value),
+                connectionId: document.getElementById('dnConnectionId').value,
+                data: document.getElementById('dnData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('dnResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // CC-Link
+        async function ccConnect() {
+            const ipAddress = document.getElementById('ccIp').value;
+            const port = parseInt(document.getElementById('ccPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function ccDisconnect() {
+            const ipAddress = document.getElementById('ccIp').value;
+            const port = parseInt(document.getElementById('ccPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function ccSend() {
+            const data = {
+                ipAddress: document.getElementById('ccIp').value,
+                port: parseInt(document.getElementById('ccPort').value),
+                station: parseInt(document.getElementById('ccStation').value),
+                operation: document.getElementById('ccOperation').value,
+                address: document.getElementById('ccAddress').value,
+                count: parseInt(document.getElementById('ccCount').value),
+                data: document.getElementById('ccData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('ccResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // 网络工具切换
+        function toggleNetworkTool(toolId) {
+            document.querySelectorAll('.protocol-detail').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById('networkToolsSection').style.display = 'block';
+            
+            document.getElementById('lanScanPanel').style.display = 'none';
+            document.getElementById('ipScanPanel').style.display = 'none';
+            document.getElementById('pingPanel').style.display = 'none';
+            document.getElementById('ipQueryPanel').style.display = 'none';
+            document.getElementById('whoisPanel').style.display = 'none';
+            
+            document.getElementById(toolId + 'Panel').style.display = 'block';
+        }
+
+        // 局域网扫描
+        async function scanLan() {
+            const ipRange = document.getElementById('lanIpRange').value;
+            const resultDiv = document.getElementById('lanResult');
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在扫描局域网...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/lan/scan?ipRange=${encodeURIComponent(ipRange)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if (result.data.length === 0) {
+                        resultDiv.innerHTML = '<p style="color: #95a5a6;">未发现在线设备</p>';
+                    } else {
+                        let html = `<p style="color: #27ae60; margin-bottom: 10px;">发现 ${result.count} 台在线设备</p>`;
+                        result.data.forEach(device => {
+                            html += `
+                                <div class="lan-device">
+                                    <div>
+                                        <span class="ip">${device.ipAddress}</span>
+                                        <span class="hostname"> (${device.hostname})</span>
+                                    </div>
+                                    <span class="status">${device.responseTime}</span>
+                                </div>
+                            `;
+                        });
+                        resultDiv.innerHTML = html;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">扫描失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">扫描失败: ${err.message}</p>`;
+            }
+        }
+
+        function clearLanResult() {
+            document.getElementById('lanResult').innerHTML = '';
+        }
+
+        // 端口扫描
+        async function scanPorts() {
+            const ip = document.getElementById('scanIpAddress').value;
+            const startPort = parseInt(document.getElementById('startPort').value);
+            const endPort = parseInt(document.getElementById('endPort').value);
+            const resultDiv = document.getElementById('portResult');
+            
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在检测端口...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/port/scan?ipAddress=${encodeURIComponent(ip)}&startPort=${startPort}&endPort=${endPort}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    let html = `<p style="color: #27ae60; margin-bottom: 10px;">检测完成，占用端口: ${result.occupiedCount} 个</p>`;
+                    result.data.forEach(port => {
+                        const cls = port.status === '占用' ? 'occupied' : 'free';
+                        html += `
+                            <div class="port-item ${cls}">
+                                <span>端口 ${port.port}</span>
+                                <span>${port.status}</span>
+                            </div>
+                        `;
+                    });
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">检测失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">检测失败: ${err.message}</p>`;
+            }
+        }
+
+        // Ping检测
+        async function pingTest() {
+            const host = document.getElementById('pingHost').value;
+            const count = parseInt(document.getElementById('pingCount').value);
+            const resultDiv = document.getElementById('pingResult');
+            
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在执行Ping测试...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/ping?host=${encodeURIComponent(host)}&count=${count}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    let html = `<p style="margin-bottom: 10px;">Ping ${host} 结果:</p>`;
+                    result.data.responses.forEach((r, i) => {
+                        const cls = r.success ? 'ping-success' : 'ping-failed';
+                        html += `<div class="ping-status ${cls}">Ping ${i + 1}: ${r.time}</div>`;
+                    });
+                    html += `<p style="margin-top: 10px; font-weight: bold;">成功率: ${result.data.successRate}</p>`;
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">Ping失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">Ping失败: ${err.message}</p>`;
+            }
+        }
+
+        function clearPingResult() {
+            document.getElementById('pingResult').innerHTML = '';
+        }
+
+        // IP查询
+        async function queryIP() {
+            const ip = document.getElementById('queryIp').value;
+            if (!ip) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/ip/query?ipOrDomain=${encodeURIComponent(ip)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    document.getElementById('qIpAddr').textContent = data.ipAddress || '-';
+                    document.getElementById('qIpHost').textContent = data.hostname || '-';
+                    document.getElementById('qIpRegion').textContent = data.region || '-';
+                    document.getElementById('qIpISP').textContent = data.ISP || '-';
+                    document.getElementById('qIpMask').textContent = data.subnetMask || '-';
+                    document.getElementById('qIpGateway').textContent = data.gateway || '-';
+                } else {
+                    alert('查询失败: ' + result.message);
+                }
+            } catch (err) {
+                alert('查询失败: ' + err.message);
+            }
+        }
+
+        function getLocalIP() {
+            document.getElementById('qIpAddr').textContent = '192.168.1.xxx';
+            document.getElementById('qIpHost').textContent = 'localhost';
+            document.getElementById('qIpRegion').textContent = '局域网';
+            document.getElementById('qIpISP').textContent = '本地网络';
+            document.getElementById('qIpMask').textContent = '255.255.255.0';
+            document.getElementById('qIpGateway').textContent = '192.168.1.1';
+        }
+
+        // Whois查询
+        async function queryWhois() {
+            const domain = document.getElementById('whoisDomain').value;
+            if (!domain) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/whois?domain=${encodeURIComponent(domain)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const whoisText = `Domain: ${data.domain}
+Registrar: ${data.registrar}
+Created Date: ${data.createdDate}
+Updated Date: ${data.updatedDate}
+Expiry Date: ${data.expiryDate}
+Nameservers: ${data.nameservers.join('\n            ')}
+Status: ${data.status}`;
+                    document.getElementById('whoisResult').value = whoisText;
+                } else {
+                    alert('查询失败: ' + result.message);
+                }
+            } catch (err) {
+                alert('查询失败: ' + err.message);
+            }
+        }
+
+        // AS-Interface
+        async function asiConnect() {
+            const portName = document.getElementById('asiPort').value;
+            const baudRate = parseInt(document.getElementById('asiBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function asiDisconnect() {
+            const portName = document.getElementById('asiPort').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function asiSend() {
+            const data = {
+                portName: document.getElementById('asiPort').value,
+                baudRate: parseInt(document.getElementById('asiBaudRate').value),
+                masterAddr: parseInt(document.getElementById('asiMasterAddr').value),
+                slaveAddr: parseInt(document.getElementById('asiSlaveAddr').value),
+                operation: document.getElementById('asiOperation').value,
+                data: document.getElementById('asiData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('asiResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
         }
     </script>
 </body>
