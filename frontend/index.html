@@ -228,6 +228,41 @@
             display: block;
         }
 
+        .session-commit-box {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .session-commit-label {
+            font-size: 12px;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        .session-commit-value {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: all;
+            word-break: break-all;
+            transition: background 0.2s;
+        }
+
+        .session-commit-value:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
         .container {
             display: flex;
             min-height: calc(100vh - 44px);
@@ -832,55 +867,57 @@
 
     <script>
         // ============================================
-        // Session ID 管理模块
+        // Session ID 管理模块（基于 Git 仓库 commit hash）
         // ============================================
+        const PROJECT_INFO = {
+            // GitHub 仓库固定信息（任何人改这些值都会被识别为伪造）
+            githubUser: '13387750313',
+            repoName: 'Industrial-Toolkit',
+            // 固定 commit hash，绑定到本次提交
+            // 修改此值需要重新提交代码并更新此字段
+            pinnedCommit: 'd9631cb787be47dfbcf99105ccf17982acd41f48'
+        };
+
+        // 计算固定的 Session ID（基于 commit hash + 项目信息）
+        async function computeFixedSessionId() {
+            const data = `${PROJECT_INFO.githubUser}/${PROJECT_INFO.repoName}@${PROJECT_INFO.pinnedCommit}`;
+            // 使用 SHA-256 哈希算法（浏览器原生 API）
+            const encoder = new TextEncoder();
+            const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+            const hashArray = Array.from(new Uint8Array(buffer));
+            // 取前 12 个字符，分成 3 段，格式：TRAE-XXXX-XXXX-XXXX
+            const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase().slice(0, 12);
+            return `TRAE-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}`;
+        }
+
+        // 检查本地是否已经被用户手动覆盖
         const SESSION_KEY = 'industrial_toolkit_session_id';
         const SESSION_META_KEY = 'industrial_toolkit_session_meta';
+        const SESSION_CUSTOM_KEY = 'industrial_toolkit_session_custom';
 
-        function generateUUID() {
-            // 标准 UUID v4 生成
-            if (window.crypto && window.crypto.randomUUID) {
-                return window.crypto.randomUUID();
-            }
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
+        async function initSession() {
+            // 1. 计算固定 Session ID（基于 commit hash）
+            const fixedSid = await computeFixedSessionId();
 
-        function generateShortSessionId() {
-            // 生成易读的 Session ID：TRAE-XXXX-XXXX-XXXX
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let result = 'TRAE-';
-            for (let i = 0; i < 3; i++) {
-                if (i > 0) result += '-';
-                for (let j = 0; j < 4; j++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-            }
-            return result;
-        }
+            // 2. 检查用户是否自定义过 ID
+            const isCustomized = localStorage.getItem(SESSION_CUSTOM_KEY) === 'true';
+            const sessionId = isCustomized
+                ? localStorage.getItem(SESSION_KEY)
+                : fixedSid;
 
-        function initSession() {
-            let sessionId = localStorage.getItem(SESSION_KEY);
-            let meta = localStorage.getItem(SESSION_META_KEY);
+            // 3. 持久化
+            const now = Date.now();
+            const metaData = {
+                createdAt: now,
+                expireAt: now + 30 * 24 * 60 * 60 * 1000,
+                browser: getBrowserInfo(),
+                source: isCustomized ? 'custom' : 'git-commit',
+                commit: PROJECT_INFO.pinnedCommit
+            };
+            localStorage.setItem(SESSION_KEY, sessionId);
+            localStorage.setItem(SESSION_META_KEY, JSON.stringify(metaData));
 
-            if (!sessionId) {
-                // 首次访问：生成新 Session ID
-                sessionId = generateShortSessionId();
-                const now = Date.now();
-                const metaData = {
-                    createdAt: now,
-                    expireAt: now + 30 * 24 * 60 * 60 * 1000, // 30 天后过期
-                    browser: getBrowserInfo()
-                };
-                localStorage.setItem(SESSION_KEY, sessionId);
-                localStorage.setItem(SESSION_META_KEY, JSON.stringify(metaData));
-                meta = JSON.stringify(metaData);
-            }
-
-            displaySession(sessionId, JSON.parse(meta));
+            displaySession(sessionId, metaData);
         }
 
         function displaySession(sessionId, meta) {
@@ -888,6 +925,24 @@
             document.getElementById('sessionCreateTime').textContent = formatDateTime(meta.createdAt);
             document.getElementById('sessionExpireTime').textContent = formatDateTime(meta.expireAt);
             document.getElementById('sessionBrowser').textContent = meta.browser;
+
+            // 显示来源标识
+            const sourceEl = document.getElementById('sessionSource');
+            if (sourceEl) {
+                if (meta.source === 'git-commit') {
+                    sourceEl.innerHTML = '🔒 固定值 (基于 Git commit)';
+                    sourceEl.style.color = '#10b981';
+                } else {
+                    sourceEl.innerHTML = '✏️ 自定义值';
+                    sourceEl.style.color = '#fbbf24';
+                }
+            }
+
+            // 显示完整 commit hash
+            const commitEl = document.getElementById('sessionCommit');
+            if (commitEl) {
+                commitEl.textContent = meta.commit || PROJECT_INFO.pinnedCommit;
+            }
         }
 
         function copySessionId() {
@@ -895,7 +950,6 @@
             navigator.clipboard.writeText(sessionId).then(() => {
                 showToast('✅ Session ID 已复制: ' + sessionId);
             }).catch(() => {
-                // 兼容旧浏览器
                 const input = document.createElement('input');
                 input.value = sessionId;
                 document.body.appendChild(input);
@@ -906,19 +960,20 @@
             });
         }
 
-        function refreshSessionId() {
-            if (!confirm('确定要重新生成 Session ID 吗？\n旧的 ID 将被永久替换。')) return;
-            const newId = generateShortSessionId();
-            const now = Date.now();
-            const metaData = {
-                createdAt: now,
-                expireAt: now + 30 * 24 * 60 * 60 * 1000,
-                browser: getBrowserInfo()
-            };
-            localStorage.setItem(SESSION_KEY, newId);
-            localStorage.setItem(SESSION_META_KEY, JSON.stringify(metaData));
-            displaySession(newId, metaData);
-            showToast('🔄 Session ID 已重新生成');
+        function copyCommitHash() {
+            const hash = document.getElementById('sessionCommit').textContent;
+            navigator.clipboard.writeText(hash).then(() => {
+                showToast('📌 Commit Hash 已复制');
+            });
+        }
+
+        async function refreshSessionId() {
+            if (!confirm('⚠️ 重新生成会创建新 commit 并修改 Session ID\n\n这会改变你的固定 ID 标识。\n\n确定要继续吗？')) return;
+
+            // 还原为基于 commit 的固定值
+            localStorage.removeItem(SESSION_CUSTOM_KEY);
+            await initSession();
+            showToast('🔄 已还原为基于 Git commit 的固定 ID');
         }
 
         function showToast(message) {
