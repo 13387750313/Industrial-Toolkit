@@ -1,0 +1,46 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "Industrial-Toolkit (Root)"
+    },
+    {
+      "path": "backend",
+      "name": "Backend (.NET API)"
+    },
+    {
+      "path": "frontend",
+      "name": "Frontend (HTML Tools)"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/bin": true,
+      "**/obj": true,
+      "**/.vs": true,
+      "**/node_modules": true,
+      "**/.uploads": true
+    },
+    "files.watcherExclude": {
+      "**/bin/**": true,
+      "**/obj/**": true,
+      "**/.vs/**": true
+    },
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "files.encoding": "utf8",
+    "trae.ai.context": {
+      "projectType": "industrial-toolkit",
+      "description": "工业工程师工具箱 - PLC/机器人/电气/C++/视觉等多领域工具集合",
+      "primaryLanguage": "csharp",
+      "secondaryLanguages": ["html", "javascript", "css"],
+      "frameworks": ["ASP.NET Core 10.0", "WebSerial", "Modbus"]
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-dotnettools.csharp",
+      "ms-dotnettools.csdevkit"
+    ]
+  }
+}

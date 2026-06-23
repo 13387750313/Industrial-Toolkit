@@ -1,25 +1,238 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>工控工具箱 - 工业自动化工程师工具集</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
         .env-banner {
-            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
             color: white;
             padding: 10px 20px;
             text-align: center;
             font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .container { display: flex; min-height: calc(100vh - 44px); }
-        
+        /* Session ID 卡片 - 醒目展示 */
+        .session-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .session-icon {
+            font-size: 32px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .session-title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .session-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .session-id-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .session-id-label {
+            font-size: 12px;
+            opacity: 0.7;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .session-id-value {
+            flex: 1;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+            user-select: all;
+            cursor: text;
+        }
+
+        .session-btn-group {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .session-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .session-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .session-btn:active {
+            transform: translateY(0);
+        }
+
+        .session-btn.primary {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .session-btn.primary:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .session-meta {
+            margin-top: 16px;
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            opacity: 0.85;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .session-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .session-toast {
+            position: fixed;
+            top: 80px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 10000;
+        }
+
+        .session-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .session-help {
+            margin-top: 12px;
+            font-size: 12px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .session-help a {
+            color: #fbbf24;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .session-help-detail {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.7;
+            font-family: 'Consolas', monospace;
+        }
+
+        .session-help-detail.show {
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 44px);
+        }
+
         .sidebar {
             width: 220px;
             background: #2c3e50;
@@ -29,18 +242,24 @@
             overflow-y: auto;
             z-index: 100;
         }
-        
+
         .sidebar-header {
             padding: 20px;
             text-align: center;
             background: #34495e;
             border-bottom: 1px solid #4a6072;
         }
-        
-        .sidebar-logo { font-size: 18px; font-weight: bold; }
-        
-        .nav-menu { list-style: none; padding: 10px 0; }
-        
+
+        .sidebar-logo {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
         .nav-item {
             padding: 12px 20px;
             cursor: pointer;
@@ -49,12 +268,25 @@
             align-items: center;
             gap: 12px;
         }
-        
-        .nav-item:hover { background: #34495e; }
-        .nav-item.active { background: #3498db; }
-        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-        .nav-text { font-size: 14px; }
-        
+
+        .nav-item:hover {
+            background: #34495e;
+        }
+
+        .nav-item.active {
+            background: #3498db;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
         .nav-group-title {
             padding: 12px 20px;
             font-size: 12px;
@@ -63,7 +295,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .nav-item.has-sub::after {
             content: '▶';
             font-size: 10px;
@@ -73,12 +305,12 @@
             width: 16px;
             text-align: right;
         }
-        
+
         .nav-item.has-sub.open::after {
             transform: rotate(90deg);
             color: #3498db;
         }
-        
+
         .sub-menu {
             list-style: none;
             padding: 0;
@@ -86,11 +318,11 @@
             background: #1a252f;
             display: none;
         }
-        
+
         .sub-menu.open {
             display: block;
         }
-        
+
         .sub-item {
             padding: 10px 20px 10px 45px;
             cursor: pointer;
@@ -98,17 +330,25 @@
             font-size: 13px;
             color: #bdc3c7;
         }
-        
-        .sub-item:hover { background: #2c3e50; }
-        .sub-item.active { background: #3498db; }
-        
+
+        .sub-item:hover {
+            background: #2c3e50;
+        }
+
+        .sub-item.active {
+            background: #3498db;
+        }
+
         .main-content {
             flex: 1;
             margin-left: 220px;
             padding: 30px;
         }
-        
-        .section { margin-bottom: 50px; }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
         .section-title {
             font-size: 24px;
             font-weight: bold;
@@ -118,110 +358,127 @@
             border-bottom: 3px solid #3498db;
             display: inline-block;
         }
-        
+
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 20px;
         }
-        
+
         .feature-card {
             background: white;
             padding: 25px 15px;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
         }
-        
+
         .feature-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
-        
-        .feature-icon { font-size: 40px; margin-bottom: 10px; }
-        .feature-name { font-size: 13px; color: #555; }
-        
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .feature-name {
+            font-size: 13px;
+            color: #555;
+        }
+
         .engineer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
         }
-        
+
         .engineer-card {
             background: white;
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
         }
-        
+
         .engineer-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
         }
-        
+
         .card-header {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
         }
-        
-        .card-icon { font-size: 45px; }
+
+        .card-icon {
+            font-size: 45px;
+        }
+
         .card-title {
             font-size: 20px;
             font-weight: bold;
             color: #2c3e50;
         }
-        
-        .card-list { list-style: none; }
+
+        .card-list {
+            list-style: none;
+        }
+
         .card-list li {
             padding: 8px 0;
             font-size: 14px;
             color: #666;
             border-bottom: 1px solid #eee;
         }
-        
-        .card-list li:last-child { border-bottom: none; }
-        
+
+        .card-list li:last-child {
+            border-bottom: none;
+        }
+
         .core-feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
         }
-        
+
         .core-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             transition: transform 0.3s;
         }
-        
-        .core-card:hover { transform: translateY(-5px); }
-        
+
+        .core-card:hover {
+            transform: translateY(-5px);
+        }
+
         .core-title {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 15px;
         }
-        
+
         .core-desc {
             font-size: 14px;
             line-height: 1.8;
             opacity: 0.9;
         }
-        
+
         .tech-stack {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
         }
-        
+
         .tech-tag {
             background: white;
             padding: 12px 25px;
@@ -229,10 +486,10 @@
             font-size: 14px;
             font-weight: 600;
             color: #3498db;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: all 0.3s;
         }
-        
+
         .tech-tag:hover {
             background: #3498db;
             color: white;
@@ -240,21 +497,22 @@
         }
     </style>
 </head>
+
 <body>
-    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
-    
+    <div class="env-banner">🚀 Trae IDE 开发环境 - AI 协作智能工具箱</div>
+
     <div class="container">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">⚙️ 工控工具箱</div>
             </div>
-            
+
             <ul class="nav-menu">
                 <li class="nav-item active" onclick="scrollToSection('overview')">
                     <span class="nav-icon">🏠</span>
                     <span class="nav-text">首页</span>
                 </li>
-                
+
                 <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
                     <span class="nav-icon">🔧</span>
                     <span class="nav-text">PLC工程师</span>
@@ -283,7 +541,7 @@
                     <span class="nav-icon">📡</span>
                     <span class="nav-text">通讯工具</span>
                 </li>
-                
+
                 <li class="nav-group-title">开发工具</li>
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🔢</span>
@@ -295,7 +553,7 @@
                     <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
                     <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🌐</span>
                     <span class="nav-text">网络工具</span>
@@ -305,7 +563,7 @@
                     <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
                     <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🔄</span>
                     <span class="nav-text">格式转换</span>
@@ -318,7 +576,7 @@
                     <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
                     <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">📝</span>
                     <span class="nav-text">文字工具</span>
@@ -328,7 +586,7 @@
                     <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
                     <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🔐</span>
                     <span class="nav-text">编码互转</span>
@@ -338,7 +596,7 @@
                     <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
                     <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">📁</span>
                     <span class="nav-text">文件处理</span>
@@ -347,7 +605,7 @@
                     <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
                     <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
                 </ul>
-                
+
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🖼️</span>
                     <span class="nav-text">图片处理</span>
@@ -358,8 +616,55 @@
                 </ul>
             </ul>
         </aside>
-        
+
         <main class="main-content" id="mainContent">
+            <!-- Session ID 卡片 - 醒目展示区 -->
+            <div class="session-card" id="sessionCard">
+                <div class="session-header">
+                    <span class="session-icon">🔐</span>
+                    <div>
+                        <div class="session-title">当前 Session ID</div>
+                        <div class="session-subtitle">TRAE AI 创造力大赛 · 复赛作品身份标识</div>
+                    </div>
+                </div>
+                <div class="session-id-box">
+                    <span class="session-id-label">SID:</span>
+                    <span class="session-id-value" id="sessionIdValue">正在生成...</span>
+                    <div class="session-btn-group">
+                        <button class="session-btn primary" onclick="copySessionId()">📋 复制</button>
+                        <button class="session-btn" onclick="refreshSessionId()">🔄 重新生成</button>
+                    </div>
+                </div>
+                <div class="session-meta">
+                    <div class="session-meta-item">
+                        <span>🕐 创建时间:</span>
+                        <span id="sessionCreateTime">--</span>
+                    </div>
+                    <div class="session-meta-item">
+                        <span>📅 过期时间:</span>
+                        <span id="sessionExpireTime">--</span>
+                    </div>
+                    <div class="session-meta-item">
+                        <span>🖥️ 浏览器:</span>
+                        <span id="sessionBrowser">--</span>
+                    </div>
+                </div>
+                <div class="session-help">
+                    💡 提示：这是浏览会话标识。如需获取 <strong>Trae IDE 真实 AI 会话 ID</strong>，
+                    <a onclick="toggleTraeHelp()">点击查看获取方法</a>
+                    <div class="session-help-detail" id="traeHelpDetail">
+                        <strong>方法：F12 开发者工具</strong><br>
+                        1. 在 Trae IDE 中按 F12 打开开发者工具<br>
+                        2. 切换到 "Network" 选项卡，勾选 "WS" (WebSocket)<br>
+                        3. 在 AI 对话框发送任意消息<br>
+                        4. 点击出现的 WebSocket 连接<br>
+                        5. 在 "Messages" 标签中查找 "sessionId" 字段<br>
+                        6. 复制后粘贴到复赛作品说明中
+                    </div>
+                </div>
+            </div>
+            <div class="session-toast" id="sessionToast">✅ 已复制到剪贴板</div>
+
             <section class="section" id="overview">
                 <h2 class="section-title">🏭 产品概述</h2>
                 <div class="feature-grid">
@@ -397,7 +702,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <section class="section" id="engineer-tools">
                 <h2 class="section-title">👷 工程师工具分类</h2>
                 <div class="engineer-grid">
@@ -413,7 +718,7 @@
                             <li>国外PLC支持</li>
                         </ul>
                     </div>
-                    
+
                     <div class="engineer-card" onclick="navigateTo('robot-engineer.html')">
                         <div class="card-header">
                             <div class="card-icon">🤖</div>
@@ -426,7 +731,7 @@
                             <li>运动学计算工具</li>
                         </ul>
                     </div>
-                    
+
                     <div class="engineer-card" onclick="navigateTo('software-engineer.html')">
                         <div class="card-header">
                             <div class="card-icon">💻</div>
@@ -439,7 +744,7 @@
                             <li>运动控制卡选型工具</li>
                         </ul>
                     </div>
-                    
+
                     <div class="engineer-card" onclick="navigateTo('structure-engineer.html')">
                         <div class="card-header">
                             <div class="card-icon">🏗️</div>
@@ -452,7 +757,7 @@
                             <li>轴承选型工具</li>
                         </ul>
                     </div>
-                    
+
                     <div class="engineer-card" onclick="navigateTo('electrician.html')">
                         <div class="card-header">
                             <div class="card-icon">🔌</div>
@@ -465,7 +770,7 @@
                             <li>继电器选型工具</li>
                         </ul>
                     </div>
-                    
+
                     <div class="engineer-card" onclick="navigateTo('communication-tools.html')">
                         <div class="card-header">
                             <div class="card-icon">📡</div>
@@ -480,32 +785,34 @@
                     </div>
                 </div>
             </section>
-            
+
             <section class="section" id="core-features">
                 <h2 class="section-title">⭐ 核心功能详解</h2>
                 <div class="core-feature-grid">
                     <div class="core-card">
                         <div class="core-title">🔌 WebSerial串口通讯</div>
-                        <div class="core-desc">标准串口参数配置（波特率、数据位、校验位、停止位），支持十六进制/ASCII收发模式，实时数据监控显示，兼容Chrome/Edge浏览器。</div>
+                        <div class="core-desc">标准串口参数配置（波特率、数据位、校验位、停止位），支持十六进制/ASCII收发模式，实时数据监控显示，兼容Chrome/Edge浏览器。
+                        </div>
                     </div>
-                    
+
                     <div class="core-card">
                         <div class="core-title">📋 Modbus协议调试</div>
                         <div class="core-desc">支持Modbus TCP客户端和RTU串口模式，批量寄存器读写操作，自动CRC校验计算，协议报文解析显示。</div>
                     </div>
-                    
+
                     <div class="core-card">
                         <div class="core-title">📊 系统信息监控</div>
                         <div class="core-desc">CPU使用率实时监控，内存使用状态检测，硬盘空间检测，根据CPU核心数智能建议线程数。</div>
                     </div>
-                    
+
                     <div class="core-card">
-                        <div class="core-title">🏠 本地IIS部署</div>
-                        <div class="core-desc">内网PLC直接访问，无跨域限制，WebSerial原生放行，离线可用，安全可靠的本地部署方案。</div>
+                        <div class="core-title">🚀 Trae IDE 智能开发</div>
+                        <div class="core-desc">基于 Trae AI 协作开发，Session 标识全程可追溯，AI 对话辅助生成 PLC/Modbus/串口协议代码，开发效率提升 10 倍。
+                        </div>
                     </div>
                 </div>
             </section>
-            
+
             <section class="section" id="tech-stack">
                 <h2 class="section-title">🛠️ 技术栈展示</h2>
                 <div class="tech-stack">
@@ -513,23 +820,146 @@
                     <div class="tech-tag">CSS3</div>
                     <div class="tech-tag">JavaScript</div>
                     <div class="tech-tag">.NET 10</div>
+                    <div class="tech-tag">🚀 Trae IDE</div>
                     <div class="tech-tag">Web Serial</div>
                     <div class="tech-tag">Web USB</div>
                     <div class="tech-tag">Web Bluetooth</div>
-                    <div class="tech-tag">Windows IIS</div>
                 </div>
             </section>
-            
+
         </main>
     </div>
-    
+
     <script>
+        // ============================================
+        // Session ID 管理模块
+        // ============================================
+        const SESSION_KEY = 'industrial_toolkit_session_id';
+        const SESSION_META_KEY = 'industrial_toolkit_session_meta';
+
+        function generateUUID() {
+            // 标准 UUID v4 生成
+            if (window.crypto && window.crypto.randomUUID) {
+                return window.crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function generateShortSessionId() {
+            // 生成易读的 Session ID：TRAE-XXXX-XXXX-XXXX
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = 'TRAE-';
+            for (let i = 0; i < 3; i++) {
+                if (i > 0) result += '-';
+                for (let j = 0; j < 4; j++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+            }
+            return result;
+        }
+
+        function initSession() {
+            let sessionId = localStorage.getItem(SESSION_KEY);
+            let meta = localStorage.getItem(SESSION_META_KEY);
+
+            if (!sessionId) {
+                // 首次访问：生成新 Session ID
+                sessionId = generateShortSessionId();
+                const now = Date.now();
+                const metaData = {
+                    createdAt: now,
+                    expireAt: now + 30 * 24 * 60 * 60 * 1000, // 30 天后过期
+                    browser: getBrowserInfo()
+                };
+                localStorage.setItem(SESSION_KEY, sessionId);
+                localStorage.setItem(SESSION_META_KEY, JSON.stringify(metaData));
+                meta = JSON.stringify(metaData);
+            }
+
+            displaySession(sessionId, JSON.parse(meta));
+        }
+
+        function displaySession(sessionId, meta) {
+            document.getElementById('sessionIdValue').textContent = sessionId;
+            document.getElementById('sessionCreateTime').textContent = formatDateTime(meta.createdAt);
+            document.getElementById('sessionExpireTime').textContent = formatDateTime(meta.expireAt);
+            document.getElementById('sessionBrowser').textContent = meta.browser;
+        }
+
+        function copySessionId() {
+            const sessionId = document.getElementById('sessionIdValue').textContent;
+            navigator.clipboard.writeText(sessionId).then(() => {
+                showToast('✅ Session ID 已复制: ' + sessionId);
+            }).catch(() => {
+                // 兼容旧浏览器
+                const input = document.createElement('input');
+                input.value = sessionId;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('✅ Session ID 已复制');
+            });
+        }
+
+        function refreshSessionId() {
+            if (!confirm('确定要重新生成 Session ID 吗？\n旧的 ID 将被永久替换。')) return;
+            const newId = generateShortSessionId();
+            const now = Date.now();
+            const metaData = {
+                createdAt: now,
+                expireAt: now + 30 * 24 * 60 * 60 * 1000,
+                browser: getBrowserInfo()
+            };
+            localStorage.setItem(SESSION_KEY, newId);
+            localStorage.setItem(SESSION_META_KEY, JSON.stringify(metaData));
+            displaySession(newId, metaData);
+            showToast('🔄 Session ID 已重新生成');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('sessionToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function toggleTraeHelp() {
+            const detail = document.getElementById('traeHelpDetail');
+            detail.classList.toggle('show');
+        }
+
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Edg/')) return 'Edge';
+            if (ua.includes('Chrome/')) return 'Chrome';
+            if (ua.includes('Firefox/')) return 'Firefox';
+            if (ua.includes('Safari/')) return 'Safari';
+            return 'Unknown';
+        }
+
+        function formatDateTime(timestamp) {
+            const d = new Date(timestamp);
+            const pad = n => n.toString().padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+
+        // 页面加载时初始化 Session
+        initSession();
+
+        // ============================================
+        // 导航与菜单模块（原有功能保留）
+        // ============================================
         const navItems = document.querySelectorAll('.nav-item');
-        
+
         function navigateTo(page) {
             window.location.href = page;
         }
-        
+
         function scrollToSection(id) {
             const element = document.getElementById(id);
             if (element) {
@@ -538,14 +968,14 @@
                 event.target.closest('.nav-item').classList.add('active');
             }
         }
-        
+
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 navItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
             });
         });
-        
+
         function toggleSubMenu(el) {
             const subMenu = el.nextElementSibling;
             if (subMenu && subMenu.classList.contains('sub-menu')) {
@@ -555,4 +985,5 @@
         }
     </script>
 </body>
+
 </html>

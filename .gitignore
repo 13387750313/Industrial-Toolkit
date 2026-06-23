@@ -1,1 +1,124 @@
-﻿.vs/
+# ============================================
+# Industrial-Toolkit .gitignore
+# ============================================
+
+# --- Visual Studio (Windows) ---
+.vs/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+*.userosscache
+*.sln.ide
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+[Oo]bj/
+[Oo]ut/
+
+# --- .NET / C# build artifacts ---
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.user
+*.cachefile
+*.nugetpackages
+*.lock.json.bak
+project.fragment.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+TestResults/
+
+# --- NuGet ---
+*.nupkg
+*.snupkg
+packages/
+**/packages/*
+!**/packages/build/
+
+# --- ASP.NET Core specific ---
+appsettings.*.local.json
+secrets.json
+wwwroot/dist/
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs ---
+*.log
+logs/
+*.txt.log
+
+# --- OS generated files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- Temporary & backup files ---
+*.tmp
+*.bak
+*.backup
+*.rar
+*.zip
+*.7z
+*.tar.gz
+*.iso
+
+# --- Upload folders ---
+.uploads/
+uploads/
+file-uploads/
+
+# --- Node (if frontend tooling is added later) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+.next/
+.nuxt/
+.vuepress/
+
+# --- Python (if any scripts) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# --- Test coverage ---
+coverage/
+*.coverage
+*.coveragexml
+
+# --- Trae IDE workspace state (keep workspace.json, exclude transient state) ---
+.trae/state/
+.trae/cache/
+.trae/sessions/
+
+# --- Keep this file tracked ---
+!.gitignore
