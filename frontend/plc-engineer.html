@@ -1691,6 +1691,8 @@
             document.getElementById('receiveArea').value = '';
         }
         
+        let tcpPollingInterval = null;
+
         async function connectTcp() {
             const ipAddress = document.getElementById('tcpIpAddress').value;
             const port = parseInt(document.getElementById('tcpPort').value);
@@ -1711,6 +1713,8 @@
                 if (result.status === 'success') {
                     const statusElement = document.getElementById('tcpStatus');
                     statusElement.innerHTML = '<span class="status-indicator online"></span><span>已连接</span>';
+                    addLog(`TCP连接成功: ${ipAddress}:${port}`, 'INFO');
+                    startTcpPolling(ipAddress, port);
                     alert('连接成功');
                 } else {
                     alert('连接失败: ' + result.message);
@@ -1718,6 +1722,53 @@
             } catch (err) {
                 console.error('连接失败:', err);
                 alert('连接失败: ' + err.message);
+            }
+        }
+        
+        function startTcpPolling(ipAddress, port) {
+            if (tcpPollingInterval) {
+                clearInterval(tcpPollingInterval);
+            }
+            
+            tcpPollingInterval = setInterval(async () => {
+                try {
+                    const statusResponse = await fetch(`${API_BASE}/plc/status/tcp?ipAddress=${ipAddress}&port=${port}`);
+                    const statusResult = await statusResponse.json();
+                    
+                    const statusElement = document.getElementById('tcpStatus');
+                    if (statusResult.connected) {
+                        statusElement.innerHTML = '<span class="status-indicator online"></span><span>已连接</span>';
+                    } else {
+                        statusElement.innerHTML = '<span class="status-indicator offline"></span><span>未连接</span>';
+                        stopTcpPolling();
+                        return;
+                    }
+                    
+                    const receiveResponse = await fetch(`${API_BASE}/plc/receive/tcp?ipAddress=${ipAddress}&port=${port}`);
+                    const receiveResult = await receiveResponse.json();
+                    
+                    if (receiveResult.status === 'success' && receiveResult.data && receiveResult.data.length > 0) {
+                        const hexReceive = document.getElementById('tcpHexReceive').checked;
+                        receiveResult.data.forEach(byteArray => {
+                            let dataStr;
+                            if (hexReceive) {
+                                dataStr = byteArray.map(b => b.toString(16).padStart(2, '0')).join(' ');
+                            } else {
+                                dataStr = new TextDecoder().decode(new Uint8Array(byteArray));
+                            }
+                            addLog(`RECV ${dataStr}`, 'INFO');
+                        });
+                    }
+                } catch (err) {
+                    console.error('轮询错误:', err);
+                }
+            }, 500);
+        }
+        
+        function stopTcpPolling() {
+            if (tcpPollingInterval) {
+                clearInterval(tcpPollingInterval);
+                tcpPollingInterval = null;
             }
         }
         
@@ -1734,8 +1785,10 @@
                 const result = await response.json();
                 
                 if (result.status === 'success') {
+                    stopTcpPolling();
                     const statusElement = document.getElementById('tcpStatus');
                     statusElement.innerHTML = '<span class="status-indicator offline"></span><span>未连接</span>';
+                    addLog(`TCP断开连接: ${ipAddress}:${port}`, 'INFO');
                     alert('断开成功');
                 } else {
                     alert('断开失败: ' + result.message);
@@ -1775,8 +1828,6 @@
             }
             
             try {
-                addLog(`发送数据到 ${ipAddress}:${port}: ${data}`, 'INFO');
-                
                 const response = await fetch(`${API_BASE}/plc/send/tcp`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1785,16 +1836,7 @@
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    const hexReceive = document.getElementById('tcpHexReceive').checked;
-                    
-                    if (result.response && result.response.length > 0) {
-                        const responseStr = hexReceive 
-                            ? result.response.map(b => b.toString(16).padStart(2, '0')).join(' ')
-                            : new TextDecoder().decode(new Uint8Array(result.response));
-                        addLog(`从 ${ipAddress}:${port} 接收: ${responseStr}`, 'INFO');
-                    } else {
-                        addLog(`发送成功，无响应数据`, 'INFO');
-                    }
+                    addLog(`发送: ${data}`, 'INFO');
                 } else {
                     addLog(`发送失败: ${result.message}`, 'ERROR');
                     alert('发送失败: ' + result.message);
@@ -1812,7 +1854,6 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadPorts();
-            loadLogs();
         });
         
         function scrollToPanel(panelId) {
@@ -1854,31 +1895,7 @@
         }
 
         async function loadLogs() {
-            try {
-                const response = await fetch(`${API_BASE}/plc/logs`);
-                const logs = await response.json();
-                if (logs && logs.length > 0) {
-                    const receiveArea = document.getElementById('tcpReceiveArea');
-                    if (receiveArea) {
-                        receiveArea.value = '';
-                        logs.forEach(log => {
-                            const timestamp = new Date(log.timestamp).toLocaleString('zh-CN', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit',
-                                hour12: false
-                            });
-                            receiveArea.value += `[${log.level}] [${timestamp}] [${log.source}] ${log.message}\n`;
-                        });
-                        receiveArea.scrollTop = receiveArea.scrollHeight;
-                    }
-                }
-            } catch (err) {
-                console.error('加载日志失败:', err);
-            }
+            return [];
         }
 
         async function clearLogs() {

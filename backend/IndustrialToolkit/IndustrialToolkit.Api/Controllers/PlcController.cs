@@ -179,6 +179,21 @@ namespace IndustrialToolkit.Controllers
             return Ok(new { status = status.Contains("成功") ? "success" : "error", message = status, response });
         }
 
+        [HttpGet("receive/tcp")]
+        public IActionResult GetReceivedData([FromQuery] string ipAddress, [FromQuery] int port)
+        {
+            var dataList = _communicationService.GetReceivedData(ipAddress, port);
+            var result = dataList.Select(d => d.Select(b => (int)b).ToArray()).ToList();
+            return Ok(new { status = "success", data = result });
+        }
+
+        [HttpGet("status/tcp")]
+        public IActionResult GetTcpStatus([FromQuery] string ipAddress, [FromQuery] int port)
+        {
+            var isConnected = _communicationService.IsTcpConnected(ipAddress, port);
+            return Ok(new { status = "success", connected = isConnected });
+        }
+
         [HttpGet("logs")]
         public IActionResult GetLogs()
         {
