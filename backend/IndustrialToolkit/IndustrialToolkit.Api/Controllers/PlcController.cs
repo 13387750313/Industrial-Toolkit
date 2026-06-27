@@ -10,11 +10,13 @@ namespace IndustrialToolkit.Controllers
     {
         private readonly PlcCommunicationService _communicationService;
         private readonly SerialPortDetectorService _serialDetector;
+        private readonly DebugToolInfoService _debugTools;
 
-        public PlcController(PlcCommunicationService communicationService, SerialPortDetectorService serialDetector)
+        public PlcController(PlcCommunicationService communicationService, SerialPortDetectorService serialDetector, DebugToolInfoService debugTools)
         {
             _communicationService = communicationService;
             _serialDetector = serialDetector;
+            _debugTools = debugTools;
         }
 
         [HttpGet("protocols")]
@@ -201,6 +203,13 @@ namespace IndustrialToolkit.Controllers
         {
             var info = _serialDetector.GetSerialPortInfo();
             return Ok(new { status = "success", data = info });
+        }
+
+        [HttpGet("debug-tools")]
+        public IActionResult GetDebugTools()
+        {
+            var tools = _debugTools.GetDebugTools();
+            return Ok(new { status = "success", data = tools });
         }
 
         [HttpGet("logs")]

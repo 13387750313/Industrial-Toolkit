@@ -486,6 +486,11 @@
                     <li class="sub-item" onclick="toggleNetworkTool('ipQuery')">IP 查询</li>
                     <li class="sub-item" onclick="toggleNetworkTool('whois')">Whois 查询</li>
                 </ul>
+
+                <li class="nav-item" onclick="showDebugTools()">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">调试工具下载</span>
+                </li>
                 
                 <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
                     <span class="nav-icon">🔄</span>
@@ -1382,6 +1387,12 @@
                         <textarea id="whoisResult" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px;"></textarea>
                     </div>
                 </div>
+            </section>
+
+            <section class="section" id="debugToolsSection" style="display: none;">
+                <h2 class="section-title">🔧 调试工具下载</h2>
+                <p style="color: #666; margin-bottom: 20px;">以下是各工业通讯协议常用的调试助手和工具软件，点击下载按钮可前往官方网站下载。</p>
+                <div id="debugToolsContainer"></div>
             </section>
 
             <section class="section">
@@ -2540,6 +2551,75 @@ Status: ${data.status}`;
                     alert('发送失败: ' + result.message);
                 }
             } catch (err) { alert('发送失败: ' + err.message); }
+        }
+
+        function showDebugTools() {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById('debugToolsSection').style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            loadDebugTools();
+        }
+
+        async function loadDebugTools() {
+            const container = document.getElementById('debugToolsContainer');
+            container.innerHTML = '<p style="color: #3498db;">正在加载调试工具列表...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/plc/debug-tools`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const categories = result.data;
+                    let html = '';
+
+                    categories.forEach(category => {
+                        html += `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="color: #2c3e50; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #3498db;">
+                                    ${category.icon} ${category.name}
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+                        `;
+
+                        category.tools.forEach(tool => {
+                            const priceColor = tool.Price.includes('免费') ? '#27ae60' : '#e67e22';
+                            html += `
+                                <div style="background: white; border-radius: 8px; padding: 15px; border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <span style="font-size: 28px;">${tool.Icon}</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #2c3e50; font-size: 15px;">${tool.Name}</div>
+                                            <div style="font-size: 12px; color: #7f8c8d;">${tool.Protocol}</div>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 13px; color: #666; margin-bottom: 10px; line-height: 1.5;">${tool.Description}</p>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; color: ${priceColor}; font-weight: 600;">${tool.Price}</span>
+                                        <a href="${tool.DownloadUrl}" target="_blank" style="background: #3498db; color: white; padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 13px;">
+                                            前往下载
+                                        </a>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 11px; color: #95a5a6;">
+                                        厂商：${tool.Manufacturer}
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="color: #e74c3c;">加载失败: ' + result.message + '</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p style="color: #e74c3c;">加载失败: ' + err.message + '</p>';
+            }
         }
     </script>
 </body>

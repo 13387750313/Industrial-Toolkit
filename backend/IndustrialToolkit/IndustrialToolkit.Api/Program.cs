@@ -46,6 +46,7 @@ builder.Services.AddSingleton<CanCommunicationService>();
 builder.Services.AddSingleton<IndustrialProtocolService>();
 builder.Services.AddSingleton<NetworkToolService>();
 builder.Services.AddSingleton<SerialPortDetectorService>();
+builder.Services.AddSingleton<DebugToolInfoService>();
 
 var app = builder.Build();
 
