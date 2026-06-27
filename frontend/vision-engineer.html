@@ -372,7 +372,67 @@
         .tab-content.active {
             display: block;
         }
-        
+
+        .sdk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .sdk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9ecef;
+        }
+
+        .sdk-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .sdk-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sdk-icon {
+            font-size: 28px;
+        }
+
+        .sdk-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .sdk-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .sdk-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .sdk-link:hover {
+            background: #2980b9;
+        }
+
         .camera-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -542,7 +602,8 @@
             
             <div class="tab-container">
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="switchTab('calculator')">📐 选型计算</button>
+                    <button class="tab-btn active" onclick="switchTab('sdk')">📚 SDK文档</button>
+                    <button class="tab-btn" onclick="switchTab('calculator')">📐 选型计算</button>
                     <button class="tab-btn" onclick="switchTab('camera')">📸 相机推荐</button>
                     <button class="tab-btn" onclick="switchTab('lens')">🔍 镜头推荐</button>
                     <button class="tab-btn" onclick="switchTab('guide')">📖 选型指南</button>
@@ -766,9 +827,96 @@
                     </div>
                 </div>
                 
-                <div class="tab-content" id="camera">
+                <div class="tab-content active" id="sdk">
                     <div class="section">
-                        <h3 class="section-title">📸 工业相机推荐</h3>
+                        <h3 class="section-title">📚 视觉SDK与开发工具官方文档</h3>
+                        <p style="color: #666; margin-bottom: 20px;">以下是主流机器视觉软件和SDK的官方文档、下载地址，点击即可前往官网获取更多资源。</p>
+                        <div class="sdk-grid">
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔬</span>
+                                    <span class="sdk-name">OpenCV (C++)</span>
+                                </div>
+                                <p class="sdk-desc">开源计算机视觉库，支持图像处理、特征检测等</p>
+                                <a href="https://docs.opencv.org/" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔷</span>
+                                    <span class="sdk-name">OpenCVSharp (C#)</span>
+                                </div>
+                                <p class="sdk-desc">OpenCV的C#封装，适合.NET平台开发</p>
+                                <a href="https://shimat.github.io/opencvsharp_docs/html/d69c29a1-7fb1-4f78-82e9-79be971c3d03.htm" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🎯</span>
+                                    <span class="sdk-name">Halcon</span>
+                                </div>
+                                <p class="sdk-desc">德国MVTec机器视觉软件，行业标准</p>
+                                <a href="https://www.mvtec.com/products/halcon" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🏭</span>
+                                    <span class="sdk-name">海康机器视觉 VM</span>
+                                </div>
+                                <p class="sdk-desc">海康威视机器视觉算法平台，国产首选</p>
+                                <a href="https://www.hikvision.com/cn/solutions/solution-library/machine-vision/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">⚡</span>
+                                    <span class="sdk-name">奥普特 VisionPro</span>
+                                </div>
+                                <p class="sdk-desc">OPT机器视觉软件，完整解决方案</p>
+                                <a href="https://www.opticaltest.com/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">✨</span>
+                                    <span class="sdk-name">凌云光 VisionLab</span>
+                                </div>
+                                <p class="sdk-desc">凌云光视觉算法平台，国内领先</p>
+                                <a href="http://www.lusterai.com/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🤖</span>
+                                    <span class="sdk-name">NI Vision</span>
+                                </div>
+                                <p class="sdk-desc">美国国家仪器机器视觉工具</p>
+                                <a href="https://www.ni.com/zh-cn/shop/model/products.html?category=category-platforms-vision" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔧</span>
+                                    <span class="sdk-name">OpenVINO</span>
+                                </div>
+                                <p class="sdk-desc">Intel视觉推理工具套件</p>
+                                <a href="https://docs.openvino.ai/" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">📊</span>
+                                    <span class="sdk-name">VisionPro (康耐视)</span>
+                                </div>
+                                <p class="sdk-desc">Cognex康耐视机器视觉软件</p>
+                                <a href="https://www.cognex.com/products/machine-vision/visionpro" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🎨</span>
+                                    <span class="sdk-name">VisionMaster (海康VM)</span>
+                                </div>
+                                <p class="sdk-desc">海康机器视觉算法平台软件</p>
+                                <a href="https://www.hikvision.com/cn/solutions/solution-library/machine-vision/" target="_blank" class="sdk-link">下载地址</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="calculator">
                         <div class="camera-list">
                             <div class="camera-card">
                                 <div class="camera-name">海康威视 MV-CA016</div>
