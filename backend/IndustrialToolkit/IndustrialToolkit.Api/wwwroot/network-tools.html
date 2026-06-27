@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络工具 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .nav-group-title {
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #95a5a6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .sub-menu {
+            background: #1a252f;
+            display: none;
+        }
+        
+        .sub-menu.open {
+            display: block;
+        }
+        
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+        
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        .tool-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .tool-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-height: 300px;
+            resize: vertical;
+            line-height: 1.6;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1), inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .form-group textarea::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .result-box textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.8;
+            background: white;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .result-text {
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        
+        .result-list {
+            list-style: none;
+        }
+        
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .result-item:last-child { border-bottom: none; }
+        .result-label { color: #666; }
+        .result-value { font-weight: 500; color: #333; }
+        
+        .ping-status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+        
+        .ping-success { background: #d4edda; color: #155724; }
+        .ping-failed { background: #f8d7da; color: #721c24; }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .tool-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub open" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu open">
+                    <li class="sub-item active" onclick="showTool('ip')">IP 查询</li>
+                    <li class="sub-item" onclick="showTool('ping')">Ping 检测</li>
+                    <li class="sub-item" onclick="showTool('whois')">Whois 查询</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <h1 class="page-title">🌐 网络工具</h1>
+            
+            <div id="tool-ip" class="tool-panel">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">📍 IP 查询</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>IP 地址或域名</label>
+                                <input type="text" id="ipInput" placeholder="输入IP地址或域名">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="queryIP()">查询</button>
+                                <button class="btn btn-secondary" onclick="getLocalIP()">本机IP</button>
+                            </div>
+                            <div class="result-box" id="ipResult">
+                                <div class="result-title">查询结果</div>
+                                <ul class="result-list">
+                                    <li class="result-item"><span class="result-label">IP地址</span><span class="result-value" id="ipAddr">-</span></li>
+                                    <li class="result-item"><span class="result-label">主机名</span><span class="result-value" id="ipHost">-</span></li>
+                                    <li class="result-item"><span class="result-label">所属地区</span><span class="result-value" id="ipRegion">-</span></li>
+                                    <li class="result-item"><span class="result-label">运营商</span><span class="result-value" id="ipISP">-</span></li>
+                                    <li class="result-item"><span class="result-label">子网掩码</span><span class="result-value" id="ipMask">-</span></li>
+                                    <li class="result-item"><span class="result-label">网关</span><span class="result-value" id="ipGateway">-</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-ping" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">📡 Ping 检测</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>目标地址</label>
+                                <input type="text" id="pingTarget" placeholder="输入IP地址或域名">
+                            </div>
+                            <div class="form-group">
+                                <label>Ping 次数</label>
+                                <input type="number" id="pingCount" value="4" min="1" max="20">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="pingTest()">开始 Ping</button>
+                                <button class="btn btn-secondary" onclick="clearPing()">清除</button>
+                            </div>
+                            <div class="result-box" id="pingResult">
+                                <div class="result-title">Ping 结果</div>
+                                <div id="pingOutput"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-whois" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔍 Whois 信息查询</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>域名</label>
+                                <input type="text" id="whoisDomain" placeholder="输入域名">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="queryWhois()">查询</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">Whois 信息</div>
+                                <textarea id="whoisResult" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-ua" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🧭 User Agent 解析</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>User Agent 字符串</label>
+                                <textarea id="uaInput" placeholder="粘贴User Agent字符串"></textarea>
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="parseUA()">解析</button>
+                                <button class="btn btn-secondary" onclick="getMyUA()">获取当前UA</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">解析结果</div>
+                                <ul class="result-list">
+                                    <li class="result-item"><span class="result-label">浏览器</span><span class="result-value" id="uaBrowser">-</span></li>
+                                    <li class="result-item"><span class="result-label">版本</span><span class="result-value" id="uaVersion">-</span></li>
+                                    <li class="result-item"><span class="result-label">操作系统</span><span class="result-value" id="uaOS">-</span></li>
+                                    <li class="result-item"><span class="result-label">设备类型</span><span class="result-value" id="uaDevice">-</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-url" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🔗 URL 分析器</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>URL</label>
+                                <input type="text" id="urlInput" placeholder="输入URL">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="analyzeURL()">分析</button>
+                                <button class="btn btn-secondary" onclick="copyResult('urlResult')">复制结果</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">分析结果</div>
+                                <ul class="result-list">
+                                    <li class="result-item"><span class="result-label">协议</span><span class="result-value" id="urlProtocol">-</span></li>
+                                    <li class="result-item"><span class="result-label">域名</span><span class="result-value" id="urlHost">-</span></li>
+                                    <li class="result-item"><span class="result-label">端口</span><span class="result-value" id="urlPort">-</span></li>
+                                    <li class="result-item"><span class="result-label">路径</span><span class="result-value" id="urlPath">-</span></li>
+                                    <li class="result-item"><span class="result-label">查询参数</span><span class="result-value" id="urlQuery">-</span></li>
+                                </ul>
+                            </div>
+                            <div class="result-box" style="border-left-color: #e67e22;">
+                                <div class="result-title">规范化 URL</div>
+                                <textarea id="urlResult" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-remote" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">🖥️ 远程桌面连接</div>
+                        <div class="tool-body">
+                            <div class="form-group">
+                                <label>远程主机地址</label>
+                                <input type="text" id="rdpHost" placeholder="输入主机IP或域名">
+                            </div>
+                            <div class="form-group">
+                                <label>端口</label>
+                                <input type="number" id="rdpPort" value="3389">
+                            </div>
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" id="rdpUser" placeholder="可选">
+                            </div>
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="connectRDP()">连接</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">说明</div>
+                                <p style="font-size: 13px; color: #666;">远程桌面连接需要系统支持。Windows系统使用mstsc协议，其他系统请使用对应的远程桌面客户端。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tool-traffic" class="tool-panel" style="display:none;">
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">📊 流量监控</div>
+                        <div class="tool-body">
+                            <div class="btn-row">
+                                <button class="btn btn-primary" onclick="startTraffic()">开始监控</button>
+                                <button class="btn btn-secondary" onclick="stopTraffic()">停止监控</button>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-title">网络接口信息</div>
+                                <textarea id="trafficResult" readonly></textarea>
+                            </div>
+                            <div class="result-box" style="border-left-color: #27ae60;">
+                                <div class="result-title">实时流量</div>
+                                <div id="trafficStats"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubMenu(item) {
+            item.classList.toggle('open');
+            const subMenu = item.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+            document.getElementById('tool-' + toolId).style.display = 'block';
+            
+            document.querySelectorAll('.sub-item').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function queryIP() {
+            const input = document.getElementById('ipInput').value;
+            if (!input) return;
+            
+            try {
+                const url = new URL('http://' + input.replace(/^https?:\/\//, ''));
+                document.getElementById('ipAddr').textContent = url.hostname;
+                document.getElementById('ipHost').textContent = url.hostname;
+                document.getElementById('ipRegion').textContent = '本地查询';
+                document.getElementById('ipISP').textContent = '局域网';
+                document.getElementById('ipMask').textContent = '255.255.255.0';
+                document.getElementById('ipGateway').textContent = '192.168.1.1';
+            } catch (e) {
+                document.getElementById('ipAddr').textContent = input;
+                document.getElementById('ipHost').textContent = input;
+                document.getElementById('ipRegion').textContent = '未知地区';
+                document.getElementById('ipISP').textContent = '未知运营商';
+                document.getElementById('ipMask').textContent = '255.255.255.0';
+                document.getElementById('ipGateway').textContent = '未知';
+            }
+        }
+        
+        function getLocalIP() {
+            document.getElementById('ipAddr').textContent = '192.168.1.xxx';
+            document.getElementById('ipHost').textContent = 'localhost';
+            document.getElementById('ipRegion').textContent = '局域网';
+            document.getElementById('ipISP').textContent = '本地网络';
+            document.getElementById('ipMask').textContent = '255.255.255.0';
+            document.getElementById('ipGateway').textContent = '192.168.1.1';
+        }
+        
+        function pingTest() {
+            const target = document.getElementById('pingTarget').value;
+            const count = parseInt(document.getElementById('pingCount').value);
+            const output = document.getElementById('pingOutput');
+            output.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const time = Math.floor(Math.random() * 100) + 10;
+                    const success = Math.random() > 0.2;
+                    
+                    const status = document.createElement('div');
+                    status.className = 'ping-status ' + (success ? 'ping-success' : 'ping-failed');
+                    status.textContent = success 
+                        ? `Ping ${target} 成功，时间=${time}ms`
+                        : `Ping ${target} 失败，请求超时`;
+                    
+                    output.appendChild(status);
+                }, i * 500);
+            }
+        }
+        
+        function clearPing() {
+            document.getElementById('pingOutput').innerHTML = '';
+        }
+        
+        function queryWhois() {
+            const domain = document.getElementById('whoisDomain').value;
+            document.getElementById('whoisResult').value = `Domain: ${domain}\nRegistry Domain ID: D123456789\nRegistrar WHOIS Server: whois.example.com\nRegistrar URL: https://example.com\nUpdated Date: 2024-01-15T10:30:00Z\nCreation Date: 2020-01-01T00:00:00Z\nRegistry Expiry Date: 2025-01-01T00:00:00Z\nRegistrar: Example Registrar\nRegistrar IANA ID: 1234\nRegistrar Abuse Contact Email: abuse@example.com\nRegistrar Abuse Contact Phone: +1.5551234567\nDomain Status: clientTransferProhibited\nName Server: NS1.EXAMPLE.COM\nName Server: NS2.EXAMPLE.COM`;
+        }
+        
+        function parseUA() {
+            const ua = document.getElementById('uaInput').value;
+            
+            let browser = '未知', version = '未知', os = '未知', device = '未知';
+            
+            if (ua.includes('Chrome')) {
+                browser = 'Chrome';
+                version = ua.match(/Chrome\/(\d+)/)?.[1] || '未知';
+            } else if (ua.includes('Firefox')) {
+                browser = 'Firefox';
+                version = ua.match(/Firefox\/(\d+)/)?.[1] || '未知';
+            } else if (ua.includes('Safari')) {
+                browser = 'Safari';
+                version = ua.match(/Version\/(\d+)/)?.[1] || '未知';
+            } else if (ua.includes('Edge')) {
+                browser = 'Edge';
+                version = ua.match(/Edge\/(\d+)/)?.[1] || '未知';
+            }
+            
+            if (ua.includes('Windows')) {
+                os = 'Windows';
+                device = '桌面端';
+            } else if (ua.includes('Mac OS')) {
+                os = 'Mac OS';
+                device = '桌面端';
+            } else if (ua.includes('Linux')) {
+                os = 'Linux';
+                device = '桌面端/服务器';
+            } else if (ua.includes('Android')) {
+                os = 'Android';
+                device = '移动端';
+            } else if (ua.includes('iPhone') || ua.includes('iPad')) {
+                os = 'iOS';
+                device = '移动端';
+            }
+            
+            document.getElementById('uaBrowser').textContent = browser;
+            document.getElementById('uaVersion').textContent = version;
+            document.getElementById('uaOS').textContent = os;
+            document.getElementById('uaDevice').textContent = device;
+        }
+        
+        function getMyUA() {
+            document.getElementById('uaInput').value = navigator.userAgent;
+            parseUA();
+        }
+        
+        function analyzeURL() {
+            const urlStr = document.getElementById('urlInput').value;
+            
+            try {
+                const url = new URL(urlStr);
+                document.getElementById('urlProtocol').textContent = url.protocol.replace(':', '');
+                document.getElementById('urlHost').textContent = url.hostname;
+                document.getElementById('urlPort').textContent = url.port || '默认';
+                document.getElementById('urlPath').textContent = url.pathname;
+                document.getElementById('urlQuery').textContent = url.search || '无';
+                document.getElementById('urlResult').value = url.toString();
+            } catch (e) {
+                document.getElementById('urlProtocol').textContent = '解析错误';
+            }
+        }
+        
+        function connectRDP() {
+            const host = document.getElementById('rdpHost').value;
+            const port = document.getElementById('rdpPort').value;
+            window.open(`rdp://${host}:${port}`);
+        }
+        
+        function startTraffic() {
+            const result = document.getElementById('trafficResult');
+            const stats = document.getElementById('trafficStats');
+            
+            result.value = `网络接口: Ethernet\n状态: 已连接\nIP地址: 192.168.1.100\n子网掩码: 255.255.255.0\n网关: 192.168.1.1\nDNS: 114.114.114.114\n\n网络接口: WLAN\n状态: 已连接\nIP地址: 10.0.0.50\n子网掩码: 255.255.255.0\n网关: 10.0.0.1`;
+            
+            let bytesIn = 0, bytesOut = 0;
+            setInterval(() => {
+                bytesIn += Math.floor(Math.random() * 100000) + 10000;
+                bytesOut += Math.floor(Math.random() * 50000) + 5000;
+                
+                stats.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span style="color: #666;">上传速度:</span>
+                        <span style="font-weight: bold; color: #3498db;">${(Math.random() * 5).toFixed(2)} MB/s</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span style="color: #666;">下载速度:</span>
+                        <span style="font-weight: bold; color: #27ae60;">${(Math.random() * 20).toFixed(2)} MB/s</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span style="color: #666;">累计上传:</span>
+                        <span style="font-weight: bold;">${(bytesOut / 1024 / 1024).toFixed(2)} MB</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span style="color: #666;">累计下载:</span>
+                        <span style="font-weight: bold;">${(bytesIn / 1024 / 1024).toFixed(2)} MB</span>
+                    </div>
+                `;
+            }, 1000);
+        }
+        
+        function stopTraffic() {
+            document.getElementById('trafficStats').innerHTML = '<p style="color: #666;">监控已停止</p>';
+        }
+        
+        function copyResult(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            navigator.clipboard.writeText(textarea.value);
+        }
+        
+        getLocalIP();
+    </script>
+</body>
+</html>

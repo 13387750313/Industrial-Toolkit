@@ -89,6 +89,10 @@ Thumbs.db
 uploads/
 file-uploads/
 
+# --- Build output / publish ---
+publish/
+*.zip
+
 # --- Node (if frontend tooling is added later) ---
 node_modules/
 npm-debug.log*

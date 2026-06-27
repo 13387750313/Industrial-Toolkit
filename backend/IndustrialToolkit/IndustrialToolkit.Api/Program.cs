@@ -2,6 +2,7 @@ using IndustrialToolkit.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 var logDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
@@ -26,6 +27,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 builder.Services.AddCors(options =>
 {
@@ -56,7 +59,21 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowLocal");
-app.UseHttpsRedirection();
+
+var webRootPath = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+if (Directory.Exists(webRootPath))
+{
+    app.UseDefaultFiles(new DefaultFilesOptions
+    {
+        FileProvider = new PhysicalFileProvider(webRootPath),
+        DefaultFileNames = new List<string> { "index.html" }
+    });
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(webRootPath)
+    });
+}
+
 app.UseAuthorization();
 app.MapControllers();
 

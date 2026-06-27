@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC工程师 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-text { font-size: 14px; }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+
+        .sub-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: #1a252f;
+            display: none;
+        }
+
+        .sub-menu.open {
+            display: block;
+        }
+
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+
+        .nav-group-title {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section { margin-bottom: 40px; }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .brand-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border-left: 4px solid #3498db;
+        }
+        
+        .brand-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .brand-card.domestic { border-left-color: #e74c3c; }
+        .brand-card.foreign { border-left-color: #3498db; }
+        
+        .brand-icon { font-size: 36px; margin-bottom: 12px; }
+        .brand-name { font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 8px; }
+        .brand-desc { font-size: 13px; color: #666; }
+        
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .protocol-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .protocol-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        .protocol-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .protocol-icon { font-size: 28px; }
+        .protocol-name { font-size: 16px; font-weight: bold; color: #2c3e50; }
+        
+        .protocol-list { list-style: none; }
+        .protocol-list li {
+            padding: 6px 0;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .protocol-list li:last-child { border-bottom: none; }
+        
+        .serial-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 30px;
+        }
+        
+        .serial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .serial-title { font-size: 18px; font-weight: bold; color: #2c3e50; }
+        
+        .serial-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .control-group label { font-size: 13px; color: #555; font-weight: 500; }
+        .control-group select, .control-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #1e8449; }
+        
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #d68910; }
+        
+        .serial-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .area-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .area-group label { font-size: 14px; font-weight: 600; color: #555; }
+        .area-group textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            resize: none;
+        }
+        
+        .serial-status {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-online { color: #27ae60; font-weight: bold; }
+        .status-offline { color: #e74c3c; font-weight: bold; }
+        
+        .command-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .command-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        
+        .command-name { font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+        .command-desc { font-size: 12px; color: #666; }
+        
+        .opc-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 30px;
+        }
+        
+        .opc-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .result-list {
+            list-style: none;
+        }
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { color: #666; }
+        .result-value { font-weight: 500; color: #333; }
+
+        .lan-device {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            margin: 4px 0;
+            border-radius: 4px;
+            border-left: 3px solid #27ae60;
+        }
+        .lan-device .ip { font-weight: bold; color: #2c3e50; }
+        .lan-device .hostname { color: #666; font-size: 13px; }
+        .lan-device .status { color: #27ae60; font-size: 12px; }
+
+        .port-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            margin: 2px 0;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .port-item.occupied {
+            background: #ffeaa7;
+            border-left: 3px solid #f39c12;
+        }
+        .port-item.free {
+            background: #dfe6e9;
+            border-left: 3px solid #74b9ff;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .serial-area { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item active">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="toggleNetworkTool('lanScan')">局域网扫描</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ipScan')">IP占用检测</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ping')">Ping 检测</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('ipQuery')">IP 查询</li>
+                    <li class="sub-item" onclick="toggleNetworkTool('whois')">Whois 查询</li>
+                </ul>
+
+                <li class="nav-item" onclick="showDebugTools()">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">调试工具下载</span>
+                </li>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <h1 class="page-title">🔧 PLC工程师工具</h1>
+            
+            <section class="section">
+                <h2 class="section-title">🇨🇳 国产PLC</h2>
+                <div class="brand-grid">
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">汇川技术</div>
+                        <div class="brand-desc">H1U/H2U/H3U系列</div>
+                    </div>
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">信捷电气</div>
+                        <div class="brand-desc">XC/XD/XL系列</div>
+                    </div>
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">台达电子</div>
+                        <div class="brand-desc">DVP/ES2/EX2系列</div>
+                    </div>
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">欧姆龙</div>
+                        <div class="brand-desc">CP1H/CP1L/CP2E系列</div>
+                    </div>
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">西门子(国产)</div>
+                        <div class="brand-desc">S7-200 SMART</div>
+                    </div>
+                    <div class="brand-card domestic">
+                        <div class="brand-icon">🏭</div>
+                        <div class="brand-name">三菱电机</div>
+                        <div class="brand-desc">FX3U/FX5U系列</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🌍 国外PLC</h2>
+                <div class="brand-grid">
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇩🇪</div>
+                        <div class="brand-name">西门子</div>
+                        <div class="brand-desc">S7-1200/S7-1500系列</div>
+                    </div>
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇯🇵</div>
+                        <div class="brand-name">三菱</div>
+                        <div class="brand-desc">Q系列/L系列</div>
+                    </div>
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇺🇸</div>
+                        <div class="brand-name">罗克韦尔</div>
+                        <div class="brand-desc">ControlLogix/CompactLogix</div>
+                    </div>
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇯🇵</div>
+                        <div class="brand-name">欧姆龙</div>
+                        <div class="brand-desc">CJ2M/CJ2H系列</div>
+                    </div>
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇫🇷</div>
+                        <div class="brand-name">施耐德</div>
+                        <div class="brand-desc">Modicon M340/M580</div>
+                    </div>
+                    <div class="brand-card foreign">
+                        <div class="brand-icon">🇯🇵</div>
+                        <div class="brand-name">富士电机</div>
+                        <div class="brand-desc">NP1/NP2系列</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🔌 串口通讯 - WebSerial调试助手</h2>
+                <div class="serial-container">
+                    <div class="serial-header">
+                        <div class="serial-title">WebSerial串口调试</div>
+                        <div class="serial-status" id="serialStatus">
+                            <span>🟡</span>
+                            <span class="status-offline" id="statusText">未连接</span>
+                        </div>
+                    </div>
+                    
+                    <div id="serialDriverInfo" style="margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #f8f9fa; border: 1px solid #e9ecef;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: bold; color: #2c3e50;">🔍 串口驱动检测</span>
+                            <button class="btn btn-primary" onclick="loadSerialDriverInfo()" style="padding: 6px 12px; font-size: 12px;">刷新检测</button>
+                        </div>
+                        <div id="driverStatus" style="color: #666; font-size: 13px;">点击刷新按钮检测系统串口状态...</div>
+                    </div>
+                    
+                    <div id="driverDownloadPanel" style="display: none; margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #fff8e6; border: 1px solid #ffc107;">
+                        <div style="font-weight: bold; color: #f57c00; margin-bottom: 10px;">⚠️ 未检测到串口，请下载安装驱动</div>
+                        <div id="driverList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;"></div>
+                    </div>
+                    
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>串口选择</label>
+                            <select id="portSelect">
+                                <option value="">请选择串口</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="baudRate">
+                                <option value="9600">9600</option>
+                                <option value="19200">19200</option>
+                                <option value="38400">38400</option>
+                                <option value="57600">57600</option>
+                                <option value="115200" selected>115200</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>数据位</label>
+                            <select id="dataBits">
+                                <option value="8" selected>8</option>
+                                <option value="7">7</option>
+                                <option value="6">6</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>校验位</label>
+                            <select id="parity">
+                                <option value="none" selected>无</option>
+                                <option value="odd">奇校验</option>
+                                <option value="even">偶校验</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>停止位</label>
+                            <select id="stopBits">
+                                <option value="1" selected>1</option>
+                                <option value="1.5">1.5</option>
+                                <option value="2">2</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="connectSerial()">连接串口</button>
+                        <button class="btn btn-danger" onclick="disconnectSerial()">断开连接</button>
+                    </div>
+                    
+                    <div class="serial-controls">
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" id="hexSend" checked> 十六进制发送
+                        </label>
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" id="hexReceive" checked> 十六进制显示
+                        </label>
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" id="autoScroll"> 自动滚动
+                        </label>
+                        <button class="btn btn-warning" onclick="clearReceive()">清空接收</button>
+                    </div>
+                    
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>发送数据</label>
+                            <textarea id="sendArea" placeholder="输入要发送的数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>接收数据</label>
+                            <textarea id="receiveArea" placeholder="接收的数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="sendData()" style="width: 100%; padding: 12px;">发送数据</button>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🔗 TCP/IP通讯 - 以太网调试助手</h2>
+                <div class="serial-container">
+                    <div class="serial-header">
+                        <div class="serial-title">TCP客户端调试</div>
+                        <div class="serial-status" id="tcpStatus">
+                            <span class="status-indicator offline"></span>
+                            <span>未连接</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>主机地址</label>
+                            <input type="text" id="tcpIpAddress" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口号</label>
+                            <input type="number" id="tcpPort" placeholder="502" value="502">
+                        </div>
+                        <button class="btn btn-primary" onclick="connectTcp()">连接</button>
+                        <button class="btn btn-danger" onclick="disconnectTcp()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <label>
+                            <input type="checkbox" id="tcpHexSend"> 十六进制发送
+                        </label>
+                        <label>
+                            <input type="checkbox" id="tcpHexReceive"> 十六进制显示
+                        </label>
+                        <button class="btn btn-warning" onclick="clearTcpReceive()">清空接收</button>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>发送数据</label>
+                            <textarea id="tcpSendArea" placeholder="输入要发送的数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>接收数据</label>
+                            <textarea id="tcpReceiveArea" placeholder="接收的数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="sendTcpData()" style="width: 100%; padding: 12px;">发送数据</button>
+                        <div style="margin-top: 10px;">
+                            <a href="https://www.cmsoft.cn/" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-right: 10px;">🌐 网络调试助手 NetAssist</a>
+                            <a href="https://www.wireshark.org/" target="_blank" style="background: #3498db; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🦈 Wireshark 抓包工具</a>
+                        </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🌐 以太网协议</h2>
+                <div class="protocol-grid">
+                    <div class="protocol-card" onclick="scrollToPanel('modbusTcpPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">📡</div>
+                            <div class="protocol-name">Modbus TCP</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>端口：502</li>
+                            <li>寄存器读写</li>
+                            <li>线圈操作</li>
+                            <li>离散输入</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('ethernetIpPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">📡</div>
+                            <div class="protocol-name">Ethernet/IP</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>端口：44818</li>
+                            <li>CIP协议</li>
+                            <li>隐式/显式消息</li>
+                            <li>罗克韦尔支持</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('profinetPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">📡</div>
+                            <div class="protocol-name">Profinet</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>实时以太网</li>
+                            <li>西门子标准</li>
+                            <li>IO控制器</li>
+                            <li>设备管理</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('finsTcpPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">📡</div>
+                            <div class="protocol-name">FinsTCP</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>欧姆龙协议</li>
+                            <li>端口：9600</li>
+                            <li>数据链接</li>
+                            <li>程序读写</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="modbusTcpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Modbus TCP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="modbusIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="modbusPort" value="502">
+                        </div>
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="modbusSlaveId" value="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="modbusConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="modbusDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>功能码</label>
+                            <select id="modbusFunction">
+                                <option value="3">读保持寄存器 (0x03)</option>
+                                <option value="4">读输入寄存器 (0x04)</option>
+                                <option value="6">写单个寄存器 (0x06)</option>
+                                <option value="16">写多个寄存器 (0x10)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="modbusAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="modbusCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>数据值</label>
+                            <textarea id="modbusData" placeholder="写多个寄存器时输入: 1 2 3 4"></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="modbusResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="modbusSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://www.modbustools.com/modbus_poll.html" target="_blank" style="background: #3498db; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">📊 Modbus Poll</a>
+                            <a href="https://www.modbustools.com/modbus_slave.html" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🔧 Modbus Slave</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="ethernetIpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Ethernet/IP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="eipIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="eipPort" value="44818">
+                        </div>
+                        <button class="btn btn-primary" onclick="eipConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="eipDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>CIP服务</label>
+                            <select id="eipService">
+                                <option value="0x4C">读标签 (0x4C)</option>
+                                <option value="0x4D">写标签 (0x4D)</option>
+                                <option value="0x0E">读取服务 (0x0E)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>标签名</label>
+                            <input type="text" id="eipTag" value="Tag1">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="eipData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="eipResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="eipSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://github.com/EIPScanner/EIPScanner" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">💎 EIPScanner (开源)</a>
+                            <a href="https://www.rockwellautomation.com/en-us/products/software/rslinx.html" target="_blank" style="background: #e67e22; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🏭 RSLinx Classic</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="profinetPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Profinet 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="pnIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="pnPort" value="34964">
+                        </div>
+                        <button class="btn btn-primary" onclick="pnConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="pnDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="pnOperation">
+                                <option value="read">读取数据</option>
+                                <option value="write">写入数据</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>槽位/索引</label>
+                            <input type="text" id="pnSlot" value="0/0">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="pnData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="pnResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="pnSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://support.industry.siemens.com/cs/document/67460624/proneta" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🔍 PRONETA (西门子免费)</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="finsTcpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 FinsTCP 通讯 (欧姆龙)</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="finsIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="finsPort" value="9600">
+                        </div>
+                        <button class="btn btn-primary" onclick="finsConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="finsDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>命令</label>
+                            <select id="finsCommand">
+                                <option value="0101">读取字 (0101)</option>
+                                <option value="0102">读取位 (0102)</option>
+                                <option value="0104">读取字块 (0104)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>存储区</label>
+                            <select id="finsArea">
+                                <option value="DM">DM区</option>
+                                <option value="WR">WR区</option>
+                                <option value="HR">HR区</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="finsAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="finsCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="finsData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="finsResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="finsSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://www.omron.com/global/en/" target="_blank" style="background: #3498db; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">📡 FinsGateway (欧姆龙)</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🔗 现场总线</h2>
+                <div class="protocol-grid">
+                    <div class="protocol-card" onclick="scrollToPanel('profibusDpPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">🔗</div>
+                            <div class="protocol-name">Profibus DP</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>RS-485物理层</li>
+                            <li>主从结构</li>
+                            <li>高速传输</li>
+                            <li>西门子标准</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('deviceNetPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">🔗</div>
+                            <div class="protocol-name">DeviceNet</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>CAN物理层</li>
+                            <li>CIP协议</li>
+                            <li>罗克韦尔标准</li>
+                            <li>设备级网络</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('ccLinkPanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">🔗</div>
+                            <div class="protocol-name">CC-Link</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>三菱标准</li>
+                            <li>高速现场总线</li>
+                            <li>远程IO</li>
+                            <li>设备互联</li>
+                        </ul>
+                    </div>
+                    <div class="protocol-card" onclick="scrollToPanel('asInterfacePanel')">
+                        <div class="protocol-header">
+                            <div class="protocol-icon">🔗</div>
+                            <div class="protocol-name">AS-i</div>
+                        </div>
+                        <ul class="protocol-list">
+                            <li>传感器总线</li>
+                            <li>低成本</li>
+                            <li>简单设备</li>
+                            <li>AS-Interface</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="profibusDpPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 Profibus DP 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>串口</label>
+                            <select id="pbPort">
+                                <option value="COM1">COM1</option>
+                                <option value="COM2">COM2</option>
+                                <option value="COM3">COM3</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="pbBaudRate">
+                                <option value="9600">9600</option>
+                                <option value="19200">19200</option>
+                                <option value="187500">187500</option>
+                                <option value="500000">500000</option>
+                                <option value="1500000">1500000</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="pbSlaveId" value="3">
+                        </div>
+                        <button class="btn btn-primary" onclick="pbConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="pbDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>功能码</label>
+                            <select id="pbFunction">
+                                <option value="read">读数据</option>
+                                <option value="write">写数据</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>起始地址</label>
+                            <input type="number" id="pbAddress" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label>数据长度</label>
+                            <input type="number" id="pbLength" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="pbData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="pbResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="pbSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://support.industry.siemens.com/cs/document/109794442/step-7-v5-6" target="_blank" style="background: #e67e22; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">⚙️ SIMATIC Step 7 (西门子)</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="deviceNetPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 DeviceNet 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>CAN通道</label>
+                            <select id="dnChannel">
+                                <option value="can0">can0</option>
+                                <option value="can1">can1</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="dnBaudRate">
+                                <option value="125000">125 kbps</option>
+                                <option value="250000">250 kbps</option>
+                                <option value="500000">500 kbps</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>MAC ID</label>
+                            <input type="number" id="dnMacId" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="dnConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="dnDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>连接ID</label>
+                            <input type="text" id="dnConnectionId" value="0x01">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="dnData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="dnResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="dnSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://www.rockwellautomation.com/en-us/products/software/rsnetworx.html" target="_blank" style="background: #e67e22; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🔧 RSNetWorx for DeviceNet</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="ccLinkPanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 CC-Link 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP地址</label>
+                            <input type="text" id="ccIp" placeholder="192.168.1.1" value="192.168.1.1">
+                        </div>
+                        <div class="control-group">
+                            <label>端口</label>
+                            <input type="number" id="ccPort" value="61451">
+                        </div>
+                        <div class="control-group">
+                            <label>站号</label>
+                            <input type="number" id="ccStation" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="ccConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="ccDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="ccOperation">
+                                <option value="read">读远程寄存器</option>
+                                <option value="write">写远程寄存器</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>地址</label>
+                            <input type="text" id="ccAddress" value="D0">
+                        </div>
+                        <div class="control-group">
+                            <label>数量</label>
+                            <input type="number" id="ccCount" value="10">
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="ccData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="ccResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="ccSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://www.mitsubishielectric.com/fa/products/cnt/plc/software/gx_works/index.html" target="_blank" style="background: #e67e22; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🎛️ GX Works3 (三菱)</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="asInterfacePanel" class="protocol-detail" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔗 AS-i (AS-Interface) 通讯</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>串口</label>
+                            <select id="asiPort">
+                                <option value="COM1">COM1</option>
+                                <option value="COM2">COM2</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>波特率</label>
+                            <select id="asiBaudRate">
+                                <option value="19200">19200 (默认)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>主站地址</label>
+                            <input type="number" id="asiMasterAddr" value="0">
+                        </div>
+                        <button class="btn btn-primary" onclick="asiConnect()">连接</button>
+                        <button class="btn btn-danger" onclick="asiDisconnect()">断开</button>
+                    </div>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>从站地址</label>
+                            <input type="number" id="asiSlaveAddr" value="1">
+                        </div>
+                        <div class="control-group">
+                            <label>操作</label>
+                            <select id="asiOperation">
+                                <option value="read">读数据</option>
+                                <option value="write">写数据</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="serial-area">
+                        <div class="area-group">
+                            <label>请求数据</label>
+                            <textarea id="asiData" placeholder="请求数据..."></textarea>
+                        </div>
+                        <div class="area-group">
+                            <label>响应数据</label>
+                            <textarea id="asiResponse" placeholder="响应数据将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="asiSend()" style="width: 100%; padding: 12px;">发送请求</button>
+                    <div style="margin-top: 15px; padding: 12px; background: #e8f4fd; border-radius: 6px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px;">🔧 推荐调试工具</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://www.bihl-wiedemann.com/en/products/software/as-i-control-tools/" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">📋 AS-i Control Tools (免费)</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">🔐 OPC UA客户端</h2>
+                <div class="opc-container">
+                    <div class="opc-form">
+                        <div class="control-group">
+                            <label>服务器地址</label>
+                            <input type="text" placeholder="opc.tcp://localhost:4840">
+                        </div>
+                        <div class="control-group">
+                            <label>安全策略</label>
+                            <select>
+                                <option>None</option>
+                                <option>Basic128Rsa15</option>
+                                <option>Basic256</option>
+                                <option>Basic256Sha256</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>用户名</label>
+                            <input type="text" placeholder="用户名">
+                        </div>
+                        <div class="control-group">
+                            <label>密码</label>
+                            <input type="password" placeholder="密码">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">连接服务器</button>
+                    <button class="btn btn-danger" style="margin-left: 10px;">断开连接</button>
+                </div>
+            </section>
+            
+            <section class="section" id="networkToolsSection" style="display: none;">
+                <h2 class="section-title">🌐 网络工具</h2>
+                
+                <div id="lanScanPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 局域网扫描</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP段</label>
+                            <input type="text" id="lanIpRange" value="192.168.1." placeholder="192.168.1.">
+                        </div>
+                        <button class="btn btn-primary" onclick="scanLan()">开始扫描</button>
+                        <button class="btn btn-secondary" onclick="clearLanResult()">清除结果</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">扫描结果</div>
+                        <div id="lanResult" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div id="ipScanPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 IP占用检测</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>目标IP</label>
+                            <input type="text" id="scanIpAddress" value="192.168.1.1" placeholder="IP地址">
+                        </div>
+                        <div class="control-group">
+                            <label>起始端口</label>
+                            <input type="number" id="startPort" value="1">
+                        </div>
+                        <div class="control-group">
+                            <label>结束端口</label>
+                            <input type="number" id="endPort" value="100">
+                        </div>
+                        <button class="btn btn-primary" onclick="scanPorts()">开始检测</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">端口检测结果</div>
+                        <div id="portResult" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div id="pingPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📡 Ping 检测</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>目标地址</label>
+                            <input type="text" id="pingHost" value="127.0.0.1" placeholder="IP或域名">
+                        </div>
+                        <div class="control-group">
+                            <label>次数</label>
+                            <input type="number" id="pingCount" value="4" min="1" max="20">
+                        </div>
+                        <button class="btn btn-primary" onclick="pingTest()">开始Ping</button>
+                        <button class="btn btn-secondary" onclick="clearPingResult()">清除</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">Ping结果</div>
+                        <div id="pingResult"></div>
+                    </div>
+                </div>
+
+                <div id="ipQueryPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📍 IP 查询</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>IP/域名</label>
+                            <input type="text" id="queryIp" placeholder="输入IP地址或域名">
+                        </div>
+                        <button class="btn btn-primary" onclick="queryIP()">查询</button>
+                        <button class="btn btn-secondary" onclick="getLocalIP()">本机IP</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">查询结果</div>
+                        <ul class="result-list">
+                            <li class="result-item"><span class="result-label">IP地址</span><span class="result-value" id="qIpAddr">-</span></li>
+                            <li class="result-item"><span class="result-label">主机名</span><span class="result-value" id="qIpHost">-</span></li>
+                            <li class="result-item"><span class="result-label">所属地区</span><span class="result-value" id="qIpRegion">-</span></li>
+                            <li class="result-item"><span class="result-label">运营商</span><span class="result-value" id="qIpISP">-</span></li>
+                            <li class="result-item"><span class="result-label">子网掩码</span><span class="result-value" id="qIpMask">-</span></li>
+                            <li class="result-item"><span class="result-label">网关</span><span class="result-value" id="qIpGateway">-</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="whoisPanel" class="protocol-detail" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔍 Whois 查询</h3>
+                    <div class="serial-controls">
+                        <div class="control-group">
+                            <label>域名</label>
+                            <input type="text" id="whoisDomain" placeholder="输入域名">
+                        </div>
+                        <button class="btn btn-primary" onclick="queryWhois()">查询</button>
+                    </div>
+                    <div class="result-box" style="margin-top: 15px;">
+                        <div class="result-title">Whois信息</div>
+                        <textarea id="whoisResult" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="debugToolsSection" style="display: none;">
+                <h2 class="section-title">🔧 调试工具下载</h2>
+                <p style="color: #666; margin-bottom: 20px;">以下是各工业通讯协议常用的调试助手和工具软件，点击下载按钮可前往官方网站下载。</p>
+                <div id="debugToolsContainer"></div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">📖 PLC指令速查</h2>
+                <div class="command-tabs">
+                    <button class="tab-btn active" onclick="switchTab('siemens')">西门子</button>
+                    <button class="tab-btn" onclick="switchTab('mitsubishi')">三菱</button>
+                    <button class="tab-btn" onclick="switchTab('omron')">欧姆龙</button>
+                </div>
+                
+                <div id="siemensCommands" class="command-grid">
+                    <div class="command-card">
+                        <div class="command-name">LD/LDN</div>
+                        <div class="command-desc">装载/装载非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">A/AN</div>
+                        <div class="command-desc">与/与非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">O/ON</div>
+                        <div class="command-desc">或/或非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">= (OUT)</div>
+                        <div class="command-desc">输出</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">S/R</div>
+                        <div class="command-desc">置位/复位</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">TON/TOF</div>
+                        <div class="command-desc">接通延时/断开延时</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">CTU/CTD</div>
+                        <div class="command-desc">加计数器/减计数器</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MOV</div>
+                        <div class="command-desc">数据传送</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">ADD/SUB</div>
+                        <div class="command-desc">加法/减法</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MUL/DIV</div>
+                        <div class="command-desc">乘法/除法</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">CALL</div>
+                        <div class="command-desc">调用子程序</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">RET</div>
+                        <div class="command-desc">返回</div>
+                    </div>
+                </div>
+                
+                <div id="mitsubishiCommands" class="command-grid" style="display: none;">
+                    <div class="command-card">
+                        <div class="command-name">LD/LDI</div>
+                        <div class="command-desc">取/取反</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">AND/ANI</div>
+                        <div class="command-desc">与/与非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">OR/ORI</div>
+                        <div class="command-desc">或/或非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">OUT</div>
+                        <div class="command-desc">输出</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">SET/RST</div>
+                        <div class="command-desc">置位/复位</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">TMR/TMX</div>
+                        <div class="command-desc">定时器</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">CTU/CTD</div>
+                        <div class="command-desc">计数器</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MOV</div>
+                        <div class="command-desc">传送</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">ADD/SUB</div>
+                        <div class="command-desc">加/减</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MUL/DIV</div>
+                        <div class="command-desc">乘/除</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MC/MCR</div>
+                        <div class="command-desc">主控指令</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">FEND</div>
+                        <div class="command-desc">程序结束</div>
+                    </div>
+                </div>
+                
+                <div id="omronCommands" class="command-grid" style="display: none;">
+                    <div class="command-card">
+                        <div class="command-name">LD/LDNOT</div>
+                        <div class="command-desc">取/取非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">AND/ANDNOT</div>
+                        <div class="command-desc">与/与非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">OR/ORNOT</div>
+                        <div class="command-desc">或/或非</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">OUT</div>
+                        <div class="command-desc">输出</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">SET/RSET</div>
+                        <div class="command-desc">置位/复位</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">TIM/TIMH</div>
+                        <div class="command-desc">定时器</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">CNT</div>
+                        <div class="command-desc">计数器</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MOV</div>
+                        <div class="command-desc">传送</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">ADD/SUB</div>
+                        <div class="command-desc">加/减</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">MUL/DIV</div>
+                        <div class="command-desc">乘/除</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">JMP/JME</div>
+                        <div class="command-desc">跳转</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-name">END</div>
+                        <div class="command-desc">程序结束</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5180/api';
+        
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubMenu(el) {
+            const subMenu = el.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                el.classList.toggle('open');
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('siemensCommands').style.display = 'none';
+            document.getElementById('mitsubishiCommands').style.display = 'none';
+            document.getElementById('omronCommands').style.display = 'none';
+            
+            document.getElementById(tab + 'Commands').style.display = 'grid';
+        }
+        
+        async function loadPorts() {
+            try {
+                const response = await fetch(`${API_BASE}/plc/ports`);
+                const data = await response.json();
+                const portSelect = document.getElementById('portSelect');
+                portSelect.innerHTML = '<option value="">请选择串口</option>';
+                data.ports.forEach(port => {
+                    portSelect.innerHTML += `<option value="${port}">${port}</option>`;
+                });
+            } catch (err) {
+                console.error('加载端口失败:', err);
+            }
+        }
+        
+        async function loadSerialDriverInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/plc/serial/info`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const info = result.data;
+                    const driverStatus = document.getElementById('driverStatus');
+                    const downloadPanel = document.getElementById('driverDownloadPanel');
+                    const driverList = document.getElementById('driverList');
+                    
+                    if (info.hasSerialPorts) {
+                        const ports = info.ports.join(', ');
+                        driverStatus.innerHTML = `✅ <span style="color: #27ae60;">检测到 ${info.ports.length} 个串口: ${ports}</span>`;
+                        downloadPanel.style.display = 'none';
+                    } else {
+                        driverStatus.innerHTML = `⚠️ <span style="color: #e67e22;">未检测到可用串口</span>`;
+                        downloadPanel.style.display = 'block';
+                        
+                        driverList.innerHTML = '';
+                        info.commonDrivers.forEach(driver => {
+                            driverList.innerHTML += `
+                                <div style="padding: 10px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                    <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 4px;">
+                                        ${driver.icon} ${driver.chipName}
+                                    </div>
+                                    <div style="font-size: 11px; color: #666; margin-bottom: 6px;">${driver.manufacturer}</div>
+                                    <div style="font-size: 11px; color: #999; margin-bottom: 8px;">${driver.description}</div>
+                                    <a href="${driver.downloadUrl}" target="_blank" 
+                                       style="display: block; text-align: center; padding: 6px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">
+                                        下载驱动
+                                    </a>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('加载串口信息失败:', err);
+                document.getElementById('driverStatus').innerHTML = '❌ 检测失败: ' + err.message;
+            }
+        }
+        
+        async function connectSerial() {
+            const portName = document.getElementById('portSelect').value;
+            const baudRate = parseInt(document.getElementById('baudRate').value);
+            const dataBits = parseInt(document.getElementById('dataBits').value);
+            const parity = document.getElementById('parity').value;
+            const stopBits = document.getElementById('stopBits').value;
+            
+            if (!portName) {
+                alert('请选择串口');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/connect/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate, dataBits, parity, stopBits })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    document.getElementById('statusText').textContent = '已连接';
+                    document.getElementById('statusText').className = 'status-online';
+                    loadLogs();
+                } else {
+                    alert('连接失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('连接失败:', err);
+                alert('连接失败: ' + err.message);
+            }
+        }
+        
+        async function disconnectSerial() {
+            const portName = document.getElementById('portSelect').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/disconnect/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                
+                document.getElementById('statusText').textContent = '未连接';
+                document.getElementById('statusText').className = 'status-offline';
+                
+                if (result.status !== 'success') {
+                    alert(result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
+            }
+        }
+        
+        async function sendData() {
+            const portName = document.getElementById('portSelect').value;
+            const data = document.getElementById('sendArea').value;
+            const hexSend = document.getElementById('hexSend').checked;
+            
+            if (!portName) {
+                alert('请选择串口');
+                return;
+            }
+            
+            let byteData;
+            if (hexSend) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/send/serial`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, data: byteData })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const receiveArea = document.getElementById('receiveArea');
+                    const hexReceive = document.getElementById('hexReceive').checked;
+                    
+                    if (result.response && result.response.length > 0) {
+                        if (hexReceive) {
+                            const hex = result.response.map(b => b.toString(16).padStart(2, '0')).join(' ');
+                            receiveArea.value += hex + ' ';
+                        } else {
+                            receiveArea.value += new TextDecoder().decode(new Uint8Array(result.response));
+                        }
+                    }
+                    
+                    if (document.getElementById('autoScroll').checked) {
+                        receiveArea.scrollTop = receiveArea.scrollHeight;
+                    }
+                    
+                    loadLogs();
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('发送失败:', err);
+                alert('发送失败: ' + err.message);
+            }
+        }
+        
+        function clearReceive() {
+            document.getElementById('receiveArea').value = '';
+        }
+        
+        let tcpPollingInterval = null;
+
+        async function connectTcp() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            
+            if (!ipAddress || isNaN(port)) {
+                alert('请输入有效的IP地址和端口');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/connect/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const statusElement = document.getElementById('tcpStatus');
+                    statusElement.innerHTML = '<span class="status-indicator online"></span><span>已连接</span>';
+                    addLog(`TCP连接成功: ${ipAddress}:${port}`, 'INFO');
+                    startTcpPolling(ipAddress, port);
+                    alert('连接成功');
+                } else {
+                    alert('连接失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('连接失败:', err);
+                alert('连接失败: ' + err.message);
+            }
+        }
+        
+        function startTcpPolling(ipAddress, port) {
+            if (tcpPollingInterval) {
+                clearInterval(tcpPollingInterval);
+            }
+            
+            tcpPollingInterval = setInterval(async () => {
+                try {
+                    const statusResponse = await fetch(`${API_BASE}/plc/status/tcp?ipAddress=${ipAddress}&port=${port}`);
+                    const statusResult = await statusResponse.json();
+                    
+                    const statusElement = document.getElementById('tcpStatus');
+                    if (statusResult.connected) {
+                        statusElement.innerHTML = '<span class="status-indicator online"></span><span>已连接</span>';
+                    } else {
+                        statusElement.innerHTML = '<span class="status-indicator offline"></span><span>未连接</span>';
+                        stopTcpPolling();
+                        return;
+                    }
+                    
+                    const receiveResponse = await fetch(`${API_BASE}/plc/receive/tcp?ipAddress=${ipAddress}&port=${port}`);
+                    const receiveResult = await receiveResponse.json();
+                    
+                    if (receiveResult.status === 'success' && receiveResult.data && receiveResult.data.length > 0) {
+                        const hexReceive = document.getElementById('tcpHexReceive').checked;
+                        receiveResult.data.forEach(byteArray => {
+                            let dataStr;
+                            if (hexReceive) {
+                                dataStr = byteArray.map(b => b.toString(16).padStart(2, '0')).join(' ');
+                            } else {
+                                dataStr = new TextDecoder().decode(new Uint8Array(byteArray));
+                            }
+                            addLog(`接收 ${dataStr}`, 'INFO');
+                        });
+                    }
+                } catch (err) {
+                    console.error('轮询错误:', err);
+                }
+            }, 500);
+        }
+        
+        function stopTcpPolling() {
+            if (tcpPollingInterval) {
+                clearInterval(tcpPollingInterval);
+                tcpPollingInterval = null;
+            }
+        }
+        
+        async function disconnectTcp() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/disconnect/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    stopTcpPolling();
+                    const statusElement = document.getElementById('tcpStatus');
+                    statusElement.innerHTML = '<span class="status-indicator offline"></span><span>未连接</span>';
+                    addLog(`TCP断开连接: ${ipAddress}:${port}`, 'INFO');
+                    alert('断开成功');
+                } else {
+                    alert('断开失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('断开失败:', err);
+                alert('断开失败: ' + err.message);
+            }
+        }
+        
+        async function sendTcpData() {
+            const ipAddress = document.getElementById('tcpIpAddress').value;
+            const port = parseInt(document.getElementById('tcpPort').value);
+            const data = document.getElementById('tcpSendArea').value;
+            const hexSend = document.getElementById('tcpHexSend').checked;
+            
+            if (!ipAddress || isNaN(port)) {
+                alert('请输入有效的IP地址和端口');
+                return;
+            }
+            
+            if (!data) {
+                alert('请输入要发送的数据');
+                return;
+            }
+            
+            let byteData;
+            if (hexSend) {
+                const hexArray = data.match(/[0-9a-fA-F]{2}/g);
+                if (!hexArray) {
+                    alert('请输入有效的十六进制数据');
+                    return;
+                }
+                byteData = hexArray.map(h => parseInt(h, 16));
+            } else {
+                byteData = Array.from(new TextEncoder().encode(data));
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/plc/send/tcp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port, data: byteData })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    addLog(`发送: ${data}`, 'INFO');
+                } else {
+                    addLog(`发送失败: ${result.message}`, 'ERROR');
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) {
+                console.error('发送失败:', err);
+                addLog(`发送异常: ${err.message}`, 'ERROR');
+                alert('发送失败: ' + err.message);
+            }
+        }
+        
+        function clearTcpReceive() {
+            document.getElementById('tcpReceiveArea').value = '';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPorts();
+            loadSerialDriverInfo();
+        });
+        
+        function scrollToPanel(panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        let receiveDataCount = 0;
+        const maxReceiveDataCount = 100;
+
+        function addLog(message, level = 'INFO') {
+            const receiveArea = document.getElementById('tcpReceiveArea');
+            if (!receiveArea) return;
+
+            const now = new Date();
+            const timestamp = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }) + '.' + now.getMilliseconds().toString().padStart(3, '0');
+
+            const logLine = `[${level}] [${timestamp}] ${message}\n`;
+            
+            const currentLines = receiveArea.value.split('\n').filter(line => line.trim());
+            if (currentLines.length >= 100) {
+                receiveArea.value = currentLines.slice(-99).join('\n') + '\n';
+                const warnLine = `[WARN] [${timestamp}] 日志已满100条，已自动清理\n`;
+                receiveArea.value += warnLine;
+            }
+            
+            receiveArea.value += logLine;
+            receiveArea.scrollTop = receiveArea.scrollHeight;
+        }
+
+        async function loadLogs() {
+            return [];
+        }
+
+        async function clearLogs() {
+            try {
+                await fetch(`${API_BASE}/protocol/logs`, { method: 'DELETE' });
+                const logDisplay = document.getElementById('logDisplay');
+                if (logDisplay) {
+                    logDisplay.textContent = '';
+                }
+                addLog('日志已清空', 'INFO');
+            } catch (err) {
+                alert('清空日志失败: ' + err.message);
+            }
+        }
+
+        function appendReceiveData(data) {
+            receiveDataCount++;
+            if (receiveDataCount >= maxReceiveDataCount) {
+                document.getElementById('tcpReceiveArea')?.setValue('');
+                receiveDataCount = 0;
+                addLog('接收数据已满100条，已自动清空', 'WARN');
+            }
+            addLog(`接收数据: ${data}`, 'DEBUG');
+        }
+
+        // 页面加载时自动获取日志
+        setInterval(loadLogs, 3000);
+        
+        // Modbus TCP
+        async function modbusConnect() {
+            const ipAddress = document.getElementById('modbusIp').value;
+            const port = parseInt(document.getElementById('modbusPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function modbusDisconnect() {
+            const ipAddress = document.getElementById('modbusIp').value;
+            const port = parseInt(document.getElementById('modbusPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function modbusSend() {
+            const data = {
+                ipAddress: document.getElementById('modbusIp').value,
+                port: parseInt(document.getElementById('modbusPort').value),
+                slaveId: parseInt(document.getElementById('modbusSlaveId').value),
+                functionCode: parseInt(document.getElementById('modbusFunction').value),
+                address: parseInt(document.getElementById('modbusAddress').value),
+                count: parseInt(document.getElementById('modbusCount').value),
+                values: document.getElementById('modbusData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/modbus/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('modbusResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Ethernet/IP
+        async function eipConnect() {
+            const ipAddress = document.getElementById('eipIp').value;
+            const port = parseInt(document.getElementById('eipPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function eipDisconnect() {
+            const ipAddress = document.getElementById('eipIp').value;
+            const port = parseInt(document.getElementById('eipPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function eipSend() {
+            const data = {
+                ipAddress: document.getElementById('eipIp').value,
+                port: parseInt(document.getElementById('eipPort').value),
+                service: document.getElementById('eipService').value,
+                tag: document.getElementById('eipTag').value,
+                data: document.getElementById('eipData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/ethernetip/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('eipResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Profinet
+        async function pnConnect() {
+            const ipAddress = document.getElementById('pnIp').value;
+            const port = parseInt(document.getElementById('pnPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function pnDisconnect() {
+            const ipAddress = document.getElementById('pnIp').value;
+            const port = parseInt(document.getElementById('pnPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function pnSend() {
+            const data = {
+                ipAddress: document.getElementById('pnIp').value,
+                port: parseInt(document.getElementById('pnPort').value),
+                operation: document.getElementById('pnOperation').value,
+                slot: document.getElementById('pnSlot').value,
+                data: document.getElementById('pnData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profinet/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('pnResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // FinsTCP
+        async function finsConnect() {
+            const ipAddress = document.getElementById('finsIp').value;
+            const port = parseInt(document.getElementById('finsPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function finsDisconnect() {
+            const ipAddress = document.getElementById('finsIp').value;
+            const port = parseInt(document.getElementById('finsPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + result.message); }
+        }
+        async function finsSend() {
+            const data = {
+                ipAddress: document.getElementById('finsIp').value,
+                port: parseInt(document.getElementById('finsPort').value),
+                command: document.getElementById('finsCommand').value,
+                area: document.getElementById('finsArea').value,
+                address: parseInt(document.getElementById('finsAddress').value),
+                count: parseInt(document.getElementById('finsCount').value)
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/fins/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('finsResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // Profibus DP
+        async function pbConnect() {
+            const portName = document.getElementById('pbPort').value;
+            const baudRate = parseInt(document.getElementById('pbBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function pbDisconnect() {
+            const portName = document.getElementById('pbPort').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function pbSend() {
+            const data = {
+                portName: document.getElementById('pbPort').value,
+                baudRate: parseInt(document.getElementById('pbBaudRate').value),
+                slaveId: parseInt(document.getElementById('pbSlaveId').value),
+                function: document.getElementById('pbFunction').value,
+                address: parseInt(document.getElementById('pbAddress').value),
+                length: parseInt(document.getElementById('pbLength').value),
+                data: document.getElementById('pbData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/profibus/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('pbResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // DeviceNet
+        async function dnConnect() {
+            const channelName = document.getElementById('dnChannel').value;
+            const baudRate = parseInt(document.getElementById('dnBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function dnDisconnect() {
+            const channelName = document.getElementById('dnChannel').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function dnSend() {
+            const data = {
+                channelName: document.getElementById('dnChannel').value,
+                macId: parseInt(document.getElementById('dnMacId').value),
+                connectionId: document.getElementById('dnConnectionId').value,
+                data: document.getElementById('dnData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/devicenet/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('dnResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // CC-Link
+        async function ccConnect() {
+            const ipAddress = document.getElementById('ccIp').value;
+            const port = parseInt(document.getElementById('ccPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function ccDisconnect() {
+            const ipAddress = document.getElementById('ccIp').value;
+            const port = parseInt(document.getElementById('ccPort').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress, port })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function ccSend() {
+            const data = {
+                ipAddress: document.getElementById('ccIp').value,
+                port: parseInt(document.getElementById('ccPort').value),
+                station: parseInt(document.getElementById('ccStation').value),
+                operation: document.getElementById('ccOperation').value,
+                address: document.getElementById('ccAddress').value,
+                count: parseInt(document.getElementById('ccCount').value),
+                data: document.getElementById('ccData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/cclink/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('ccResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+        
+        // 网络工具切换
+        function toggleNetworkTool(toolId) {
+            document.querySelectorAll('.protocol-detail').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById('networkToolsSection').style.display = 'block';
+            
+            document.getElementById('lanScanPanel').style.display = 'none';
+            document.getElementById('ipScanPanel').style.display = 'none';
+            document.getElementById('pingPanel').style.display = 'none';
+            document.getElementById('ipQueryPanel').style.display = 'none';
+            document.getElementById('whoisPanel').style.display = 'none';
+            
+            document.getElementById(toolId + 'Panel').style.display = 'block';
+        }
+
+        // 局域网扫描
+        async function scanLan() {
+            const ipRange = document.getElementById('lanIpRange').value;
+            const resultDiv = document.getElementById('lanResult');
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在扫描局域网...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/lan/scan?ipRange=${encodeURIComponent(ipRange)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if (result.data.length === 0) {
+                        resultDiv.innerHTML = '<p style="color: #95a5a6;">未发现在线设备</p>';
+                    } else {
+                        let html = `<p style="color: #27ae60; margin-bottom: 10px;">发现 ${result.count} 台在线设备</p>`;
+                        result.data.forEach(device => {
+                            html += `
+                                <div class="lan-device">
+                                    <div>
+                                        <span class="ip">${device.ipAddress}</span>
+                                        <span class="hostname"> (${device.hostname})</span>
+                                    </div>
+                                    <span class="status">${device.responseTime}</span>
+                                </div>
+                            `;
+                        });
+                        resultDiv.innerHTML = html;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">扫描失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">扫描失败: ${err.message}</p>`;
+            }
+        }
+
+        function clearLanResult() {
+            document.getElementById('lanResult').innerHTML = '';
+        }
+
+        // 端口扫描
+        async function scanPorts() {
+            const ip = document.getElementById('scanIpAddress').value;
+            const startPort = parseInt(document.getElementById('startPort').value);
+            const endPort = parseInt(document.getElementById('endPort').value);
+            const resultDiv = document.getElementById('portResult');
+            
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在检测端口...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/port/scan?ipAddress=${encodeURIComponent(ip)}&startPort=${startPort}&endPort=${endPort}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    let html = `<p style="color: #27ae60; margin-bottom: 10px;">检测完成，占用端口: ${result.occupiedCount} 个</p>`;
+                    result.data.forEach(port => {
+                        const cls = port.status === '占用' ? 'occupied' : 'free';
+                        html += `
+                            <div class="port-item ${cls}">
+                                <span>端口 ${port.port}</span>
+                                <span>${port.status}</span>
+                            </div>
+                        `;
+                    });
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">检测失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">检测失败: ${err.message}</p>`;
+            }
+        }
+
+        // Ping检测
+        async function pingTest() {
+            const host = document.getElementById('pingHost').value;
+            const count = parseInt(document.getElementById('pingCount').value);
+            const resultDiv = document.getElementById('pingResult');
+            
+            resultDiv.innerHTML = '<p style="color: #3498db;">正在执行Ping测试...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/ping?host=${encodeURIComponent(host)}&count=${count}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    let html = `<p style="margin-bottom: 10px;">Ping ${host} 结果:</p>`;
+                    result.data.responses.forEach((r, i) => {
+                        const cls = r.success ? 'ping-success' : 'ping-failed';
+                        html += `<div class="ping-status ${cls}">Ping ${i + 1}: ${r.time}</div>`;
+                    });
+                    html += `<p style="margin-top: 10px; font-weight: bold;">成功率: ${result.data.successRate}</p>`;
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #e74c3c;">Ping失败: ${result.message}</p>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: #e74c3c;">Ping失败: ${err.message}</p>`;
+            }
+        }
+
+        function clearPingResult() {
+            document.getElementById('pingResult').innerHTML = '';
+        }
+
+        // IP查询
+        async function queryIP() {
+            const ip = document.getElementById('queryIp').value;
+            if (!ip) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/ip/query?ipOrDomain=${encodeURIComponent(ip)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    document.getElementById('qIpAddr').textContent = data.ipAddress || '-';
+                    document.getElementById('qIpHost').textContent = data.hostname || '-';
+                    document.getElementById('qIpRegion').textContent = data.region || '-';
+                    document.getElementById('qIpISP').textContent = data.ISP || '-';
+                    document.getElementById('qIpMask').textContent = data.subnetMask || '-';
+                    document.getElementById('qIpGateway').textContent = data.gateway || '-';
+                } else {
+                    alert('查询失败: ' + result.message);
+                }
+            } catch (err) {
+                alert('查询失败: ' + err.message);
+            }
+        }
+
+        function getLocalIP() {
+            document.getElementById('qIpAddr').textContent = '192.168.1.xxx';
+            document.getElementById('qIpHost').textContent = 'localhost';
+            document.getElementById('qIpRegion').textContent = '局域网';
+            document.getElementById('qIpISP').textContent = '本地网络';
+            document.getElementById('qIpMask').textContent = '255.255.255.0';
+            document.getElementById('qIpGateway').textContent = '192.168.1.1';
+        }
+
+        // Whois查询
+        async function queryWhois() {
+            const domain = document.getElementById('whoisDomain').value;
+            if (!domain) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/network/whois?domain=${encodeURIComponent(domain)}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const whoisText = `Domain: ${data.domain}
+Registrar: ${data.registrar}
+Created Date: ${data.createdDate}
+Updated Date: ${data.updatedDate}
+Expiry Date: ${data.expiryDate}
+Nameservers: ${data.nameservers.join('\n            ')}
+Status: ${data.status}`;
+                    document.getElementById('whoisResult').value = whoisText;
+                } else {
+                    alert('查询失败: ' + result.message);
+                }
+            } catch (err) {
+                alert('查询失败: ' + err.message);
+            }
+        }
+
+        // AS-Interface
+        async function asiConnect() {
+            const portName = document.getElementById('asiPort').value;
+            const baudRate = parseInt(document.getElementById('asiBaudRate').value);
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/connect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName, baudRate })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '连接成功' : '连接失败: ' + result.message);
+            } catch (err) { alert('连接失败: ' + err.message); }
+        }
+        async function asiDisconnect() {
+            const portName = document.getElementById('asiPort').value;
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/disconnect`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ portName })
+                });
+                const result = await response.json();
+                alert(result.status === 'success' ? '断开成功' : '断开失败: ' + result.message);
+            } catch (err) { alert('断开失败: ' + err.message); }
+        }
+        async function asiSend() {
+            const data = {
+                portName: document.getElementById('asiPort').value,
+                baudRate: parseInt(document.getElementById('asiBaudRate').value),
+                masterAddr: parseInt(document.getElementById('asiMasterAddr').value),
+                slaveAddr: parseInt(document.getElementById('asiSlaveAddr').value),
+                operation: document.getElementById('asiOperation').value,
+                data: document.getElementById('asiData').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/protocol/asinterface/send`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('asiResponse').value = JSON.stringify(result.response);
+                } else {
+                    alert('发送失败: ' + result.message);
+                }
+            } catch (err) { alert('发送失败: ' + err.message); }
+        }
+
+        function showDebugTools() {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById('debugToolsSection').style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            loadDebugTools();
+        }
+
+        async function loadDebugTools() {
+            const container = document.getElementById('debugToolsContainer');
+            container.innerHTML = '<p style="color: #3498db;">正在加载调试工具列表...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/plc/debug-tools`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const categories = result.data;
+                    let html = '';
+
+                    categories.forEach(category => {
+                        html += `
+                            <div style="margin-bottom: 30px;">
+                                <h3 style="color: #2c3e50; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #3498db;">
+                                    ${category.icon} ${category.name}
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+                        `;
+
+                        category.tools.forEach(tool => {
+                            const priceColor = tool.Price.includes('免费') ? '#27ae60' : '#e67e22';
+                            html += `
+                                <div style="background: white; border-radius: 8px; padding: 15px; border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                        <span style="font-size: 28px;">${tool.Icon}</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #2c3e50; font-size: 15px;">${tool.Name}</div>
+                                            <div style="font-size: 12px; color: #7f8c8d;">${tool.Protocol}</div>
+                                        </div>
+                                    </div>
+                                    <p style="font-size: 13px; color: #666; margin-bottom: 10px; line-height: 1.5;">${tool.Description}</p>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; color: ${priceColor}; font-weight: 600;">${tool.Price}</span>
+                                        <a href="${tool.DownloadUrl}" target="_blank" style="background: #3498db; color: white; padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 13px;">
+                                            前往下载
+                                        </a>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 11px; color: #95a5a6;">
+                                        厂商：${tool.Manufacturer}
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="color: #e74c3c;">加载失败: ' + result.message + '</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p style="color: #e74c3c;">加载失败: ' + err.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

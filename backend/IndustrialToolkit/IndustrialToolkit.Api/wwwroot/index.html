@@ -1099,39 +1099,13 @@
         // 计算固定的 Session ID（基于 commit hash + 项目信息）
         async function computeFixedSessionId() {
             const data = `${PROJECT_INFO.githubUser}/${PROJECT_INFO.repoName}@${PROJECT_INFO.pinnedCommit}`;
-            let hex = '';
-            try {
-                if (crypto.subtle && location.protocol === 'https:') {
-                    const encoder = new TextEncoder();
-                    const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
-                    const hashArray = Array.from(new Uint8Array(buffer));
-                    hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-                } else {
-                    hex = simpleSha256(data).toUpperCase();
-                }
-            } catch (e) {
-                hex = simpleSha256(data).toUpperCase();
-            }
-            hex = hex.slice(0, 12);
+            // 使用 SHA-256 哈希算法（浏览器原生 API）
+            const encoder = new TextEncoder();
+            const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+            const hashArray = Array.from(new Uint8Array(buffer));
+            // 取前 12 个字符，分成 3 段，格式：TRAE-XXXX-XXXX-XXXX
+            const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase().slice(0, 12);
             return `TRAE-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}`;
-        }
-
-        function simpleSha256(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            let hex = Math.abs(hash).toString(16).padStart(8, '0');
-            let hash2 = 0;
-            for (let i = str.length - 1; i >= 0; i--) {
-                const char = str.charCodeAt(i);
-                hash2 = ((hash2 << 5) - hash2) + char + i * 7;
-                hash2 = hash2 & hash2;
-            }
-            hex += Math.abs(hash2).toString(16).padStart(8, '0');
-            return hex.padEnd(12, '0');
         }
 
         // 检查本地是否已经被用户手动覆盖

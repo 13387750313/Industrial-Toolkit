@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视觉工程师 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-text { font-size: 14px; }
+        
+        .nav-item.has-sub::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            color: #95a5a6;
+            transition: all 0.3s;
+            width: 16px;
+            text-align: right;
+        }
+
+        .nav-item.has-sub.open::after {
+            transform: rotate(90deg);
+            color: #3498db;
+        }
+
+        .sub-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: #1a252f;
+            display: none;
+        }
+
+        .sub-menu.open {
+            display: block;
+        }
+
+        .sub-item {
+            padding: 10px 20px 10px 45px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+
+        .sub-item:hover { background: #2c3e50; }
+        .sub-item.active { background: #3498db; }
+
+        .nav-group-title {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section { margin-bottom: 40px; }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        .tool-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .tool-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            color: #666;
+        }
+        
+        .result-value {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .recommend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .recommend-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.3s;
+        }
+        
+        .recommend-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .recommend-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .recommend-icon {
+            font-size: 40px;
+        }
+        
+        .recommend-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .recommend-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .recommend-specs {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 13px;
+        }
+        
+        .spec-label { color: #999; }
+        .spec-value { color: #333; font-weight: 500; }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .info-table th,
+        .info-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-table th {
+            background: #34495e;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .info-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .tab-container {
+            margin-bottom: 25px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            color: #3498db;
+        }
+        
+        .tab-btn.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        .sdk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .sdk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9ecef;
+        }
+
+        .sdk-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .sdk-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sdk-icon {
+            font-size: 28px;
+        }
+
+        .sdk-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .sdk-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .sdk-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .sdk-link:hover {
+            background: #2980b9;
+        }
+
+        .camera-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .camera-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        .camera-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .camera-spec {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .camera-spec span {
+            display: block;
+            padding: 3px 0;
+        }
+        
+        .camera-price {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .tool-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">🔒 本地IIS离线环境 - 安全可靠</div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item active">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('communication-tools.html')">
+                    <span class="nav-icon">📡</span>
+                    <span class="nav-text">通讯工具</span>
+                </li>
+                
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <h1 class="page-title">📷 视觉工程师工具</h1>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('sdk')">📚 SDK文档</button>
+                    <button class="tab-btn" onclick="switchTab('calculator')">📐 选型计算</button>
+                    <button class="tab-btn" onclick="switchTab('camera')">📸 相机推荐</button>
+                    <button class="tab-btn" onclick="switchTab('lens')">🔍 镜头推荐</button>
+                    <button class="tab-btn" onclick="switchTab('guide')">📖 选型指南</button>
+                </div>
+                
+                <div class="tab-content active" id="calculator">
+                    <div class="tool-grid">
+                        <div class="tool-card">
+                            <div class="tool-header">📏 视野范围计算</div>
+                            <div class="tool-body">
+                                <div class="form-group">
+                                    <label>相机分辨率 (像素)</label>
+                                    <select id="camRes">
+                                        <option value="640x480">640 x 480 (30万)</option>
+                                        <option value="1280x720">1280 x 720 (100万)</option>
+                                        <option value="1280x960">1280 x 960 (120万)</option>
+                                        <option value="1600x1200">1600 x 1200 (200万)</option>
+                                        <option value="1920x1080">1920 x 1080 (200万)</option>
+                                        <option value="2048x1536">2048 x 1536 (300万)</option>
+                                        <option value="2448x2048">2448 x 2048 (500万)</option>
+                                        <option value="4096x2160">4096 x 2160 (800万)</option>
+                                        <option value="5472x3648">5472 x 3648 (2000万)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>靶面尺寸</label>
+                                    <select id="sensorSize">
+                                        <option value="1/4">1/4 英寸 (3.2mm)</option>
+                                        <option value="1/3">1/3 英寸 (4.8mm)</option>
+                                        <option value="1/2.5">1/2.5 英寸 (5.76mm)</option>
+                                        <option value="1/2">1/2 英寸 (6.4mm)</option>
+                                        <option value="1/1.8">1/1.8 英寸 (7.1mm)</option>
+                                        <option value="2/3">2/3 英寸 (8.8mm)</option>
+                                        <option value="1">1 英寸 (12.8mm)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>检测精度要求 (mm/像素)</label>
+                                    <input type="number" id="precision" value="0.05" step="0.001" min="0.001">
+                                </div>
+                                <div class="btn-row">
+                                    <button class="btn btn-primary" onclick="calcFOV()">计算视野</button>
+                                    <button class="btn btn-secondary" onclick="calcFOVReset()">重置</button>
+                                </div>
+                                <div class="result-box" id="fovResult">
+                                    <div class="result-title">计算结果</div>
+                                    <div class="result-item">
+                                        <span class="result-label">水平视野</span>
+                                        <span class="result-value" id="hFOV">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">垂直视野</span>
+                                        <span class="result-value" id="vFOV">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">对角线视野</span>
+                                        <span class="result-value" id="dFOV">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">建议工作距离</span>
+                                        <span class="result-value" id="wd">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <div class="tool-header">🔍 镜头焦距计算</div>
+                            <div class="tool-body">
+                                <div class="form-group">
+                                    <label>视野范围 (mm)</label>
+                                    <input type="number" id="fovSize" value="100" step="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>工作距离 (mm)</label>
+                                    <input type="number" id="workDist" value="300" step="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>靶面尺寸 (mm)</label>
+                                    <select id="sensorType">
+                                        <option value="3.2">1/4 英寸 (3.2mm)</option>
+                                        <option value="4.8">1/3 英寸 (4.8mm)</option>
+                                        <option value="5.76">1/2.5 英寸 (5.76mm)</option>
+                                        <option value="6.4">1/2 英寸 (6.4mm)</option>
+                                        <option value="7.1">1/1.8 英寸 (7.1mm)</option>
+                                        <option value="8.8">2/3 英寸 (8.8mm)</option>
+                                        <option value="12.8">1 英寸 (12.8mm)</option>
+                                    </select>
+                                </div>
+                                <div class="btn-row">
+                                    <button class="btn btn-primary" onclick="calcFocal()">计算焦距</button>
+                                    <button class="btn btn-secondary" onclick="calcFocalReset()">重置</button>
+                                </div>
+                                <div class="result-box" id="focalResult">
+                                    <div class="result-title">计算结果</div>
+                                    <div class="result-item">
+                                        <span class="result-label">推荐焦距</span>
+                                        <span class="result-value" id="focalLen">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">视角 (°)</span>
+                                        <span class="result-value" id="viewAngle">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">景深范围</span>
+                                        <span class="result-value" id="dofRange">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">建议镜头类型</span>
+                                        <span class="result-value" id="lensType">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <div class="tool-header">💡 光源选型计算</div>
+                            <div class="tool-body">
+                                <div class="form-group">
+                                    <label>检测对象尺寸 (mm)</label>
+                                    <input type="number" id="objSize" value="50" step="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>视野范围 (mm)</label>
+                                    <input type="number" id="lightFOV" value="60" step="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>检测类型</label>
+                                    <select id="inspectType">
+                                        <option value="表面">表面缺陷检测</option>
+                                        <option value="尺寸">尺寸测量</option>
+                                        <option value="字符">字符/二维码识别</option>
+                                        <option value="定位">目标定位</option>
+                                        <option value="有无">有无检测</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>被测物体材质</label>
+                                    <select id="materialType">
+                                        <option value="金属">金属（镜面）</option>
+                                        <option value="塑料">塑料（漫反射）</option>
+                                        <option value="纸">纸张/电路板</option>
+                                        <option value="食品">食品/药品</option>
+                                    </select>
+                                </div>
+                                <div class="btn-row">
+                                    <button class="btn btn-primary" onclick="calcLight()">推荐光源</button>
+                                    <button class="btn btn-secondary" onclick="calcLightReset()">重置</button>
+                                </div>
+                                <div class="result-box" id="lightResult">
+                                    <div class="result-title">推荐光源配置</div>
+                                    <div class="result-item">
+                                        <span class="result-label">光源类型</span>
+                                        <span class="result-value" id="lightType">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">光源颜色</span>
+                                        <span class="result-value" id="lightColor">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">光源尺寸</span>
+                                        <span class="result-value" id="lightSize">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">照射方式</span>
+                                        <span class="result-value" id="lightMethod">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <div class="tool-header">📊 景深计算</div>
+                            <div class="tool-body">
+                                <div class="form-group">
+                                    <label>镜头焦距 (mm)</label>
+                                    <input type="number" id="dofFocal" value="12" step="0.5" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>光圈值 (F)</label>
+                                    <input type="number" id="aperture" value="8" step="0.5" min="1.4">
+                                </div>
+                                <div class="form-group">
+                                    <label>工作距离 (mm)</label>
+                                    <input type="number" id="dofWD" value="300" step="1" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>靶面尺寸 (mm)</label>
+                                    <select id="dofSensor">
+                                        <option value="4.8">1/3 英寸 (4.8mm)</option>
+                                        <option value="5.76">1/2.5 英寸 (5.76mm)</option>
+                                        <option value="6.4">1/2 英寸 (6.4mm)</option>
+                                        <option value="7.1">1/1.8 英寸 (7.1mm)</option>
+                                    </select>
+                                </div>
+                                <div class="btn-row">
+                                    <button class="btn btn-primary" onclick="calcDOF()">计算景深</button>
+                                    <button class="btn btn-secondary" onclick="calcDOFReset()">重置</button>
+                                </div>
+                                <div class="result-box" id="dofResult">
+                                    <div class="result-title">景深分析</div>
+                                    <div class="result-item">
+                                        <span class="result-label">近点景深</span>
+                                        <span class="result-value" id="dofNear">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">远点景深</span>
+                                        <span class="result-value" id="dofFar">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">总景深</span>
+                                        <span class="result-value" id="dofTotal">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">超焦距</span>
+                                        <span class="result-value" id="hyperDist">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content active" id="sdk">
+                    <div class="section">
+                        <h3 class="section-title">📚 视觉SDK与开发工具官方文档</h3>
+                        <p style="color: #666; margin-bottom: 20px;">以下是主流机器视觉软件和SDK的官方文档、下载地址，点击即可前往官网获取更多资源。</p>
+                        <div class="sdk-grid">
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔬</span>
+                                    <span class="sdk-name">OpenCV (C++)</span>
+                                </div>
+                                <p class="sdk-desc">开源计算机视觉库，支持图像处理、特征检测等</p>
+                                <a href="https://docs.opencv.org/" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔷</span>
+                                    <span class="sdk-name">OpenCVSharp (C#)</span>
+                                </div>
+                                <p class="sdk-desc">OpenCV的C#封装，适合.NET平台开发</p>
+                                <a href="https://shimat.github.io/opencvsharp_docs/html/d69c29a1-7fb1-4f78-82e9-79be971c3d03.htm" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🎯</span>
+                                    <span class="sdk-name">Halcon</span>
+                                </div>
+                                <p class="sdk-desc">德国MVTec机器视觉软件，行业标准</p>
+                                <a href="https://www.mvtec.com/products/halcon" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🎨</span>
+                                    <span class="sdk-name">海康机器人</span>
+                                </div>
+                                <p class="sdk-desc">海康威视机器视觉算法平台，国产首选</p>
+                                <a href="https://www.hikrobotics.com/cn/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🏢</span>
+                                    <span class="sdk-name">大华机器视觉 (华睿)</span>
+                                </div>
+                                <p class="sdk-desc">大华股份机器视觉SDK下载，含Ver2.3.2-2.5.1各版本</p>
+                                <a href="http://download.huaraytech.com/pub/sdk/" target="_blank" class="sdk-link">SDK下载</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">⚡</span>
+                                    <span class="sdk-name">奥普特 VisionPro</span>
+                                </div>
+                                <p class="sdk-desc">OPT机器视觉软件，完整解决方案</p>
+                                <a href="https://www.optmv.com/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">✨</span>
+                                    <span class="sdk-name">凌云光 VisionLab</span>
+                                </div>
+                                <p class="sdk-desc">凌云光视觉算法平台，国内领先</p>
+                                <a href="https://www.lusterinc.com/" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🤖</span>
+                                    <span class="sdk-name">NI Vision</span>
+                                </div>
+                                <p class="sdk-desc">美国国家仪器机器视觉工具</p>
+                                <a href="https://www.ni.com/zh-cn/shop/model/products.html?category=category-platforms-vision" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">🔧</span>
+                                    <span class="sdk-name">OpenVINO</span>
+                                </div>
+                                <p class="sdk-desc">Intel视觉推理工具套件</p>
+                                <a href="https://docs.openvino.ai/" target="_blank" class="sdk-link">官方文档</a>
+                            </div>
+                            <div class="sdk-card">
+                                <div class="sdk-header">
+                                    <span class="sdk-icon">📊</span>
+                                    <span class="sdk-name">VisionPro (康耐视)</span>
+                                </div>
+                                <p class="sdk-desc">Cognex康耐视机器视觉软件</p>
+                                <a href="https://www.cognex.com/products/machine-vision/visionpro" target="_blank" class="sdk-link">官方网站</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="calculator">
+                        <div class="camera-list">
+                            <div class="camera-card">
+                                <div class="camera-name">海康威视 MV-CA016</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 1600x1200 (200万)</span>
+                                    <span>靶面: 1/1.8" CMOS</span>
+                                    <span>帧率: 60fps</span>
+                                    <span>接口: USB3.0 / GigE</span>
+                                    <span>像元: 4.4μm</span>
+                                </div>
+                                <div class="camera-price">¥1,200 - 1,800</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">海康威视 MV-CA045</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 2592x2048 (500万)</span>
+                                    <span>靶面: 2/3" CMOS</span>
+                                    <span>帧率: 35fps</span>
+                                    <span>接口: USB3.0 / GigE</span>
+                                    <span>像元: 3.45μm</span>
+                                </div>
+                                <div class="camera-price">¥2,500 - 3,500</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">大华 DH-TPM-500</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 2448x2048 (500万)</span>
+                                    <span>靶面: 2/3" CMOS</span>
+                                    <span>帧率: 45fps</span>
+                                    <span>接口: USB3.0</span>
+                                    <span>像元: 3.45μm</span>
+                                </div>
+                                <div class="camera-price">¥2,200 - 3,200</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">Basler ace2</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 2592x1944 (500万)</span>
+                                    <span>靶面: 1/2.5" CMOS</span>
+                                    <span>帧率: 25fps</span>
+                                    <span>接口: USB3.0</span>
+                                    <span>像元: 2.2μm</span>
+                                </div>
+                                <div class="camera-price">¥3,500 - 5,000</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">Basler ace2 R</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 4096x2160 (800万)</span>
+                                    <span>靶面: 1" CMOS</span>
+                                    <span>帧率: 30fps</span>
+                                    <span>接口: USB3.0 / C接口</span>
+                                    <span>像元: 3.45μm</span>
+                                </div>
+                                <div class="camera-price">¥5,500 - 7,500</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">Teledyne FLIR Blackfly</div>
+                                <div class="camera-spec">
+                                    <span>分辨率: 4096x3000 (1200万)</span>
+                                    <span>靶面: 1" CMOS</span>
+                                    <span>帧率: 20fps</span>
+                                    <span>接口: USB3.0 / GigE</span>
+                                    <span>像元: 3.45μm</span>
+                                </div>
+                                <div class="camera-price">¥4,500 - 6,500</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="lens">
+                    <div class="section">
+                        <h3 class="section-title">🔍 工业镜头推荐</h3>
+                        <div class="camera-list">
+                            <div class="camera-card">
+                                <div class="camera-name">海康 MV-L</div>
+                                <div class="camera-spec">
+                                    <span>焦距: 4mm / 6mm / 8mm / 12mm / 16mm</span>
+                                    <span>接口: C接口</span>
+                                    <span>靶面: 1/1.8"</span>
+                                    <span>类型: FA镜头</span>
+                                    <span>特点: 高分辨率，低畸变</span>
+                                </div>
+                                <div class="camera-price">¥500 - 1,200</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">海康 MV-LD</div>
+                                <div class="camera-spec">
+                                    <span>焦距: 25mm / 35mm / 50mm / 75mm</span>
+                                    <span>接口: C接口</span>
+                                    <span>靶面: 2/3"</span>
+                                    <span>类型: 远心镜头</span>
+                                    <span>特点: 低畸变，远心设计</span>
+                                </div>
+                                <div class="camera-price">¥2,000 - 5,000</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">施耐德 Apo-Componon</div>
+                                <div class="camera-spec">
+                                    <span>焦距: 8mm - 80mm</span>
+                                    <span>接口: F接口 / C接口</span>
+                                    <span>靶面: 1"</span>
+                                    <span>类型: 线扫描镜头</span>
+                                    <span>特点: 高对比度，低色差</span>
+                                </div>
+                                <div class="camera-price">¥3,000 - 8,000</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">Moritex MML</div>
+                                <div class="camera-spec">
+                                    <span>焦距: 4.5mm - 110mm</span>
+                                    <span>接口: C接口</span>
+                                    <span>靶面: 2/3"</span>
+                                    <span>类型: FA镜头</span>
+                                    <span>特点: 高分辨率，广泛焦距</span>
+                                </div>
+                                <div class="camera-price">¥1,500 - 4,000</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">Edmund Optics紧凑型</div>
+                                <div class="camera-spec">
+                                    <span>焦距: 6mm / 8mm / 12mm / 16mm / 25mm</span>
+                                    <span>接口: C接口</span>
+                                    <span>靶面: 1/2"</span>
+                                    <span>类型: 微型镜头</span>
+                                    <span>特点: 体积小，重量轻</span>
+                                </div>
+                                <div class="camera-price">¥800 - 2,000</div>
+                            </div>
+                            <div class="camera-card">
+                                <div class="camera-name">VS Technology 远心</div>
+                                <div class="camera-spec">
+                                    <span>倍率: 0.16x - 4x</span>
+                                    <span>接口: C接口</span>
+                                    <span>靶面: 2/3"</span>
+                                    <span>类型: 双远心镜头</span>
+                                    <span>特点: 完美远心，低畸变</span>
+                                </div>
+                                <div class="camera-price">¥5,000 - 15,000</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="guide">
+                    <div class="section">
+                        <h3 class="section-title">📖 视觉系统选型指南</h3>
+                        
+                        <div class="recommend-grid">
+                            <div class="recommend-card">
+                                <div class="recommend-header">
+                                    <span class="recommend-icon">📏</span>
+                                    <span class="recommend-title">尺寸测量</span>
+                                </div>
+                                <div class="recommend-desc">
+                                    适用于精密零件尺寸检测，要求高精度、高稳定性。
+                                </div>
+                                <div class="recommend-specs">
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐相机</span>
+                                        <span class="spec-value">500万以上 GigE</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐镜头</span>
+                                        <span class="spec-value">FA镜头 / 远心镜头</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐光源</span>
+                                        <span class="spec-value">同轴光 / 背光</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">精度要求</span>
+                                        <span class="spec-value">≤ 0.01mm</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommend-card">
+                                <div class="recommend-header">
+                                    <span class="recommend-icon">🔍</span>
+                                    <span class="recommend-title">表面缺陷检测</span>
+                                </div>
+                                <div class="recommend-desc">
+                                    适用于金属、塑料等产品表面划伤、凹坑、污渍等检测。
+                                </div>
+                                <div class="recommend-specs">
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐相机</span>
+                                        <span class="spec-value">200万以上 USB3.0</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐镜头</span>
+                                        <span class="spec-value">FA镜头 + 同轴光</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐光源</span>
+                                        <span class="spec-value">同轴光 / 条形光</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">检测方式</span>
+                                        <span class="spec-value">明场 / 暗场</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommend-card">
+                                <div class="recommend-header">
+                                    <span class="recommend-icon">📝</span>
+                                    <span class="recommend-title">字符/二维码识别</span>
+                                </div>
+                                <div class="recommend-desc">
+                                    适用于产品追溯、标签读取、激光码识别等场景。
+                                </div>
+                                <div class="recommend-specs">
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐相机</span>
+                                        <span class="spec-value">200万以上 USB3.0</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐镜头</span>
+                                        <span class="spec-value">FA镜头</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐光源</span>
+                                        <span class="spec-value">环形光 / 同轴光</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">字符大小</span>
+                                        <span class="spec-value">≥ 0.5mm</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommend-card">
+                                <div class="recommend-header">
+                                    <span class="recommend-icon">🎯</span>
+                                    <span class="recommend-title">定位引导</span>
+                                </div>
+                                <div class="recommend-desc">
+                                    配合机械手实现抓取、装配等自动化引导。
+                                </div>
+                                <div class="recommend-specs">
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐相机</span>
+                                        <span class="spec-value">200万以上 GigE</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐镜头</span>
+                                        <span class="spec-value">FA镜头</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">推荐光源</span>
+                                        <span class="spec-value">环形光 / 条形光</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">重复精度</span>
+                                        <span class="spec-value">≤ 0.05mm</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="font-size: 18px; margin: 30px 0 20px; color: #2c3e50;">📋 常见靶面与视野对应表</h3>
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>靶面尺寸</th>
+                                    <th>对角线</th>
+                                    <th>4mm焦距视野</th>
+                                    <th>8mm焦距视野</th>
+                                    <th>12mm焦距视野</th>
+                                    <th>16mm焦距视野</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1/4" (3.2mm)</td>
+                                    <td>4mm</td>
+                                    <td>约 280 x 210mm</td>
+                                    <td>约 140 x 105mm</td>
+                                    <td>约 93 x 70mm</td>
+                                    <td>约 70 x 52mm</td>
+                                </tr>
+                                <tr>
+                                    <td>1/3" (4.8mm)</td>
+                                    <td>6mm</td>
+                                    <td>约 420 x 315mm</td>
+                                    <td>约 210 x 157mm</td>
+                                    <td>约 140 x 105mm</td>
+                                    <td>约 105 x 78mm</td>
+                                </tr>
+                                <tr>
+                                    <td>1/2" (6.4mm)</td>
+                                    <td>8mm</td>
+                                    <td>约 560 x 420mm</td>
+                                    <td>约 280 x 210mm</td>
+                                    <td>约 186 x 140mm</td>
+                                    <td>约 140 x 105mm</td>
+                                </tr>
+                                <tr>
+                                    <td>1/2.5" (5.76mm)</td>
+                                    <td>7.2mm</td>
+                                    <td>约 500 x 375mm</td>
+                                    <td>约 250 x 187mm</td>
+                                    <td>约 167 x 125mm</td>
+                                    <td>约 125 x 93mm</td>
+                                </tr>
+                                <tr>
+                                    <td>2/3" (8.8mm)</td>
+                                    <td>11mm</td>
+                                    <td>约 770 x 577mm</td>
+                                    <td>约 385 x 288mm</td>
+                                    <td>约 257 x 192mm</td>
+                                    <td>约 192 x 144mm</td>
+                                </tr>
+                                <tr>
+                                    <td>1" (12.8mm)</td>
+                                    <td>16mm</td>
+                                    <td>约 1120 x 840mm</td>
+                                    <td>约 560 x 420mm</td>
+                                    <td>约 373 x 280mm</td>
+                                    <td>约 280 x 210mm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h3 style="font-size: 18px; margin: 30px 0 20px; color: #2c3e50;">💡 光源选型建议</h3>
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>检测类型</th>
+                                    <th>推荐光源</th>
+                                    <th>光源颜色</th>
+                                    <th>照射方式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>表面划伤检测</td>
+                                    <td>同轴光 / 条形光</td>
+                                    <td>白色 / 蓝色</td>
+                                    <td>低角度</td>
+                                </tr>
+                                <tr>
+                                    <td>尺寸测量</td>
+                                    <td>背光源</td>
+                                    <td>白色</td>
+                                    <td>透射</td>
+                                </tr>
+                                <tr>
+                                    <td>字符识别</td>
+                                    <td>环形光 / 条形光</td>
+                                    <td>红色 / 白色</td>
+                                    <td>漫射</td>
+                                </tr>
+                                <tr>
+                                    <td>金属表面检测</td>
+                                    <td>同轴光 / 点光源</td>
+                                    <td>白色 / 蓝色</td>
+                                    <td>掠射</td>
+                                </tr>
+                                <tr>
+                                    <td>塑料件检测</td>
+                                    <td>环形光 / 穹顶光源</td>
+                                    <td>白色</td>
+                                    <td>漫射</td>
+                                </tr>
+                                <tr>
+                                    <td>PCB检测</td>
+                                    <td>同轴光 / 环形光</td>
+                                    <td>白色 / 绿色</td>
+                                    <td>漫射</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubMenu(el) {
+            const subMenu = el.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                el.classList.toggle('open');
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        function getSensorSize(sizeStr) {
+            const sizes = {
+                '1/4': 3.2,
+                '1/3': 4.8,
+                '1/2.5': 5.76,
+                '1/2': 6.4,
+                '1/1.8': 7.1,
+                '2/3': 8.8,
+                '1': 12.8
+            };
+            return sizes[sizeStr] || 6.4;
+        }
+        
+        function getResolution(resStr) {
+            const [w, h] = resStr.split('x').map(Number);
+            return { width: w, height: h };
+        }
+        
+        function calcFOV() {
+            const res = getResolution(document.getElementById('camRes').value);
+            const sensorSize = getSensorSize(document.getElementById('sensorSize').value);
+            const precision = parseFloat(document.getElementById('precision').value);
+            
+            const hFOV = res.width * precision;
+            const vFOV = res.height * precision;
+            const dFOV = Math.sqrt(hFOV * hFOV + vFOV * vFOV);
+            
+            const aspectRatio = res.width / res.height;
+            const diagSensor = Math.sqrt(sensorSize * sensorSize);
+            
+            const focalLength = diagSensor / Math.sqrt(1 + aspectRatio * aspectRatio) * (hFOV / res.width);
+            const wd = (focalLength * 1000) / precision;
+            
+            document.getElementById('hFOV').textContent = hFOV.toFixed(2) + ' mm';
+            document.getElementById('vFOV').textContent = vFOV.toFixed(2) + ' mm';
+            document.getElementById('dFOV').textContent = dFOV.toFixed(2) + ' mm';
+            document.getElementById('wd').textContent = (wd / 3).toFixed(0) + ' - ' + (wd / 2).toFixed(0) + ' mm';
+        }
+        
+        function calcFOVReset() {
+            document.getElementById('camRes').value = '1280x720';
+            document.getElementById('sensorSize').value = '1/2';
+            document.getElementById('precision').value = '0.05';
+            document.getElementById('hFOV').textContent = '-';
+            document.getElementById('vFOV').textContent = '-';
+            document.getElementById('dFOV').textContent = '-';
+            document.getElementById('wd').textContent = '-';
+        }
+        
+        function calcFocal() {
+            const fovSize = parseFloat(document.getElementById('fovSize').value);
+            const workDist = parseFloat(document.getElementById('workDist').value);
+            const sensorSize = parseFloat(document.getElementById('sensorType').value);
+            
+            const focalLen = (sensorSize * workDist) / fovSize;
+            const viewAngle = 2 * Math.atan(sensorSize / (2 * focalLen)) * (180 / Math.PI);
+            const dofNear = (focalLen * workDist) / (focalLen + 0.01 * workDist);
+            const dofFar = (focalLen * workDist) / (focalLen - 0.01 * workDist);
+            
+            let lensType = '';
+            if (focalLen < 8) lensType = '广角镜头';
+            else if (focalLen < 16) lensType = '标准镜头';
+            else if (focalLen < 35) lensType = '中焦镜头';
+            else lensType = '远摄镜头';
+            
+            document.getElementById('focalLen').textContent = focalLen.toFixed(1) + ' mm';
+            document.getElementById('viewAngle').textContent = viewAngle.toFixed(1) + '°';
+            document.getElementById('dofRange').textContent = (dofNear * 0.8).toFixed(0) + ' - ' + (dofFar * 1.2).toFixed(0) + ' mm';
+            document.getElementById('lensType').textContent = lensType;
+        }
+        
+        function calcFocalReset() {
+            document.getElementById('fovSize').value = '100';
+            document.getElementById('workDist').value = '300';
+            document.getElementById('sensorType').value = '6.4';
+            document.getElementById('focalLen').textContent = '-';
+            document.getElementById('viewAngle').textContent = '-';
+            document.getElementById('dofRange').textContent = '-';
+            document.getElementById('lensType').textContent = '-';
+        }
+        
+        function calcLight() {
+            const objSize = parseFloat(document.getElementById('objSize').value);
+            const lightFOV = parseFloat(document.getElementById('lightFOV').value);
+            const inspectType = document.getElementById('inspectType').value;
+            const materialType = document.getElementById('materialType').value;
+            
+            let lightType = '';
+            let lightColor = '';
+            let lightSize = '';
+            let lightMethod = '';
+            
+            const size = lightFOV * 1.3;
+            if (size <= 50) lightSize = '50 x 50 mm';
+            else if (size <= 100) lightSize = '100 x 100 mm';
+            else if (size <= 150) lightSize = '150 x 150 mm';
+            else if (size <= 200) lightSize = '200 x 200 mm';
+            else lightSize = '定制尺寸';
+            
+            switch (inspectType) {
+                case '表面':
+                    lightType = '同轴光源 / 条形光源';
+                    lightColor = '白色 / 蓝色';
+                    lightMethod = '低角度照射';
+                    break;
+                case '尺寸':
+                    lightType = '背光源';
+                    lightColor = '白色';
+                    lightMethod = '透射方式';
+                    break;
+                case '字符':
+                    lightType = '环形光源';
+                    lightColor = '红色 / 白色';
+                    lightMethod = '漫射照射';
+                    break;
+                case '定位':
+                    lightType = '环形光源 / 条形光源';
+                    lightColor = '白色';
+                    lightMethod = '漫射照射';
+                    break;
+                case '有无':
+                    lightType = '背光源 / 同轴光源';
+                    lightColor = '白色 / 红色';
+                    lightMethod = '对比度最大化';
+                    break;
+            }
+            
+            if (materialType === '金属') {
+                lightColor += '（避免镜面反射）';
+            }
+            
+            document.getElementById('lightType').textContent = lightType;
+            document.getElementById('lightColor').textContent = lightColor;
+            document.getElementById('lightSize').textContent = lightSize;
+            document.getElementById('lightMethod').textContent = lightMethod;
+        }
+        
+        function calcLightReset() {
+            document.getElementById('objSize').value = '50';
+            document.getElementById('lightFOV').value = '60';
+            document.getElementById('inspectType').value = '表面';
+            document.getElementById('materialType').value = '金属';
+            document.getElementById('lightType').textContent = '-';
+            document.getElementById('lightColor').textContent = '-';
+            document.getElementById('lightSize').textContent = '-';
+            document.getElementById('lightMethod').textContent = '-';
+        }
+        
+        function calcDOF() {
+            const focalLen = parseFloat(document.getElementById('dofFocal').value);
+            const aperture = parseFloat(document.getElementById('aperture').value);
+            const workDist = parseFloat(document.getElementById('dofWD').value);
+            const sensorSize = parseFloat(document.getElementById('dofSensor').value);
+            
+            const c = 0.018 * aperture;
+            const f = focalLen;
+            const D = workDist;
+            const f2 = f * f;
+            
+            const hyperDist = (f2 * aperture) / (c * 1000) + f;
+            const dofNear = (hyperDist * D) / (hyperDist + (D - f));
+            const dofFar = (hyperDist * D) / (hyperDist - (D - f));
+            
+            const dofTotal = dofFar - dofNear;
+            
+            document.getElementById('dofNear').textContent = dofNear.toFixed(1) + ' mm';
+            document.getElementById('dofFar').textContent = dofFar.toFixed(1) + ' mm';
+            document.getElementById('dofTotal').textContent = dofTotal.toFixed(1) + ' mm';
+            document.getElementById('hyperDist').textContent = hyperDist.toFixed(1) + ' mm';
+        }
+        
+        function calcDOFReset() {
+            document.getElementById('dofFocal').value = '12';
+            document.getElementById('aperture').value = '8';
+            document.getElementById('dofWD').value = '300';
+            document.getElementById('dofSensor').value = '4.8';
+            document.getElementById('dofNear').textContent = '-';
+            document.getElementById('dofFar').textContent = '-';
+            document.getElementById('dofTotal').textContent = '-';
+            document.getElementById('hyperDist').textContent = '-';
+        }
+    </script>
+</body>
+</html>
