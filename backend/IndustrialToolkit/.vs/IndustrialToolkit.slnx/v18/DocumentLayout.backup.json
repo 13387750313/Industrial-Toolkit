@@ -32,7 +32,7 @@
               "RelativeDocumentMoniker": "IndustrialToolkit.Api\\Program.cs",
               "ToolTip": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\Program.cs",
               "RelativeToolTip": "IndustrialToolkit.Api\\Program.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAAACsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-23T02:39:53.919Z",
               "EditorCaption": ""
@@ -40,15 +40,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "IndustrialToolkit.Api",
+              "Title": "IndustrialToolkit.Api.csproj",
               "DocumentMoniker": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
               "RelativeDocumentMoniker": "IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
               "ToolTip": "C:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\backend\\IndustrialToolkit\\IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
               "RelativeToolTip": "IndustrialToolkit.Api\\IndustrialToolkit.Api.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-06-23T01:50:11.758Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-23T01:50:11.758Z"
             }
           ]
         }

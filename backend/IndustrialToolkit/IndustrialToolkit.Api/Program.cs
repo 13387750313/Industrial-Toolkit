@@ -45,6 +45,7 @@ builder.Services.AddSingleton<RobotCommunicationService>();
 builder.Services.AddSingleton<CanCommunicationService>();
 builder.Services.AddSingleton<IndustrialProtocolService>();
 builder.Services.AddSingleton<NetworkToolService>();
+builder.Services.AddSingleton<SerialPortDetectorService>();
 
 var app = builder.Build();
 

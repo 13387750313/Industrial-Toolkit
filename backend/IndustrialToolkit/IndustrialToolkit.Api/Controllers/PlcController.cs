@@ -9,10 +9,12 @@ namespace IndustrialToolkit.Controllers
     public class PlcController : ControllerBase
     {
         private readonly PlcCommunicationService _communicationService;
+        private readonly SerialPortDetectorService _serialDetector;
 
-        public PlcController(PlcCommunicationService communicationService)
+        public PlcController(PlcCommunicationService communicationService, SerialPortDetectorService serialDetector)
         {
             _communicationService = communicationService;
+            _serialDetector = serialDetector;
         }
 
         [HttpGet("protocols")]
@@ -192,6 +194,13 @@ namespace IndustrialToolkit.Controllers
         {
             var isConnected = _communicationService.IsTcpConnected(ipAddress, port);
             return Ok(new { status = "success", connected = isConnected });
+        }
+
+        [HttpGet("serial/info")]
+        public IActionResult GetSerialPortInfo()
+        {
+            var info = _serialDetector.GetSerialPortInfo();
+            return Ok(new { status = "success", data = info });
         }
 
         [HttpGet("logs")]

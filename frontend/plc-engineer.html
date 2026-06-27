@@ -626,6 +626,19 @@
                         </div>
                     </div>
                     
+                    <div id="serialDriverInfo" style="margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #f8f9fa; border: 1px solid #e9ecef;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: bold; color: #2c3e50;">🔍 串口驱动检测</span>
+                            <button class="btn btn-primary" onclick="loadSerialDriverInfo()" style="padding: 6px 12px; font-size: 12px;">刷新检测</button>
+                        </div>
+                        <div id="driverStatus" style="color: #666; font-size: 13px;">点击刷新按钮检测系统串口状态...</div>
+                    </div>
+                    
+                    <div id="driverDownloadPanel" style="display: none; margin-bottom: 15px; padding: 15px; border-radius: 8px; background: #fff8e6; border: 1px solid #ffc107;">
+                        <div style="font-weight: bold; color: #f57c00; margin-bottom: 10px;">⚠️ 未检测到串口，请下载安装驱动</div>
+                        <div id="driverList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;"></div>
+                    </div>
+                    
                     <div class="serial-controls">
                         <div class="control-group">
                             <label>串口选择</label>
@@ -1575,6 +1588,49 @@
             }
         }
         
+        async function loadSerialDriverInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/plc/serial/info`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const info = result.data;
+                    const driverStatus = document.getElementById('driverStatus');
+                    const downloadPanel = document.getElementById('driverDownloadPanel');
+                    const driverList = document.getElementById('driverList');
+                    
+                    if (info.hasSerialPorts) {
+                        const ports = info.ports.join(', ');
+                        driverStatus.innerHTML = `✅ <span style="color: #27ae60;">检测到 ${info.ports.length} 个串口: ${ports}</span>`;
+                        downloadPanel.style.display = 'none';
+                    } else {
+                        driverStatus.innerHTML = `⚠️ <span style="color: #e67e22;">未检测到可用串口</span>`;
+                        downloadPanel.style.display = 'block';
+                        
+                        driverList.innerHTML = '';
+                        info.commonDrivers.forEach(driver => {
+                            driverList.innerHTML += `
+                                <div style="padding: 10px; background: white; border-radius: 6px; border: 1px solid #ddd;">
+                                    <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 4px;">
+                                        ${driver.icon} ${driver.chipName}
+                                    </div>
+                                    <div style="font-size: 11px; color: #666; margin-bottom: 6px;">${driver.manufacturer}</div>
+                                    <div style="font-size: 11px; color: #999; margin-bottom: 8px;">${driver.description}</div>
+                                    <a href="${driver.downloadUrl}" target="_blank" 
+                                       style="display: block; text-align: center; padding: 6px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">
+                                        下载驱动
+                                    </a>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('加载串口信息失败:', err);
+                document.getElementById('driverStatus').innerHTML = '❌ 检测失败: ' + err.message;
+            }
+        }
+        
         async function connectSerial() {
             const portName = document.getElementById('portSelect').value;
             const baudRate = parseInt(document.getElementById('baudRate').value);
@@ -1854,6 +1910,7 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadPorts();
+            loadSerialDriverInfo();
         });
         
         function scrollToPanel(panelId) {
