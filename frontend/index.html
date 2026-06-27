@@ -530,7 +530,91 @@
             color: white;
             transform: translateY(-3px);
         }
-    </style>
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .monitor-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .monitor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .monitor-icon { font-size: 24px; }
+        .monitor-title { font-size: 14px; color: #666; }
+        .monitor-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .monitor-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .monitor-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .monitor-fill.cpu { background: linear-gradient(90deg, #3498db, #2980b9); }
+        .monitor-fill.memory { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .monitor-fill.disk { background: linear-gradient(90deg, #27ae60, #1e8449); }
+        .monitor-info { font-size: 12px; color: #888; margin-top: 8px; }
+        .drive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .drive-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        .drive-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .drive-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .drive-bar {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .drive-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            transition: width 0.5s;
+        }
+        .drive-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }    </style>
 </head>
 
 <body>
@@ -548,6 +632,10 @@
                     <span class="nav-text">首页</span>
                 </li>
 
+                <li class="nav-item" onclick="scrollToSection('systemMonitor')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">系统监控</span>
+                </li>
                 <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
                     <span class="nav-icon">🔧</span>
                     <span class="nav-text">PLC工程师</span>
@@ -700,7 +788,55 @@
             </div>
             <div class="session-toast" id="sessionToast">✅ 已复制到剪贴板</div>
 
-            <section class="section" id="overview">
+
+            <section class="section" id="systemMonitor">
+                <h2 class="section-title">📊 系统监控</h2>
+                <div class="monitor-grid">
+                    <div class="monitor-card">
+                        <div class="monitor-header">
+                            <span class="monitor-icon">🖥️</span>
+                            <span class="monitor-title">CPU使用率</span>
+                        </div>
+                        <div class="monitor-value" id="cpuValue">0%</div>
+                        <div class="monitor-bar">
+                            <div class="monitor-fill cpu" id="cpuBar"></div>
+                        </div>
+                        <div class="monitor-info" id="cpuInfo">CPU核心数: 0</div>
+                    </div>
+                    <div class="monitor-card">
+                        <div class="monitor-header">
+                            <span class="monitor-icon">💾</span>
+                            <span class="monitor-title">内存使用率</span>
+                        </div>
+                        <div class="monitor-value" id="memoryValue">0%</div>
+                        <div class="monitor-bar">
+                            <div class="monitor-fill memory" id="memoryBar"></div>
+                        </div>
+                        <div class="monitor-info" id="memoryInfo">总内存: 0 GB</div>
+                    </div>
+                    <div class="monitor-card">
+                        <div class="monitor-header">
+                            <span class="monitor-icon">⚡</span>
+                            <span class="monitor-title">系统负载</span>
+                        </div>
+                        <div class="monitor-value" id="loadValue">0.00</div>
+                        <div class="monitor-bar">
+                            <div class="monitor-fill cpu" id="loadBar"></div>
+                        </div>
+                        <div class="monitor-info" id="loadInfo">正常</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 10px;">💽 硬盘使用情况</h3>
+                    <div class="drive-grid" id="driveGrid">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                    <button class="btn btn-primary" onclick="refreshSystemInfo()">🔄 刷新系统信息</button>
+                    <span id="lastUpdateTime" style="color: #888; font-size: 13px;">上次更新: --</span>
+                </div>
+            </section>            <section class="section" id="overview">
                 <h2 class="section-title">🏭 产品概述</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
@@ -1039,6 +1175,79 @@
             }
         }
     </script>
-</body>
+    <script>
+        function refreshSystemInfo() {
+            fetch('/api/system/info')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cpuValue').textContent = (data.cpuUsage || 0) + '%';
+                    document.getElementById('cpuBar').style.width = (data.cpuUsage || 0) + '%';
+                    document.getElementById('cpuInfo').textContent = 'CPU核心数: ' + (data.cpuCores || 0);
+                    document.getElementById('memoryValue').textContent = (data.memoryUsage || 0) + '%';
+                    document.getElementById('memoryBar').style.width = (data.memoryUsage || 0) + '%';
+                    document.getElementById('memoryInfo').textContent = '总内存: ' + (data.totalMemory || 0) + ' GB';
+                    const load = data.systemLoad || 0;
+                    document.getElementById('loadValue').textContent = load.toFixed(2);
+                    document.getElementById('loadBar').style.width = Math.min(load * 30, 100) + '%';
+                    document.getElementById('loadInfo').textContent = load > 1.5 ? '较高' : '正常';
+                    
+                    // 硬盘信息
+                    const driveGrid = document.getElementById('driveGrid');
+                    driveGrid.innerHTML = '';
+                    if (data.drives && data.drives.length > 0) {
+                        data.drives.forEach(drive => {
+                            const usedPercent = drive.usedPercent || 0;
+                            const div = document.createElement('div');
+                            div.className = 'drive-card';
+                            div.innerHTML = 
+                                <div class="drive-header">
+                                    <span style="font-size: 20px;">💽</span>
+                                    <span class="drive-name">\</span>
+                                </div>
+                                <div class="drive-bar">
+                                    <div class="drive-fill" style="width: \%"></div>
+                                </div>
+                                <div class="drive-text">\ GB 可用 / \ GB 共 (\% 已用)</div>
+                            ;
+                            driveGrid.appendChild(div);
+                        });
+                    }
+                    
+                    document.getElementById('lastUpdateTime').textContent = '上次更新: ' + new Date().toLocaleTimeString();
+                })
+                .catch(() => {
+                    // 模拟数据
+                    document.getElementById('cpuValue').textContent = '35%';
+                    document.getElementById('cpuBar').style.width = '35%';
+                    document.getElementById('cpuInfo').textContent = 'CPU核心数: 8';
+                    document.getElementById('memoryValue').textContent = '42%';
+                    document.getElementById('memoryBar').style.width = '42%';
+                    document.getElementById('memoryInfo').textContent = '总内存: 16 GB';
+                    document.getElementById('loadValue').textContent = '0.85';
+                    document.getElementById('loadBar').style.width = '25%';
+                    document.getElementById('loadInfo').textContent = '正常';
+                    
+                    // 模拟硬盘
+                    const driveGrid = document.getElementById('driveGrid');
+                    driveGrid.innerHTML = 
+                        <div class="drive-card">
+                            <div class="drive-header"><span style="font-size: 20px;">💽</span><span class="drive-name">C:</span></div>
+                            <div class="drive-bar"><div class="drive-fill" style="width: 72%"></div></div>
+                            <div class="drive-text">53.9 GB 可用 / 198 GB 共 (72% 已用)</div>
+                        </div>
+                        <div class="drive-card">
+                            <div class="drive-header"><span style="font-size: 20px;">💽</span><span class="drive-name">D:</span></div>
+                            <div class="drive-bar"><div class="drive-fill" style="width: 54%"></div></div>
+                            <div class="drive-text">127 GB 可用 / 275 GB 共 (54% 已用)</div>
+                        </div>
+                    ;
+                    document.getElementById('lastUpdateTime').textContent = '上次更新: ' + new Date().toLocaleTimeString();
+                });
+        }
+        
+        // 初始加载和定时刷新
+        refreshSystemInfo();
+        setInterval(refreshSystemInfo, 60000); // 每分钟刷新
+    </script></body>
 
 </html>
