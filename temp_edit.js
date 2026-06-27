@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = 'c:\\Users\\W1338\\Desktop\\Industrial-Toolkit\\frontend\\software-engineer.html';
 let content = fs.readFileSync(path, 'utf8');
 
