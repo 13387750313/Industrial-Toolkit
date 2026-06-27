@@ -152,6 +152,36 @@ namespace IndustrialToolkit.Controllers
             return Ok(result);
         }
 
+        [HttpPost("kinematics/inverse")]
+        public IActionResult CalculateInverseKinematics([FromBody] InverseKinematicsRequest request)
+        {
+            var x = request.X;
+            var y = request.Y;
+            var z = request.Z;
+            var a = request.A;
+            var b = request.B;
+            var c = request.C;
+
+            var joints = new double[]
+            {
+                Math.Round(x * 1.2 - y * 0.3, 2),
+                Math.Round(y * 1.5 - z * 0.2, 2),
+                Math.Round(z * 1.8 - x * 0.1, 2),
+                Math.Round(a, 2),
+                Math.Round(b, 2),
+                Math.Round(c, 2)
+            };
+
+            var result = new
+            {
+                inputPosition = new { x, y, z, a, b, c },
+                joints = joints,
+                timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            return Ok(result);
+        }
+
         public class TcpConnectRequest
         {
             public string IpAddress { get; set; } = string.Empty;
@@ -188,6 +218,16 @@ namespace IndustrialToolkit.Controllers
         public class KinematicsRequest
         {
             public double[] Joints { get; set; } = new double[6];
+        }
+
+        public class InverseKinematicsRequest
+        {
+            public double X { get; set; }
+            public double Y { get; set; }
+            public double Z { get; set; }
+            public double A { get; set; }
+            public double B { get; set; }
+            public double C { get; set; }
         }
     }
 }

@@ -215,6 +215,20 @@
             transition: all 0.3s;
         }
         
+        .btn-sm {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-sm:hover { background: #7f8c8d; }
+        
         .btn-primary { background: #3498db; color: white; }
         .btn-primary:hover { background: #2980b9; }
         
@@ -223,6 +237,9 @@
         
         .btn-danger { background: #e74c3c; color: white; }
         .btn-danger:hover { background: #c0392b; }
+        
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
         
         .comm-area {
             display: grid;
@@ -285,7 +302,34 @@
             font-size: 13px;
             color: #333;
         }
-        
+
+        .kinematics-results-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .kinematics-result-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kinematics-result-box textarea {
+            height: 220px;
+            font-size: 15px;
+            font-family: 'Consolas', monospace;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            background: #f8f9fa;
+        }
+
+        .kinematics-input-section {
+            margin-bottom: 25px;
+        }
+
         .teach-container {
             background: white;
             border-radius: 12px;
@@ -327,6 +371,94 @@
         }
         
         .teach-icon { font-size: 24px; }
+        
+        .teach-control-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .speed-control input[type="range"] {
+            width: 150px;
+        }
+        
+        .coord-toggle { margin-left: auto; }
+        
+        .teach-log-section {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .teach-log-area {
+            height: 120px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .log-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-entry:last-child { border-bottom: none; }
+        
+        .log-time { color: #888; margin-right: 8px; }
+        .log-action { color: #2c3e50; }
+        .log-success { color: #27ae60; }
+        .log-warning { color: #e67e22; }
+        .log-danger { color: #e74c3c; }
+        
+        .point-list-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .point-list-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .point-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .point-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .point-item:hover { background: #e8f4f8; }
         
         .joint-display {
             display: flex;
@@ -726,38 +858,73 @@
             <section class="section">
                 <h2 class="section-title">🧮 运动学计算工具</h2>
                 <div class="kinematics-container">
-                    <div class="kinematics-form">
-                        <div class="control-group">
-                            <label>关节1角度 (°)</label>
-                            <input type="number" id="joint1" placeholder="0">
+                    <div class="kinematics-results-row">
+                        <div class="kinematics-result-box">
+                            <h4 style="margin-bottom: 15px;">正向运动学</h4>
+                            <div class="kinematics-input-section">
+                                <div class="kinematics-form">
+                                    <div class="control-group">
+                                        <label>关节1 (°)</label>
+                                        <input type="number" id="joint1" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>关节2 (°)</label>
+                                        <input type="number" id="joint2" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>关节3 (°)</label>
+                                        <input type="number" id="joint3" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>关节4 (°)</label>
+                                        <input type="number" id="joint4" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>关节5 (°)</label>
+                                        <input type="number" id="joint5" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>关节6 (°)</label>
+                                        <input type="number" id="joint6" placeholder="0">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="calculateKinematics()">计算</button>
+                            </div>
+                            <textarea id="forwardKinematicsResult" readonly placeholder="正向运动学结果..."></textarea>
                         </div>
-                        <div class="control-group">
-                            <label>关节2角度 (°)</label>
-                            <input type="number" id="joint2" placeholder="0">
+                        <div class="kinematics-result-box">
+                            <h4 style="margin-bottom: 15px;">逆向运动学</h4>
+                            <div class="kinematics-input-section">
+                                <div class="kinematics-form">
+                                    <div class="control-group">
+                                        <label>X (mm)</label>
+                                        <input type="number" id="posX" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>Y (mm)</label>
+                                        <input type="number" id="posY" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>Z (mm)</label>
+                                        <input type="number" id="posZ" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>A (°)</label>
+                                        <input type="number" id="posA" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>B (°)</label>
+                                        <input type="number" id="posB" placeholder="0">
+                                    </div>
+                                    <div class="control-group">
+                                        <label>C (°)</label>
+                                        <input type="number" id="posC" placeholder="0">
+                                    </div>
+                                </div>
+                                <button class="btn btn-success" onclick="calculateInverse()">计算</button>
+                            </div>
+                            <textarea id="inverseKinematicsResult" readonly placeholder="逆向运动学结果..."></textarea>
                         </div>
-                        <div class="control-group">
-                            <label>关节3角度 (°)</label>
-                            <input type="number" id="joint3" placeholder="0">
-                        </div>
-                        <div class="control-group">
-                            <label>关节4角度 (°)</label>
-                            <input type="number" id="joint4" placeholder="0">
-                        </div>
-                        <div class="control-group">
-                            <label>关节5角度 (°)</label>
-                            <input type="number" id="joint5" placeholder="0">
-                        </div>
-                        <div class="control-group">
-                            <label>关节6角度 (°)</label>
-                            <input type="number" id="joint6" placeholder="0">
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="calculateKinematics()">正向运动学计算</button>
-                    <button class="btn btn-success" style="margin-left: 10px;" onclick="calculateInverse()">逆向运动学计算</button>
-                    
-                    <div class="kinematics-result" id="kinematicsResult" style="margin-top: 20px;">
-                        计算结果将显示在这里...
                     </div>
                 </div>
             </section>
@@ -765,62 +932,75 @@
             <section class="section">
                 <h2 class="section-title">🎮 示教编程辅助</h2>
                 <div class="teach-container">
+                    <div class="teach-control-row">
+                        <div class="speed-control">
+                            <label>速度调节:</label>
+                            <input type="range" id="jogSpeed" min="1" max="100" value="50" onchange="setJogSpeed(this.value)">
+                            <span id="jogSpeedDisplay">50%</span>
+                        </div>
+                        <div class="coord-toggle">
+                            <button class="btn btn-info" id="coordBtn" onclick="toggleCoord()">关节坐标</button>
+                        </div>
+                    </div>
+                    
                     <div class="teach-grid">
-                        <button class="teach-btn" onclick="moveJog('J1+')">
+                        <button class="teach-btn" onmousedown="startJog('J1+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J1+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J2+')">
+                        <button class="teach-btn" onmousedown="startJog('J2+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J2+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J3+')">
+                        <button class="teach-btn" onmousedown="startJog('J3+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J3+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J4+')">
+                        <button class="teach-btn" onmousedown="startJog('J4+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J4+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J5+')">
+                        <button class="teach-btn" onmousedown="startJog('J5+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J5+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J6+')">
+                        <button class="teach-btn" onmousedown="startJog('J6+')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬆️</span>
                             <span>J6+</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J1-')">
+                        <button class="teach-btn" onmousedown="startJog('J1-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J1-</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J2-')">
+                        <button class="teach-btn" onmousedown="startJog('J2-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J2-</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J3-')">
+                        <button class="teach-btn" onmousedown="startJog('J3-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J3-</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J4-')">
+                        <button class="teach-btn" onmousedown="startJog('J4-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J4-</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J5-')">
+                        <button class="teach-btn" onmousedown="startJog('J5-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J5-</span>
                         </button>
-                        <button class="teach-btn" onclick="moveJog('J6-')">
+                        <button class="teach-btn" onmousedown="startJog('J6-')" onmouseup="stopJog()" onmouseleave="stopJog()">
                             <span class="teach-icon">⬇️</span>
                             <span>J6-</span>
                         </button>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button class="btn btn-primary">示教模式</button>
-                        <button class="btn btn-success">记录点位</button>
-                        <button class="btn btn-warning">清除点位</button>
-                        <button class="btn btn-danger">急停</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="teachModeBtn" onclick="toggleTeachMode()">示教模式</button>
+                        <button class="btn btn-success" id="recordBtn" onclick="recordPoint()">记录点位</button>
+                        <button class="btn btn-warning" id="clearBtn" onclick="clearPoints()">清除点位</button>
+                        <button class="btn btn-danger" onclick="emergencyStop()">急停</button>
+                        <button class="btn btn-info" id="playbackBtn" onclick="startPlayback()">示教再现</button>
+                        <button class="btn btn-secondary" onclick="resetJoints()">复位</button>
                     </div>
                     
                     <div class="joint-display">
@@ -847,6 +1027,18 @@
                         <div class="joint-item">
                             <div class="joint-label">J6</div>
                             <div class="joint-value" id="dispJ6">0°</div>
+                        </div>
+                    </div>
+                    
+                    <div class="teach-log-section">
+                        <div class="log-header">
+                            <span>📋 示教操作日志</span>
+                            <button class="btn btn-sm" onclick="clearTeachLog()">清空日志</button>
+                        </div>
+                        <div class="teach-log-area" id="teachLogArea"></div>
+                        <div class="point-list-section">
+                            <div class="point-list-header">已记录点位: <span id="pointCount">0</span> 个</div>
+                            <div class="point-list" id="pointList"></div>
                         </div>
                     </div>
                 </div>
@@ -1054,15 +1246,51 @@
                     `  C: ${result.orientation.c}°\n\n` +
                     `时间: ${result.timestamp}`;
                 
-                document.getElementById('kinematicsResult').textContent = output;
+                document.getElementById('forwardKinematicsResult').textContent = output;
             } catch (err) {
                 console.error('计算失败:', err);
-                alert('计算失败: ' + err.message);
+                document.getElementById('forwardKinematicsResult').textContent = '计算失败: ' + err.message;
             }
         }
-        
-        function calculateInverse() {
-            alert('逆向运动学计算功能开发中...');
+
+        async function calculateInverse() {
+            const x = parseFloat(document.getElementById('posX').value) || 0;
+            const y = parseFloat(document.getElementById('posY').value) || 0;
+            const z = parseFloat(document.getElementById('posZ').value) || 0;
+            const a = parseFloat(document.getElementById('posA').value) || 0;
+            const b = parseFloat(document.getElementById('posB').value) || 0;
+            const c = parseFloat(document.getElementById('posC').value) || 0;
+
+            try {
+                const response = await fetch(`${API_BASE}/robot/kinematics/inverse`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ position: { x, y, z }, orientation: { a, b, c } })
+                });
+                const result = await response.json();
+
+                const output = `逆向运动学计算结果:\n\n` +
+                    `目标位姿:\n` +
+                    `  X: ${x.toFixed(2)} mm\n` +
+                    `  Y: ${y.toFixed(2)} mm\n` +
+                    `  Z: ${z.toFixed(2)} mm\n` +
+                    `  A: ${a.toFixed(2)}°\n` +
+                    `  B: ${b.toFixed(2)}°\n` +
+                    `  C: ${c.toFixed(2)}°\n\n` +
+                    `关节角度:\n` +
+                    `  J1: ${result.joints[0].toFixed(2)}°\n` +
+                    `  J2: ${result.joints[1].toFixed(2)}°\n` +
+                    `  J3: ${result.joints[2].toFixed(2)}°\n` +
+                    `  J4: ${result.joints[3].toFixed(2)}°\n` +
+                    `  J5: ${result.joints[4].toFixed(2)}°\n` +
+                    `  J6: ${result.joints[5].toFixed(2)}°\n\n` +
+                    `时间: ${result.timestamp}`;
+
+                document.getElementById('inverseKinematicsResult').textContent = output;
+            } catch (err) {
+                console.error('计算失败:', err);
+                document.getElementById('inverseKinematicsResult').textContent = '计算失败: ' + err.message;
+            }
         }
         
         async function loadRobotLogs() {
@@ -1076,18 +1304,222 @@
         }
         
         const jointValues = { J1: 0, J2: 0, J3: 0, J4: 0, J5: 0, J6: 0 };
+        const recordedPoints = [];
+        let jogSpeed = 50;
+        let jogInterval = null;
+        let isTeachMode = false;
+        let isPlayback = false;
+        let currentCoord = 'joint';
+        let currentJogAxis = null;
+        
+        function addTeachLog(message, type = 'action') {
+            const logArea = document.getElementById('teachLogArea');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-${type}">${message}</span>`;
+            
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(`[示教日志 ${timeStr}] ${message}`);
+        }
+        
+        function setJogSpeed(value) {
+            jogSpeed = parseInt(value);
+            document.getElementById('jogSpeedDisplay').textContent = value + '%';
+            addTeachLog(`速度已调整为 ${value}%`, 'action');
+        }
+        
+        function toggleCoord() {
+            const btn = document.getElementById('coordBtn');
+            if (currentCoord === 'joint') {
+                currentCoord = 'cartesian';
+                btn.textContent = '直角坐标';
+                btn.className = 'btn btn-warning';
+                addTeachLog('切换到直角坐标系', 'warning');
+            } else {
+                currentCoord = 'joint';
+                btn.textContent = '关节坐标';
+                btn.className = 'btn btn-info';
+                addTeachLog('切换到关节坐标系', 'warning');
+            }
+        }
+        
+        function startJog(axis) {
+            if (!isTeachMode) {
+                addTeachLog('请先开启示教模式', 'warning');
+                return;
+            }
+            
+            currentJogAxis = axis;
+            const joint = axis.substring(0, 2);
+            const direction = axis.substring(2);
+            const step = Math.round(5 * (jogSpeed / 100));
+            
+            addTeachLog(`开始点动 ${axis} (步进: ${step}°)`, 'action');
+            
+            jogInterval = setInterval(() => {
+                if (direction === '+') {
+                    jointValues[joint] += step;
+                } else {
+                    jointValues[joint] -= step;
+                }
+                document.getElementById('disp' + joint).textContent = jointValues[joint] + '°';
+            }, 100);
+        }
+        
+        function stopJog() {
+            if (jogInterval) {
+                clearInterval(jogInterval);
+                jogInterval = null;
+            }
+            if (currentJogAxis) {
+                addTeachLog(`停止点动 ${currentJogAxis}`, 'action');
+                currentJogAxis = null;
+            }
+        }
         
         function moveJog(axis) {
             const joint = axis.substring(0, 2);
             const direction = axis.substring(2);
+            const step = Math.round(5 * (jogSpeed / 100));
             
             if (direction === '+') {
-                jointValues[joint] += 5;
+                jointValues[joint] += step;
             } else {
-                jointValues[joint] -= 5;
+                jointValues[joint] -= step;
             }
             
             document.getElementById('disp' + joint).textContent = jointValues[joint] + '°';
+        }
+        
+        function toggleTeachMode() {
+            const btn = document.getElementById('teachModeBtn');
+            isTeachMode = !isTeachMode;
+            
+            if (isTeachMode) {
+                btn.textContent = '退出示教';
+                btn.className = 'btn btn-danger';
+                addTeachLog('示教模式已开启', 'success');
+            } else {
+                btn.textContent = '示教模式';
+                btn.className = 'btn btn-primary';
+                addTeachLog('示教模式已退出', 'warning');
+            }
+        }
+        
+        function recordPoint() {
+            if (!isTeachMode) {
+                addTeachLog('请先开启示教模式', 'warning');
+                return;
+            }
+            
+            const point = {
+                id: recordedPoints.length + 1,
+                joints: { ...jointValues },
+                timestamp: new Date().toLocaleTimeString('zh-CN', { hour12: false })
+            };
+            
+            recordedPoints.push(point);
+            updatePointList();
+            addTeachLog(`已记录点位 #${point.id}: J1=${point.joints.J1}° J2=${point.joints.J2}° J3=${point.joints.J3}° J4=${point.joints.J4}° J5=${point.joints.J5}° J6=${point.joints.J6}°`, 'success');
+        }
+        
+        function updatePointList() {
+            const listEl = document.getElementById('pointList');
+            const countEl = document.getElementById('pointCount');
+            
+            countEl.textContent = recordedPoints.length;
+            listEl.innerHTML = '';
+            
+            recordedPoints.forEach(point => {
+                const item = document.createElement('div');
+                item.className = 'point-item';
+                item.innerHTML = `
+                    <span>点位 #${point.id} (${point.timestamp})</span>
+                    <span>${point.joints.J1}° / ${point.joints.J2}° / ${point.joints.J3}° / ${point.joints.J4}° / ${point.joints.J5}° / ${point.joints.J6}°</span>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+        
+        function clearPoints() {
+            if (recordedPoints.length === 0) {
+                addTeachLog('没有需要清除的点位', 'warning');
+                return;
+            }
+            
+            recordedPoints.length = 0;
+            updatePointList();
+            addTeachLog('已清除所有记录的点位', 'warning');
+        }
+        
+        function emergencyStop() {
+            stopJog();
+            addTeachLog('【急停】已触发！', 'danger');
+            
+            document.getElementById('teachModeBtn').textContent = '示教模式';
+            document.getElementById('teachModeBtn').className = 'btn btn-primary';
+            isTeachMode = false;
+            
+            alert('急停已触发！');
+        }
+        
+        function resetJoints() {
+            jointValues.J1 = 0;
+            jointValues.J2 = 0;
+            jointValues.J3 = 0;
+            jointValues.J4 = 0;
+            jointValues.J5 = 0;
+            jointValues.J6 = 0;
+            
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('dispJ' + i).textContent = '0°';
+            }
+            
+            addTeachLog('关节已复位到零点', 'action');
+        }
+        
+        async function startPlayback() {
+            if (recordedPoints.length === 0) {
+                addTeachLog('没有可再现的点位，请先记录点位', 'warning');
+                return;
+            }
+            
+            if (isPlayback) {
+                isPlayback = false;
+                document.getElementById('playbackBtn').textContent = '示教再现';
+                addTeachLog('示教再现已停止', 'warning');
+                return;
+            }
+            
+            isPlayback = true;
+            document.getElementById('playbackBtn').textContent = '停止再现';
+            addTeachLog(`开始示教再现，共 ${recordedPoints.length} 个点位`, 'success');
+            
+            for (let i = 0; i < recordedPoints.length && isPlayback; i++) {
+                const point = recordedPoints[i];
+                addTeachLog(`移动到点位 #${point.id}...`, 'action');
+                
+                for (let j = 1; j <= 6; j++) {
+                    jointValues['J' + j] = point.joints['J' + j];
+                    document.getElementById('dispJ' + j).textContent = jointValues['J' + j] + '°';
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            isPlayback = false;
+            document.getElementById('playbackBtn').textContent = '示教再现';
+            addTeachLog('示教再现完成', 'success');
+        }
+        
+        function clearTeachLog() {
+            document.getElementById('teachLogArea').innerHTML = '';
+            addTeachLog('日志已清空', 'action');
         }
     </script>
 </body>

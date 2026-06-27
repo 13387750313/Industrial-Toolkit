@@ -763,6 +763,10 @@
                         </div>
                     </div>
                     <button class="btn btn-success" onclick="sendTcpData()" style="width: 100%; padding: 12px;">发送数据</button>
+                        <div style="margin-top: 10px;">
+                            <a href="https://www.cmsoft.cn/" target="_blank" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-right: 10px;">🌐 网络调试助手 NetAssist</a>
+                            <a href="https://www.wireshark.org/" target="_blank" style="background: #3498db; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px;">🦈 Wireshark 抓包工具</a>
+                        </div>
                 </div>
             </section>
             
@@ -1873,7 +1877,7 @@
                             } else {
                                 dataStr = new TextDecoder().decode(new Uint8Array(byteArray));
                             }
-                            addLog(`RECV ${dataStr}`, 'INFO');
+                            addLog(`接收 ${dataStr}`, 'INFO');
                         });
                     }
                 } catch (err) {
