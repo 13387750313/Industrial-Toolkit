@@ -638,7 +638,12 @@
                     
                     <button class="btn btn-primary" onclick="selectCable()">查询电缆规格</button>
                     
-                    <table class="cable-table">
+                    <div class="cable-result" id="cableResult" style="display:none; margin-bottom: 20px; padding: 20px; background: #e8f8f5; border-radius: 10px; border-left: 4px solid #27ae60;">
+                        <div style="font-weight: bold; font-size: 16px; color: #2c3e50; margin-bottom: 10px;">✅ 推荐电缆规格</div>
+                        <div id="cableResultContent" style="font-size: 14px; color: #333; line-height: 1.8;"></div>
+                    </div>
+                    
+                    <table class="cable-table" id="cableTable">
                         <thead>
                             <tr>
                                 <th>电缆规格</th>
@@ -648,57 +653,57 @@
                                 <th>重量</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
+                        <tbody id="cableTableBody">
+                            <tr data-size="1.5">
                                 <td>1.5 mm²</td>
                                 <td>16 A</td>
                                 <td>12 A</td>
                                 <td>6.3 mm</td>
                                 <td>0.09 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="2.5">
                                 <td>2.5 mm²</td>
                                 <td>22 A</td>
                                 <td>17 A</td>
                                 <td>7.3 mm</td>
                                 <td>0.13 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="4">
                                 <td>4 mm²</td>
                                 <td>28 A</td>
                                 <td>22 A</td>
                                 <td>8.3 mm</td>
                                 <td>0.19 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="6">
                                 <td>6 mm²</td>
                                 <td>36 A</td>
                                 <td>28 A</td>
                                 <td>9.6 mm</td>
                                 <td>0.26 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="10">
                                 <td>10 mm²</td>
                                 <td>50 A</td>
                                 <td>39 A</td>
                                 <td>11.6 mm</td>
                                 <td>0.44 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="16">
                                 <td>16 mm²</td>
                                 <td>68 A</td>
                                 <td>52 A</td>
                                 <td>14.0 mm</td>
                                 <td>0.67 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="25">
                                 <td>25 mm²</td>
                                 <td>90 A</td>
                                 <td>69 A</td>
                                 <td>16.6 mm</td>
                                 <td>1.01 kg/m</td>
                             </tr>
-                            <tr>
+                            <tr data-size="35">
                                 <td>35 mm²</td>
                                 <td>110 A</td>
                                 <td>85 A</td>
@@ -744,7 +749,12 @@
                     
                     <button class="btn btn-primary" onclick="selectRelay()">查询继电器型号</button>
                     
-                    <div class="relay-grid">
+                    <div class="relay-result" id="relayResult" style="display:none; margin-top: 20px; padding: 20px; background: #e8f4fd; border-radius: 10px; border-left: 4px solid #3498db;">
+                        <div style="font-weight: bold; font-size: 16px; color: #2c3e50; margin-bottom: 15px;">✅ 推荐继电器型号</div>
+                        <div id="relayResultContent" style="font-size: 14px; color: #333; line-height: 1.8;"></div>
+                    </div>
+                    
+                    <div class="relay-grid" id="relayGrid">
                         <div class="relay-card">
                             <div class="relay-icon">🔲</div>
                             <div class="relay-name">小型电磁继电器</div>
@@ -960,16 +970,116 @@
         function selectCable() {
             const current = parseFloat(document.getElementById('cableCurrent').value);
             const type = document.getElementById('cableType').value;
-            
-            alert(`查询电缆规格中...\n\n额定电流: ${current} A\n电缆类型: ${type === 'copper' ? '铜芯' : '铝芯'}`);
+            const install = document.getElementById('cableInstall').value;
+
+            const cableData = [
+                { size: 1.5, copper: 16, aluminum: 12, diameter: 6.3, weight: 0.09 },
+                { size: 2.5, copper: 22, aluminum: 17, diameter: 7.3, weight: 0.13 },
+                { size: 4, copper: 28, aluminum: 22, diameter: 8.3, weight: 0.19 },
+                { size: 6, copper: 36, aluminum: 28, diameter: 9.6, weight: 0.26 },
+                { size: 10, copper: 50, aluminum: 39, diameter: 11.6, weight: 0.44 },
+                { size: 16, copper: 68, aluminum: 52, diameter: 14.0, weight: 0.67 },
+                { size: 25, copper: 90, aluminum: 69, diameter: 16.6, weight: 1.01 },
+                { size: 35, copper: 110, aluminum: 85, diameter: 18.9, weight: 1.38 }
+            ];
+
+            let factor = 1;
+            if (install === 'ground') factor = 0.9;
+            if (install === 'tube') factor = 0.8;
+
+            const recommended = cableData.find(c => {
+                const ampacity = type === 'copper' ? c.copper : c.aluminum;
+                return ampacity * factor >= current;
+            });
+
+            const rows = document.querySelectorAll('#cableTableBody tr');
+            rows.forEach(row => {
+                row.style.background = '';
+                row.style.opacity = '0.5';
+            });
+
+            const resultDiv = document.getElementById('cableResult');
+            const resultContent = document.getElementById('cableResultContent');
+
+            if (recommended) {
+                const ampacity = type === 'copper' ? recommended.copper : recommended.aluminum;
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = `
+                    <div style="margin-bottom: 8px;">
+                        <strong>推荐规格：</strong><span style="color: #e74c3c; font-size: 18px; font-weight: bold;">${recommended.size} mm²</span>
+                    </div>
+                    <div style="font-size: 13px; color: #666; line-height: 1.6;">
+                        电缆类型：${type === 'copper' ? '铜芯' : '铝芯'}<br>
+                        敷设方式：${install === 'air' ? '空气中敷设' : install === 'ground' ? '直埋敷设' : '穿管敷设'}<br>
+                        工作电流：${current} A<br>
+                        载流量修正系数：${factor.toFixed(2)}<br>
+                        推荐规格载流量：${(ampacity * factor).toFixed(1)} A
+                    </div>
+                `;
+
+                rows.forEach(row => {
+                    if (parseFloat(row.dataset.size) === recommended.size) {
+                        row.style.background = '#d5f5e3';
+                        row.style.opacity = '1';
+                        row.style.fontWeight = 'bold';
+                        row.style.color = '#1e8449';
+                    }
+                });
+            } else {
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = '<div style="color: #e74c3c;">电流超出最大规格范围，请选用更大截面电缆。</div>';
+            }
         }
         
         function selectRelay() {
             const voltage = document.getElementById('relayVoltage').value;
             const contact = document.getElementById('relayContact').value;
             const current = document.getElementById('relayCurrent').value;
-            
-            alert(`查询继电器型号中...\n\n线圈电压: ${voltage}V\n触点类型: ${contact}\n额定电流: ${current}A`);
+
+            const relays = [
+                { id: 1, name: '小型电磁继电器', model: 'HH52P / MY2N', voltage: 'DC 12V/24V', contact: 'SPDT', current: 5, desc: '体积小、动作快，常用于控制回路' },
+                { id: 2, name: '中间继电器', model: 'HH54P / MY4N', voltage: 'DC 12V/24V', contact: 'DPDT', current: 5, desc: '多触点转换，用于信号扩展' },
+                { id: 3, name: '四触点继电器', model: 'HH64P / MY4N-J', voltage: 'DC 12V/24V', contact: '4PDT', current: 5, desc: '四组转换触点，多路控制' },
+                { id: 4, name: '大功率继电器', model: 'JQX-13F', voltage: 'AC 220V', contact: 'SPDT', current: 10, desc: '大负载能力，用于动力回路' },
+                { id: 5, name: '大功率继电器', model: 'JQX-38F', voltage: 'AC 220V', contact: 'DPDT', current: 30, desc: '超大电流，用于重负载' },
+                { id: 6, name: '固态继电器', model: 'SSR-25DA', voltage: 'DC 3-32V', contact: 'SPDT', current: 25, desc: '无触点、静音、长寿命' }
+            ];
+
+            const matched = relays.filter(r => {
+                let voltageMatch = r.voltage.includes(voltage === '12' ? '12' : voltage === '24' ? '24' : voltage === '110' ? '110' : '220');
+                let contactMatch = r.contact === contact;
+                let currentMatch = r.current >= parseInt(current);
+                return contactMatch && currentMatch;
+            });
+
+            const resultDiv = document.getElementById('relayResult');
+            const resultContent = document.getElementById('relayResultContent');
+            const allCards = document.querySelectorAll('.relay-card');
+
+            allCards.forEach(card => card.style.opacity = '0.3');
+
+            if (matched.length > 0) {
+                resultDiv.style.display = 'block';
+                let html = `<div style="margin-bottom: 10px;">查询条件：线圈电压 ${voltage}V / ${contact} / ${current}A</div>`;
+                html += '<div style="font-weight: 600; margin-bottom: 8px;">推荐型号：</div>';
+                matched.forEach((r, i) => {
+                    html += `<div style="padding: 8px 12px; background: white; border-radius: 6px; margin-bottom: 8px;">`;
+                    html += `<strong>${r.name}</strong> - ${r.model}<br>`;
+                    html += `<span style="color: #666; font-size: 13px;">${r.desc}</span>`;
+                    html += `</div>`;
+                    
+                    const cardIndex = r.id - 1;
+                    if (allCards[cardIndex]) {
+                        allCards[cardIndex].style.opacity = '1';
+                        allCards[cardIndex].style.boxShadow = '0 0 0 3px #3498db, 0 4px 15px rgba(52,152,219,0.3)';
+                        allCards[cardIndex].style.transform = 'scale(1.02)';
+                    }
+                });
+                resultContent.innerHTML = html;
+            } else {
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = '<div style="color: #e74c3c;">未找到完全匹配的型号，请调整参数后重新查询。</div>';
+            }
         }
     </script>
 </body>
