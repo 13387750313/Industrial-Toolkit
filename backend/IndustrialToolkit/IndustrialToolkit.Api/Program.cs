@@ -28,7 +28,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.WebHost.UseUrls("http://0.0.0.0:5180");
 
 builder.Services.AddCors(options =>
 {
