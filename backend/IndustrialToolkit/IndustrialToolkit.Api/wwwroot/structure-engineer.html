@@ -252,6 +252,87 @@
         
         .bearing-table tr:hover { background: #f8f9fa; }
         
+        .bearing-result {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .bearing-result-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bearing-result-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .bearing-summary-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .bearing-summary-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .bearing-summary-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0c4a6e;
+        }
+
+        .bearing-recommend {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .bearing-recommend-title {
+            font-weight: bold;
+            color: #047857;
+            margin-bottom: 8px;
+        }
+
+        .bearing-recommend-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .bearing-recommend-list li {
+            padding: 6px 0;
+            color: #065f46;
+            font-size: 14px;
+        }
+
+        .bearing-recommend-list li::before {
+            content: '✅ ';
+        }
+
+        .bearing-no-result {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
         .tolerance-container {
             background: white;
             border-radius: 12px;
@@ -645,6 +726,12 @@
                     
                     <button class="btn btn-primary" onclick="selectBearing()">查询轴承型号</button>
                     
+                    <div class="bearing-result" id="bearingResult" style="display: none;">
+                        <div class="bearing-result-title">🔍 查询结果</div>
+                        <div class="bearing-result-summary" id="bearingSummary"></div>
+                        <div id="bearingRecommend"></div>
+                    </div>
+                    
                     <table class="bearing-table">
                         <thead>
                             <tr>
@@ -845,11 +932,172 @@
             document.getElementById('gearResult').textContent = result;
         }
         
+        const bearingDatabase = {
+            deepGroove: [
+                { model: '6204', inner: 20, outer: 47, width: 14, dynamicLoad: 12.8, staticLoad: 6.65 },
+                { model: '6205', inner: 25, outer: 52, width: 15, dynamicLoad: 14.0, staticLoad: 7.88 },
+                { model: '6206', inner: 30, outer: 62, width: 16, dynamicLoad: 19.5, staticLoad: 11.3 },
+                { model: '6207', inner: 35, outer: 72, width: 17, dynamicLoad: 25.5, staticLoad: 15.2 },
+                { model: '6208', inner: 40, outer: 80, width: 18, dynamicLoad: 32.0, staticLoad: 19.4 },
+                { model: '6209', inner: 45, outer: 85, width: 19, dynamicLoad: 32.8, staticLoad: 21.2 },
+                { model: '6210', inner: 50, outer: 90, width: 20, dynamicLoad: 35.0, staticLoad: 23.2 },
+                { model: '6304', inner: 20, outer: 52, width: 15, dynamicLoad: 15.9, staticLoad: 7.88 },
+                { model: '6305', inner: 25, outer: 62, width: 17, dynamicLoad: 22.4, staticLoad: 11.6 },
+                { model: '6306', inner: 30, outer: 72, width: 19, dynamicLoad: 30.5, staticLoad: 17.0 },
+                { model: '6307', inner: 35, outer: 80, width: 21, dynamicLoad: 36.5, staticLoad: 21.2 },
+                { model: '6308', inner: 40, outer: 90, width: 23, dynamicLoad: 42.8, staticLoad: 25.5 },
+                { model: '6309', inner: 45, outer: 100, width: 25, dynamicLoad: 52.8, staticLoad: 31.8 },
+                { model: '6310', inner: 50, outer: 110, width: 27, dynamicLoad: 61.8, staticLoad: 38.0 },
+            ],
+            angularContact: [
+                { model: '7204C', inner: 20, outer: 47, width: 14, dynamicLoad: 14.5, staticLoad: 8.2 },
+                { model: '7205C', inner: 25, outer: 52, width: 15, dynamicLoad: 16.2, staticLoad: 10.5 },
+                { model: '7206C', inner: 30, outer: 62, width: 16, dynamicLoad: 23.0, staticLoad: 15.5 },
+                { model: '7207C', inner: 35, outer: 72, width: 17, dynamicLoad: 30.5, staticLoad: 21.0 },
+                { model: '7208C', inner: 40, outer: 80, width: 18, dynamicLoad: 36.8, staticLoad: 25.8 },
+                { model: '7209C', inner: 45, outer: 85, width: 19, dynamicLoad: 38.5, staticLoad: 28.2 },
+                { model: '7210C', inner: 50, outer: 90, width: 20, dynamicLoad: 42.0, staticLoad: 32.0 },
+                { model: '7304C', inner: 20, outer: 52, width: 15, dynamicLoad: 18.8, staticLoad: 10.8 },
+                { model: '7305C', inner: 25, outer: 62, width: 17, dynamicLoad: 26.5, staticLoad: 15.8 },
+                { model: '7306C', inner: 30, outer: 72, width: 19, dynamicLoad: 34.2, staticLoad: 21.5 },
+                { model: '7307C', inner: 35, outer: 80, width: 21, dynamicLoad: 42.0, staticLoad: 27.0 },
+                { model: '7308C', inner: 40, outer: 90, width: 23, dynamicLoad: 49.8, staticLoad: 33.2 },
+            ],
+            cylindricalRoller: [
+                { model: 'N204E', inner: 20, outer: 47, width: 14, dynamicLoad: 25.8, staticLoad: 16.2 },
+                { model: 'N205E', inner: 25, outer: 52, width: 15, dynamicLoad: 27.5, staticLoad: 19.0 },
+                { model: 'N206E', inner: 30, outer: 62, width: 16, dynamicLoad: 36.2, staticLoad: 26.5 },
+                { model: 'N207E', inner: 35, outer: 72, width: 17, dynamicLoad: 46.5, staticLoad: 35.5 },
+                { model: 'N208E', inner: 40, outer: 80, width: 18, dynamicLoad: 54.8, staticLoad: 42.0 },
+                { model: 'N209E', inner: 45, outer: 85, width: 19, dynamicLoad: 58.2, staticLoad: 47.0 },
+                { model: 'N210E', inner: 50, outer: 90, width: 20, dynamicLoad: 62.5, staticLoad: 52.0 },
+                { model: 'N304E', inner: 20, outer: 52, width: 15, dynamicLoad: 29.2, staticLoad: 18.8 },
+                { model: 'N305E', inner: 25, outer: 62, width: 17, dynamicLoad: 38.5, staticLoad: 25.5 },
+                { model: 'N306E', inner: 30, outer: 72, width: 19, dynamicLoad: 49.2, staticLoad: 34.2 },
+                { model: 'N307E', inner: 35, outer: 80, width: 21, dynamicLoad: 60.8, staticLoad: 43.5 },
+                { model: 'N308E', inner: 40, outer: 90, width: 23, dynamicLoad: 76.8, staticLoad: 55.8 },
+            ],
+            taperedRoller: [
+                { model: '30204', inner: 20, outer: 47, width: 15.25, dynamicLoad: 28.2, staticLoad: 30.5 },
+                { model: '30205', inner: 25, outer: 52, width: 16.25, dynamicLoad: 32.2, staticLoad: 37.0 },
+                { model: '30206', inner: 30, outer: 62, width: 17.25, dynamicLoad: 43.2, staticLoad: 50.5 },
+                { model: '30207', inner: 35, outer: 72, width: 18.25, dynamicLoad: 54.2, staticLoad: 63.5 },
+                { model: '30208', inner: 40, outer: 80, width: 19.75, dynamicLoad: 63.0, staticLoad: 74.0 },
+                { model: '30209', inner: 45, outer: 85, width: 20.75, dynamicLoad: 67.8, staticLoad: 83.5 },
+                { model: '30210', inner: 50, outer: 90, width: 21.75, dynamicLoad: 73.2, staticLoad: 92.0 },
+                { model: '32204', inner: 20, outer: 47, width: 19.25, dynamicLoad: 34.5, staticLoad: 36.8 },
+                { model: '32205', inner: 25, outer: 52, width: 19.25, dynamicLoad: 40.8, staticLoad: 46.2 },
+                { model: '32206', inner: 30, outer: 62, width: 21.25, dynamicLoad: 51.8, staticLoad: 60.5 },
+                { model: '32207', inner: 35, outer: 72, width: 23.25, dynamicLoad: 67.5, staticLoad: 79.8 },
+                { model: '32208', inner: 40, outer: 80, width: 24.75, dynamicLoad: 77.8, staticLoad: 93.2 },
+            ],
+            thrustBall: [
+                { model: '51204', inner: 20, outer: 40, width: 14, dynamicLoad: 22.2, staticLoad: 37.5 },
+                { model: '51205', inner: 25, outer: 47, width: 15, dynamicLoad: 27.8, staticLoad: 50.8 },
+                { model: '51206', inner: 30, outer: 52, width: 16, dynamicLoad: 28.0, staticLoad: 54.2 },
+                { model: '51207', inner: 35, outer: 62, width: 18, dynamicLoad: 37.5, staticLoad: 73.5 },
+                { model: '51208', inner: 40, outer: 68, width: 19, dynamicLoad: 39.5, staticLoad: 81.2 },
+                { model: '51209', inner: 45, outer: 73, width: 20, dynamicLoad: 39.8, staticLoad: 84.2 },
+                { model: '51210', inner: 50, outer: 78, width: 22, dynamicLoad: 48.5, staticLoad: 102.0 },
+                { model: '51304', inner: 20, outer: 47, width: 18, dynamicLoad: 34.5, staticLoad: 57.8 },
+                { model: '51305', inner: 25, outer: 52, width: 18, dynamicLoad: 34.8, staticLoad: 61.2 },
+                { model: '51306', inner: 30, outer: 60, width: 21, dynamicLoad: 44.2, staticLoad: 78.5 },
+                { model: '51307', inner: 35, outer: 68, width: 24, dynamicLoad: 54.8, staticLoad: 99.2 },
+                { model: '51308', inner: 40, outer: 78, width: 26, dynamicLoad: 69.2, staticLoad: 128.0 },
+            ]
+        };
+
+        const bearingTypeNames = {
+            deepGroove: '深沟球轴承',
+            angularContact: '角接触球轴承',
+            cylindricalRoller: '圆柱滚子轴承',
+            taperedRoller: '圆锥滚子轴承',
+            thrustBall: '推力球轴承'
+        };
+
         function selectBearing() {
+            const type = document.getElementById('bearingType').value;
             const inner = parseFloat(document.getElementById('bearingInner').value);
             const outer = parseFloat(document.getElementById('bearingOuter').value);
+            const load = parseFloat(document.getElementById('bearingLoad').value);
+
+            const allBearings = bearingDatabase[type] || [];
             
-            alert(`查询轴承型号中...\n\n内径: ${inner} mm\n外径: ${outer} mm`);
+            const filtered = allBearings.filter(b => {
+                const innerMatch = Math.abs(b.inner - inner) <= 5;
+                const outerMatch = Math.abs(b.outer - outer) <= 10;
+                const loadMatch = b.dynamicLoad >= load * 0.8;
+                return innerMatch && outerMatch && loadMatch;
+            });
+
+            filtered.sort((a, b) => Math.abs(a.inner - inner) - Math.abs(b.inner - inner));
+
+            const resultDiv = document.getElementById('bearingResult');
+            const summaryDiv = document.getElementById('bearingSummary');
+            const recommendDiv = document.getElementById('bearingRecommend');
+            const tableBody = document.getElementById('bearingTableBody');
+
+            resultDiv.style.display = 'block';
+
+            const typeName = bearingTypeNames[type] || '未知类型';
+            summaryDiv.innerHTML = `
+                <div class="bearing-summary-item">
+                    <div class="bearing-summary-label">轴承类型</div>
+                    <div class="bearing-summary-value">${typeName}</div>
+                </div>
+                <div class="bearing-summary-item">
+                    <div class="bearing-summary-label">内径要求</div>
+                    <div class="bearing-summary-value">${inner} mm</div>
+                </div>
+                <div class="bearing-summary-item">
+                    <div class="bearing-summary-label">外径要求</div>
+                    <div class="bearing-summary-value">${outer} mm</div>
+                </div>
+                <div class="bearing-summary-item">
+                    <div class="bearing-summary-label">额定载荷</div>
+                    <div class="bearing-summary-value">${load} kN</div>
+                </div>
+                <div class="bearing-summary-item">
+                    <div class="bearing-summary-label">匹配数量</div>
+                    <div class="bearing-summary-value">${filtered.length} 个</div>
+                </div>
+            `;
+
+            if (filtered.length === 0) {
+                recommendDiv.innerHTML = `
+                    <div class="bearing-no-result">
+                        ⚠️ 未找到符合条件的轴承型号，请调整参数后重新查询
+                    </div>
+                `;
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:30px;">无匹配结果</td></tr>';
+                return;
+            }
+
+            const bestMatch = filtered[0];
+            const loadSafety = (bestMatch.dynamicLoad / load).toFixed(2);
+            
+            recommendDiv.innerHTML = `
+                <div class="bearing-recommend">
+                    <div class="bearing-recommend-title">🏆 最佳推荐：${bestMatch.model}</div>
+                    <ul class="bearing-recommend-list">
+                        <li>内径 ${bestMatch.inner} mm，外径 ${bestMatch.outer} mm，宽度 ${bestMatch.width} mm</li>
+                        <li>额定动载荷 ${bestMatch.dynamicLoad} kN，额定静载荷 ${bestMatch.staticLoad} kN</li>
+                        <li>载荷安全系数：${loadSafety}（${loadSafety >= 1.5 ? '✓ 充足' : '⚠️ 偏小'}）</li>
+                        <li>内径偏差：${(bestMatch.inner - inner).toFixed(1)} mm，外径偏差：${(bestMatch.outer - outer).toFixed(1)} mm</li>
+                    </ul>
+                </div>
+            `;
+
+            tableBody.innerHTML = filtered.map(b => `
+                <tr>
+                    <td><strong>${b.model}</strong></td>
+                    <td>${b.inner} mm</td>
+                    <td>${b.outer} mm</td>
+                    <td>${b.width} mm</td>
+                    <td>${b.dynamicLoad} kN</td>
+                    <td>${b.staticLoad} kN</td>
+                </tr>
+            `).join('');
         }
         
         function queryTolerance() {

@@ -492,6 +492,9 @@
                     <div class="tool-card">
                         <div class="tool-header">📶 局域网扫描</div>
                         <div class="tool-body">
+                            <div style="background:#fff8e1; border:1px solid #ffe082; border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#f57f17; line-height:1.6;">
+                                ⚠️ 扫描的是<strong>后端服务器所在的局域网</strong>，不是你电脑的局域网。部署在公网服务器时，只能扫描服务器所在内网。
+                            </div>
                             <div class="form-group">
                                 <label>IP 段前缀</label>
                                 <input type="text" id="lanIpRange" placeholder="如 192.168.1." value="192.168.1.">
@@ -506,7 +509,7 @@
                                     <span id="lanCount" style="font-weight: normal; font-size: 13px; color: #666; margin-left: 10px;"></span>
                                 </div>
                                 <div id="lanProgress" style="margin-bottom: 10px; color: #666; font-size: 13px;"></div>
-                                <div id="lanResult" style="max-height: 350px; overflow-y: auto;"></div>
+                                <div id="lanResult" style="max-height: 320px; overflow-y: auto;"></div>
                                 <div style="margin-top:8px; font-size:12px; color:#999;">💡 点击IP地址可填充到右侧端口扫描</div>
                             </div>
                         </div>
@@ -516,7 +519,10 @@
                         <div class="tool-body">
                             <div class="form-group">
                                 <label>目标 IP</label>
-                                <input type="text" id="portIp" placeholder="输入IP地址">
+                                <div style="display:flex; gap:8px;">
+                                    <input type="text" id="portIp" placeholder="输入IP地址" style="flex:1;">
+                                    <button class="btn btn-secondary" style="white-space:nowrap;" onclick="scanLocalServer()">扫当前服务器</button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>常用端口</label>
@@ -1185,6 +1191,25 @@ DNSSEC: unsigned
         function setPortRange(start, end) {
             document.getElementById('portStart').value = start;
             document.getElementById('portEnd').value = end;
+        }
+        
+        async function scanLocalServer() {
+            const hasApi = await checkApi();
+            if (hasApi) {
+                try {
+                    const base = getApiBase();
+                    const res = await fetch(`${base}/ip/query?ipOrDomain=localhost`);
+                    const json = await res.json();
+                    if (json.status === 'success' && json.data) {
+                        const localIp = json.data.localIP || '127.0.0.1';
+                        document.getElementById('portIp').value = localIp;
+                        scanPorts();
+                        return;
+                    }
+                } catch (e) {}
+            }
+            document.getElementById('portIp').value = '127.0.0.1';
+            scanPorts();
         }
         
         function parseUA() {
