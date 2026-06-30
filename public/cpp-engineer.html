@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++工程师 - 工控工具箱</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        
+        .env-banner {
+            background: linear-gradient(90deg, #2d5a27 0%, #4a7c59 50%, #2d5a27 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { display: flex; min-height: calc(100vh - 44px); }
+        
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: calc(100vh - 44px);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 1px solid #4a6072;
+        }
+        
+        .sidebar-logo { font-size: 18px; font-weight: bold; }
+        
+        .nav-menu { list-style: none; padding: 10px 0; }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover { background: #34495e; }
+        .nav-item.active { background: #3498db; }
+        
+        .nav-icon { font-size: 20px; }
+        .nav-text { font-size: 14px; }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .tool-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .tool-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+        }
+        
+        .tool-card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .tool-card-desc {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        textarea.form-control {
+            min-height: 250px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #3498db;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dual-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+        
+        .btn-outline:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .select-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .info-box-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .info-box-content {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .motion-control-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 30px;
+        }
+        
+        .motion-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .motion-tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .motion-tab-btn.active {
+            color: #3498db;
+        }
+        
+        .motion-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #3498db;
+        }
+        
+        .motion-content {
+            display: none;
+        }
+        
+        .motion-content.active {
+            display: block;
+        }
+        
+        .motion-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .recommendation-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .recommendation-card.highlight {
+            border-color: #27ae60;
+            background: #e8f8f0;
+        }
+        
+        .recommendation-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-price {
+            font-size: 16px;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-features {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .recommendation-features li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .recommendation-features li::before {
+            content: '✓ ';
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .match-score {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="env-banner">
+        当前环境：Windows IIS 离线部署 | .NET 10 | 支持内网PLC设备访问
+    </div>
+    
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️ 工控工具箱</div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('index.html')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('plc-engineer.html')">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">PLC工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('robot-engineer.html')">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">机器人工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('vision-engineer.html')">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">视觉工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('software-engineer.html')">
+                    <span class="nav-icon">💻</span>
+                    <span class="nav-text">软件工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('structure-engineer.html')">
+                    <span class="nav-icon">🏗️</span>
+                    <span class="nav-text">结构工程师</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('electrician.html')">
+                    <span class="nav-icon">🔌</span>
+                    <span class="nav-text">电工工具</span>
+                </li>
+                <li class="nav-group-title">开发工具</li>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔢</span>
+                    <span class="nav-text">数据生成</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 GUID</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成密码</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 AES 密钥</li>
+                    <li class="sub-item" onclick="navigateTo('data-generator.html')">生成 RSA 密钥</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">网络工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">IP 查询</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Ping 检测</li>
+                    <li class="sub-item" onclick="navigateTo('network-tools.html')">Whois 查询</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">格式转换</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">Unix 时间戳</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">XML 格式化</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C#</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">JSON 转 C++</li>
+                    <li class="sub-item" onclick="navigateTo('format-converter.html')">进制转换</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">文字工具</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">正则测试</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">哈希计算器</li>
+                    <li class="sub-item" onclick="navigateTo('text-tools.html')">日志查看器</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🔐</span>
+                    <span class="nav-text">编码互转</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">BASE64 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">URL 编码</li>
+                    <li class="sub-item" onclick="navigateTo('encoding-tools.html')">HTML 编码</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">文件处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">编码识别</li>
+                    <li class="sub-item" onclick="navigateTo('file-tools.html')">文件校验</li>
+                </ul>
+                <li class="nav-item has-sub" onclick="toggleSubMenu(this)">
+                    <span class="nav-icon">🖼️</span>
+                    <span class="nav-text">图片处理</span>
+                </li>
+                <ul class="sub-menu">
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转图标</li>
+                    <li class="sub-item" onclick="navigateTo('image-tools.html')">图片转 Base64</li>
+                </ul>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <h1 class="page-title">⚙️ C++工程师工具</h1>
+            
+            <!-- C++代码格式化 -->
+            <section class="section">
+                <h2 class="section-title">📝 C++代码格式化</h2>
+                <div class="dual-panel">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">输入代码</span>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-outline" onclick="clearCppFormatter()">清空</button>
+                                <button class="btn btn-sm btn-primary" onclick="formatCppCode()">格式化</button>
+                            </div>
+                        </div>
+                        <textarea class="form-control" id="cppInput" placeholder="请输入需要格式化的C++代码..."></textarea>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">格式化结果</span>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-outline" onclick="copyCppResult()">复制</button>
+                            </div>
+                        </div>
+                        <textarea class="form-control" id="cppOutput" readonly placeholder="格式化后的代码将显示在这里..."></textarea>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- JSON/XML转C++实体类 -->
+            <section class="section">
+                <h2 class="section-title">🔄 JSON/XML转C++实体类</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchConvertTab('json')">JSON转C++</button>
+                    <button class="tab-btn" onclick="switchConvertTab('xml')">XML转C++</button>
+                </div>
+                
+                <div id="jsonConvert" class="tab-content active">
+                    <div class="dual-panel">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">JSON输入</span>
+                                <div class="panel-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="clearJsonInput()">清空</button>
+                                    <button class="btn btn-sm btn-success" onclick="convertJsonToCpp()">转换</button>
+                                </div>
+                            </div>
+                            <textarea class="form-control" id="jsonInput" placeholder='{"name": "张三", "age": 25, "skills": ["C++", "Python"]}'></textarea>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">C++实体类</span>
+                                <div class="panel-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="copyCppEntity()">复制</button>
+                                </div>
+                            </div>
+                            <textarea class="form-control" id="cppEntityOutput" readonly placeholder="生成的C++实体类将显示在这里..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="xmlConvert" class="tab-content">
+                    <div class="dual-panel">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">XML输入</span>
+                                <div class="panel-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="clearXmlInput()">清空</button>
+                                    <button class="btn btn-sm btn-success" onclick="convertXmlToCpp()">转换</button>
+                                </div>
+                            </div>
+                            <textarea class="form-control" id="xmlInput" placeholder='<person><name>张三</name><age>25</age></person>'></textarea>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <span class="panel-title">C++实体类</span>
+                                <div class="panel-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="copyXmlEntity()">复制</button>
+                                </div>
+                            </div>
+                            <textarea class="form-control" id="xmlEntityOutput" readonly placeholder="生成的C++实体类将显示在这里..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 运动控制代码生成 -->
+            <section class="section">
+                <h2 class="section-title">🎮 运动控制代码生成</h2>
+                <div class="motion-control-container">
+                    <div class="motion-tabs">
+                        <button class="motion-tab-btn active" onclick="switchMotionTab('motion')">运动控制</button>
+                        <button class="motion-tab-btn" onclick="switchMotionTab('trajectory')">轨迹规划</button>
+                        <button class="motion-tab-btn" onclick="switchMotionTab('interpolation')">插补算法</button>
+                    </div>
+                    
+                    <div id="motionCode" class="motion-content active">
+                        <div class="motion-form-grid">
+                            <div class="form-group">
+                                <label class="form-label">运动类型</label>
+                                <select class="select-control" id="motionType">
+                                    <option value="linear">直线运动</option>
+                                    <option value="arc">圆弧运动</option>
+                                    <option value="helical">螺旋运动</option>
+                                    <option value="spline">样条曲线</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">轴数量</label>
+                                <select class="select-control" id="axisNum">
+                                    <option value="1">1轴</option>
+                                    <option value="2">2轴</option>
+                                    <option value="3" selected>3轴</option>
+                                    <option value="4">4轴</option>
+                                    <option value="6">6轴</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">目标位置 (脉冲)</label>
+                                <input type="number" class="form-control" id="targetPos" value="10000" placeholder="目标位置">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">运动速度 (脉冲/秒)</label>
+                                <input type="number" class="form-control" id="moveSpeed" value="5000" placeholder="运动速度">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">加速度 (脉冲/秒²)</label>
+                                <input type="number" class="form-control" id="acceleration" value="10000" placeholder="加速度">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">控制卡品牌</label>
+                                <select class="select-control" id="cardBrand">
+                                    <option value="leishen">雷赛智能</option>
+                                    <option value="dmc">DMC</option>
+                                    <option value="adlink">研华ADLINK</option>
+                                    <option value="googol">固高GOOGOL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateMotionCode()">生成运动控制代码</button>
+                        <div class="result-box" id="motionCodeResult" style="margin-top: 15px;"></div>
+                    </div>
+                    
+                    <div id="trajectoryCode" class="motion-content">
+                        <div class="motion-form-grid">
+                            <div class="form-group">
+                                <label class="form-label">轨迹类型</label>
+                                <select class="select-control" id="trajectoryType">
+                                    <option value="linear">直线轨迹</option>
+                                    <option value="circular">圆弧轨迹</option>
+                                    <option value="bezier">贝塞尔曲线</option>
+                                    <option value="spline">样条轨迹</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">轨迹点数</label>
+                                <input type="number" class="form-control" id="pointCount" value="10" placeholder="轨迹点数">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">总时间 (秒)</label>
+                                <input type="number" class="form-control" id="totalTime" value="5.0" placeholder="总时间">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">平滑度</label>
+                                <select class="select-control" id="smoothness">
+                                    <option value="low">低</option>
+                                    <option value="medium" selected>中</option>
+                                    <option value="high">高</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateTrajectoryCode()">生成轨迹规划代码</button>
+                        <div class="result-box" id="trajectoryCodeResult" style="margin-top: 15px;"></div>
+                    </div>
+                    
+                    <div id="interpolationCode" class="motion-content">
+                        <div class="motion-form-grid">
+                            <div class="form-group">
+                                <label class="form-label">插补类型</label>
+                                <select class="select-control" id="interpolationType">
+                                    <option value="linear">线性插补</option>
+                                    <option value="circular">圆弧插补</option>
+                                    <option value="spline">样条插补</option>
+                                    <option value="nurbs">NURBS插补</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">插补精度</label>
+                                <input type="number" class="form-control" id="interpolationPrecision" value="0.001" placeholder="插补精度">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">最大速度</label>
+                                <input type="number" class="form-control" id="maxVelocity" value="1000" placeholder="最大速度">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">加减速模式</label>
+                                <select class="select-control" id="accelMode">
+                                    <option value="trapezoidal">梯形加减速</option>
+                                    <option value="s_curve">S曲线加减速</option>
+                                    <option value="exponential">指数加减速</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateInterpolationCode()">生成插补算法代码</button>
+                        <div class="result-box" id="interpolationCodeResult" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 工控协议代码生成 -->
+            <section class="section">
+                <h2 class="section-title">📡 工控协议代码生成</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchProtocolTab('modbus')">Modbus</button>
+                    <button class="tab-btn" onclick="switchProtocolTab('opcua')">OPC UA</button>
+                    <button class="tab-btn" onclick="switchProtocolTab('ethernetip')">Ethernet/IP</button>
+                    <button class="tab-btn" onclick="switchProtocolTab('profinet')">PROFINET</button>
+                </div>
+                
+                <div id="modbusCode" class="tab-content active">
+                    <div class="info-box">
+                        <div class="info-box-title">Modbus协议说明</div>
+                        <div class="info-box-content">
+                            Modbus是一种串行通信协议，广泛应用于工业自动化领域。支持RTU和TCP两种传输模式。
+                        </div>
+                    </div>
+                    <div class="motion-form-grid">
+                        <div class="form-group">
+                            <label class="form-label">功能码</label>
+                            <select class="select-control" id="modbusFunctionCode">
+                                <option value="01">01 - 读取线圈状态</option>
+                                <option value="02">02 - 读取离散输入</option>
+                                <option value="03">03 - 读取保持寄存器</option>
+                                <option value="04">04 - 读取输入寄存器</option>
+                                <option value="05">05 - 写入单个线圈</option>
+                                <option value="06">06 - 写入单个寄存器</option>
+                                <option value="15">15 - 写入多个线圈</option>
+                                <option value="16">16 - 写入多个寄存器</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">从站地址</label>
+                            <input type="number" class="form-control" id="slaveAddress" value="1" placeholder="从站地址">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">起始地址</label>
+                            <input type="number" class="form-control" id="startAddress" value="0" placeholder="起始地址">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">数量</label>
+                            <input type="number" class="form-control" id="registerCount" value="10" placeholder="寄存器数量">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateModbusCode()">生成Modbus代码</button>
+                    <div class="result-box" id="modbusCodeResult" style="margin-top: 15px;"></div>
+                </div>
+                
+                <div id="opcuaCode" class="tab-content">
+                    <div class="info-box">
+                        <div class="info-box-title">OPC UA协议说明</div>
+                        <div class="info-box-content">
+                            OPC UA (Open Platform Communications Unified Architecture) 是一个工业通信协议，用于工业自动化和设备之间的数据交换。
+                        </div>
+                    </div>
+                    <div class="motion-form-grid">
+                        <div class="form-group">
+                            <label class="form-label">操作类型</label>
+                            <select class="select-control" id="opcuaOperation">
+                                <option value="read">读取节点</option>
+                                <option value="write">写入节点</option>
+                                <option value="browse">浏览节点</option>
+                                <option value="subscribe">订阅节点</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">节点ID</label>
+                            <input type="text" class="form-control" id="opcuaNodeId" value="ns=2;s=Machine1.Temperature" placeholder="节点ID">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">数据类型</label>
+                            <select class="select-control" id="opcuaDataType">
+                                <option value="Double">Double</option>
+                                <option value="Float">Float</option>
+                                <option value="Int32">Int32</option>
+                                <option value="Int16">Int16</option>
+                                <option value="Boolean">Boolean</option>
+                                <option value="String">String</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">采样间隔 (ms)</label>
+                            <input type="number" class="form-control" id="opcuaSamplingInterval" value="1000" placeholder="采样间隔">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateOpcUaCode()">生成OPC UA代码</button>
+                    <div class="result-box" id="opcuaCodeResult" style="margin-top: 15px;"></div>
+                </div>
+                
+                <div id="ethernetipCode" class="tab-content">
+                    <div class="info-box">
+                        <div class="info-box-title">Ethernet/IP协议说明</div>
+                        <div class="info-box-content">
+                            Ethernet/IP 是ODVA开发的工业以太网协议，用于在工业自动化设备之间进行实时通信。
+                        </div>
+                    </div>
+                    <div class="motion-form-grid">
+                        <div class="form-group">
+                            <label class="form-label">服务代码</label>
+                            <select class="select-control" id="cipServiceCode">
+                                <option value="0x01">0x01 - Get Attributes All</option>
+                                <option value="0x02">0x02 - Set Attributes All</option>
+                                <option value="0x03">0x03 - Get Attribute List</option>
+                                <option value="0x04">0x04 - Set Attribute List</option>
+                                <option value="0x0E">0x0E - Read Tag</option>
+                                <option value="0x10">0x10 - Write Tag</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">类ID</label>
+                            <input type="number" class="form-control" id="cipClassId" value="0x6F" placeholder="类ID">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">实例ID</label>
+                            <input type="number" class="form-control" id="cipInstanceId" value="0x01" placeholder="实例ID">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">属性ID</label>
+                            <input type="number" class="form-control" id="cipAttributeId" value="0x01" placeholder="属性ID">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateEthernetIpCode()">生成Ethernet/IP代码</button>
+                    <div class="result-box" id="ethernetipCodeResult" style="margin-top: 15px;"></div>
+                </div>
+                
+                <div id="profinetCode" class="tab-content">
+                    <div class="info-box">
+                        <div class="info-box-title">PROFINET协议说明</div>
+                        <div class="info-box-content">
+                            PROFINET 是基于工业以太网的开放自动化标准，由PROFIBUS国际组织开发。
+                        </div>
+                    </div>
+                    <div class="motion-form-grid">
+                        <div class="form-group">
+                            <label class="form-label">设备类型</label>
+                            <select class="select-control" id="profinetDeviceType">
+                                <option value="io_controller">IO控制器</option>
+                                <option value="io_device">IO设备</option>
+                                <option value="io_supervisor">IO监视器</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">槽号</label>
+                            <input type="number" class="form-control" id="profinetSlot" value="0" placeholder="槽号">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">子槽号</label>
+                            <input type="number" class="form-control" id="profinetSubslot" value="1" placeholder="子槽号">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">模块ID</label>
+                            <input type="number" class="form-control" id="profinetModuleId" value="0x00000001" placeholder="模块ID">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateProfinetCode()">生成PROFINET代码</button>
+                    <div class="result-box" id="profinetCodeResult" style="margin-top: 15px;"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        // 导航功能
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function toggleSubMenu(el) {
+            const subMenu = el.nextElementSibling;
+            if (subMenu && subMenu.classList.contains('sub-menu')) {
+                el.classList.toggle('open');
+                subMenu.classList.toggle('open');
+            }
+        }
+        
+        // C++代码格式化
+        function formatCppCode() {
+            const input = document.getElementById('cppInput').value;
+            if (!input.trim()) {
+                alert('请输入需要格式化的C++代码');
+                return;
+            }
+            
+            try {
+                // 简单的代码格式化逻辑
+                let formatted = input;
+                // 移除多余空行
+                formatted = formatted.replace(/\n\s*\n\s*\n/g, '\n\n');
+                // 统一缩进
+                const lines = formatted.split('\n');
+                let indentLevel = 0;
+                const formattedLines = lines.map(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith('}') || trimmed.startsWith(']')) {
+                        indentLevel = Math.max(0, indentLevel - 1);
+                    }
+                    const indented = '    '.repeat(indentLevel) + trimmed;
+                    if (trimmed.endsWith('{') || trimmed.endsWith('[')) {
+                        indentLevel++;
+                    }
+                    return indented;
+                });
+                
+                document.getElementById('cppOutput').value = formattedLines.join('\n');
+            } catch (error) {
+                alert('代码格式化失败: ' + error.message);
+            }
+        }
+        
+        function clearCppFormatter() {
+            document.getElementById('cppInput').value = '';
+            document.getElementById('cppOutput').value = '';
+        }
+        
+        function copyCppResult() {
+            const output = document.getElementById('cppOutput').value;
+            if (output) {
+                navigator.clipboard.writeText(output);
+                alert('已复制到剪贴板');
+            }
+        }
+        
+        // JSON转C++实体类
+        function convertJsonToCpp() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            if (!jsonInput.trim()) {
+                alert('请输入JSON数据');
+                return;
+            }
+            
+            try {
+                const jsonObj = JSON.parse(jsonInput);
+                const cppCode = generateCppClassFromJson(jsonObj, 'DataEntity');
+                document.getElementById('cppEntityOutput').value = cppCode;
+            } catch (error) {
+                alert('JSON解析失败: ' + error.message);
+            }
+        }
+        
+        function generateCppClassFromJson(obj, className) {
+            let code = `#include <string>\n`;
+            code += `#include <vector>\n`;
+            code += `#include <map>\n\n`;
+            code += `class ${className} {\n`;
+            code += `public:\n`;
+            
+            for (const key in obj) {
+                const value = obj[key];
+                const type = getCxxType(value);
+                code += `    ${type} ${key};\n`;
+            }
+            
+            code += `\n`;
+            code += `    ${className}() {}\n`;
+            code += `    ~${className}() {}\n`;
+            code += `};\n`;
+            
+            return code;
+        }
+        
+        function getCxxType(value) {
+            if (typeof value === 'string') return 'std::string';
+            if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'double';
+            if (typeof value === 'boolean') return 'bool';
+            if (Array.isArray(value)) return 'std::vector<auto>';
+            if (typeof value === 'object') return 'std::map<std::string, auto>';
+            return 'auto';
+        }
+        
+        function clearJsonInput() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('cppEntityOutput').value = '';
+        }
+        
+        function copyCppEntity() {
+            const output = document.getElementById('cppEntityOutput').value;
+            if (output) {
+                navigator.clipboard.writeText(output);
+                alert('已复制到剪贴板');
+            }
+        }
+        
+        // XML转C++实体类
+        function convertXmlToCpp() {
+            const xmlInput = document.getElementById('xmlInput').value;
+            if (!xmlInput.trim()) {
+                alert('请输入XML数据');
+                return;
+            }
+            
+            try {
+                // 简化的XML解析
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlInput, 'text/xml');
+                const rootElement = xmlDoc.documentElement;
+                
+                const className = rootElement.tagName.charAt(0).toUpperCase() + rootElement.tagName.slice(1);
+                const cppCode = generateCppClassFromXml(rootElement, className);
+                document.getElementById('xmlEntityOutput').value = cppCode;
+            } catch (error) {
+                alert('XML解析失败: ' + error.message);
+            }
+        }
+        
+        function generateCppClassFromXml(element, className) {
+            let code = `#include <string>\n`;
+            code += `#include <vector>\n\n`;
+            code += `class ${className} {\n`;
+            code += `public:\n`;
+            
+            const children = element.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                const childName = child.tagName;
+                code += `    std::string ${childName};\n`;
+            }
+            
+            code += `\n`;
+            code += `    ${className}() {}\n`;
+            code += `    ~${className}() {}\n`;
+            code += `};\n`;
+            
+            return code;
+        }
+        
+        function clearXmlInput() {
+            document.getElementById('xmlInput').value = '';
+            document.getElementById('xmlEntityOutput').value = '';
+        }
+        
+        function copyXmlEntity() {
+            const output = document.getElementById('xmlEntityOutput').value;
+            if (output) {
+                navigator.clipboard.writeText(output);
+                alert('已复制到剪贴板');
+            }
+        }
+        
+        // 运动控制代码生成
+        function generateMotionCode() {
+            const motionType = document.getElementById('motionType').value;
+            const axisNum = parseInt(document.getElementById('axisNum').value);
+            const targetPos = parseInt(document.getElementById('targetPos').value);
+            const moveSpeed = parseInt(document.getElementById('moveSpeed').value);
+            const acceleration = parseInt(document.getElementById('acceleration').value);
+            const cardBrand = document.getElementById('cardBrand').value;
+            
+            let code = '';
+            
+            if (cardBrand === 'leishen') {
+                code = generateLeishenMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration);
+            } else if (cardBrand === 'dmc') {
+                code = generateDmcMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration);
+            } else if (cardBrand === 'adlink') {
+                code = generateAdlinkMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration);
+            } else if (cardBrand === 'googol') {
+                code = generateGoogolMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration);
+            }
+            
+            document.getElementById('motionCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        function generateLeishenMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration) {
+            let code = `// 雷赛智能运动控制卡代码\n`;
+            code += `#include "dmc3000.h"\n\n`;
+            code += `// 初始化控制卡\n`;
+            code += `d3000_board_init();\n\n`;
+            
+            if (motionType === 'linear') {
+                code += `// 设置运动参数\n`;
+                code += `d3000_set_profile(${axisNum}, ${moveSpeed}, ${acceleration}, ${acceleration});\n`;
+                code += `d3000_set_position(${axisNum}, ${targetPos});\n\n`;
+                code += `// 启动运动\n`;
+                code += `d3000_start_move(${axisNum});\n`;
+            } else if (motionType === 'arc') {
+                code += `// 圆弧运动参数\n`;
+                code += `double center_x = 5000, center_y = 5000;\n`;
+                code += `double radius = 3000;\n`;
+                code += `d3000_arc_move(${axisNum}, center_x, center_y, radius, 1);\n`;
+            }
+            
+            return code;
+        }
+        
+        function generateDmcMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration) {
+            let code = `// DMC运动控制卡代码\n`;
+            code += `#include "dmc.h"\n\n`;
+            code += `// 初始化控制卡\n`;
+            code += `dmc_init();\n\n`;
+            
+            if (motionType === 'linear') {
+                code += `// 设置运动参数\n`;
+                code += `dmc_set_profile(${axisNum}, ${moveSpeed}, ${acceleration}, ${acceleration});\n`;
+                code += `dmc_set_position(${axisNum}, ${targetPos});\n\n`;
+                code += `// 启动运动\n`;
+                code += `dmc_move(${axisNum});\n`;
+            }
+            
+            return code;
+        }
+        
+        function generateAdlinkMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration) {
+            let code = `// 研华ADLINK运动控制卡代码\n`;
+            code += `#include "adlink_motion.h"\n\n`;
+            code += `// 初始化控制卡\n`;
+            code += `adlink_init();\n\n`;
+            
+            if (motionType === 'linear') {
+                code += `// 设置运动参数\n`;
+                code += `adlink_set_velocity(${axisNum}, ${moveSpeed});\n`;
+                code += `adlink_set_acceleration(${axisNum}, ${acceleration});\n`;
+                code += `adlink_set_position(${axisNum}, ${targetPos});\n\n`;
+                code += `// 启动运动\n`;
+                code += `adlink_start_move(${axisNum});\n`;
+            }
+            
+            return code;
+        }
+        
+        function generateGoogolMotionCode(motionType, axisNum, targetPos, moveSpeed, acceleration) {
+            let code = `// 固高GOOGOL运动控制卡代码\n`;
+            code += `#include "googol_motion.h"\n\n`;
+            code += `// 初始化控制卡\n`;
+            code += `googol_init();\n\n`;
+            
+            if (motionType === 'linear') {
+                code += `// 设置运动参数\n`;
+                code += `googol_set_profile(${axisNum}, ${moveSpeed}, ${acceleration}, ${acceleration});\n`;
+                code += `googol_set_position(${axisNum}, ${targetPos});\n\n`;
+                code += `// 启动运动\n`;
+                code += `googol_move(${axisNum});\n`;
+            }
+            
+            return code;
+        }
+        
+        function generateTrajectoryCode() {
+            const trajectoryType = document.getElementById('trajectoryType').value;
+            const pointCount = parseInt(document.getElementById('pointCount').value);
+            const totalTime = parseFloat(document.getElementById('totalTime').value);
+            const smoothness = document.getElementById('smoothness').value;
+            
+            let code = `// 轨迹规划代码\n`;
+            code += `#include <vector>\n`;
+            code += `#include <cmath>\n\n`;
+            
+            if (trajectoryType === 'linear') {
+                code += `// 直线轨迹规划\n`;
+                code += `std::vector<std::vector<double>> generateLinearTrajectory(`;
+                code += `const std::vector<double>& start, const std::vector<double>& end, int points) {\n`;
+                code += `    std::vector<std::vector<double>> trajectory;\n`;
+                code += `    for (int i = 0; i <= points; i++) {\n`;
+                code += `        double t = static_cast<double>(i) / points;\n`;
+                code += `        std::vector<double> point;\n`;
+                code += `        for (size_t j = 0; j < start.size(); j++) {\n`;
+                code += `            point.push_back(start[j] + t * (end[j] - start[j]));\n`;
+                code += `        }\n`;
+                code += `        trajectory.push_back(point);\n`;
+                code += `    }\n`;
+                code += `    return trajectory;\n`;
+                code += `}\n`;
+            } else if (trajectoryType === 'circular') {
+                code += `// 圆弧轨迹规划\n`;
+                code += `std::vector<std::vector<double>> generateCircularTrajectory(`;
+                code += `double radius, double startAngle, double endAngle, int points) {\n`;
+                code += `    std::vector<std::vector<double>> trajectory;\n`;
+                code += `    for (int i = 0; i <= points; i++) {\n`;
+                code += `        double angle = startAngle + (endAngle - startAngle) * i / points;\n`;
+                code += `        trajectory.push_back({radius * cos(angle), radius * sin(angle)});\n`;
+                code += `    }\n`;
+                code += `    return trajectory;\n`;
+                code += `}\n`;
+            }
+            
+            document.getElementById('trajectoryCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        function generateInterpolationCode() {
+            const interpolationType = document.getElementById('interpolationType').value;
+            const precision = parseFloat(document.getElementById('interpolationPrecision').value);
+            const maxVelocity = parseFloat(document.getElementById('maxVelocity').value);
+            const accelMode = document.getElementById('accelMode').value;
+            
+            let code = `// 插补算法代码\n`;
+            code += `#include <vector>\n`;
+            code += `#include <cmath>\n\n`;
+            
+            if (interpolationType === 'linear') {
+                code += `// 线性插补\n`;
+                code += `std::vector<double> linearInterpolation(`;
+                code += `const std::vector<double>& p1, const std::vector<double>& p2, double t) {\n`;
+                code += `    std::vector<double> result;\n`;
+                code += `    for (size_t i = 0; i < p1.size(); i++) {\n`;
+                code += `        result.push_back(p1[i] + t * (p2[i] - p1[i]));\n`;
+                code += `    }\n`;
+                code += `    return result;\n`;
+                code += `}\n`;
+            } else if (interpolationType === 'spline') {
+                code += `// 样条插补\n`;
+                code += `double splineInterpolation(double x, const std::vector<double>& xi, `;
+                code += `const std::vector<double>& yi) {\n`;
+                code += `    // 三次样条插补实现\n`;
+                code += `    int n = xi.size() - 1;\n`;
+                code += `    std::vector<double> h(n), alpha(n), l(n + 1), mu(n), z(n + 1), c(n + 1), b(n), d(n);\n`;
+                code += `    // ... 插补计算代码 ...\n`;
+                code += `    return 0.0;\n`;
+                code += `}\n`;
+            }
+            
+            document.getElementById('interpolationCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        // 工控协议代码生成
+        function generateModbusCode() {
+            const functionCode = document.getElementById('modbusFunctionCode').value;
+            const slaveAddress = parseInt(document.getElementById('slaveAddress').value);
+            const startAddress = parseInt(document.getElementById('startAddress').value);
+            const registerCount = parseInt(document.getElementById('registerCount').value);
+            
+            let code = `// Modbus协议C++实现\n`;
+            code += `#include <vector>\n`;
+            code += `#include <cstdint>\n\n`;
+            code += `class ModbusMaster {\n`;
+            code += `public:\n`;
+            code += `    // 读取保持寄存器 (功能码 0x03)\n`;
+            code += `    std::vector<uint16_t> readHoldingRegisters(`;
+            code += `uint8_t slaveId, uint16_t startAddr, uint16_t count) {\n`;
+            code += `        std::vector<uint8_t> request = {slaveId, 0x03, \n`;
+            code += `            static_cast<uint8_t>(startAddr >> 8), static_cast<uint8_t>(startAddr & 0xFF),\n`;
+            code += `            static_cast<uint8_t>(count >> 8), static_cast<uint8_t>(count & 0xFF)};\n`;
+            code += `        \n`;
+            code += `        // 计算CRC校验\n`;
+            code += `        uint16_t crc = calculateCRC(request);\n`;
+            code += `        request.push_back(static_cast<uint8_t>(crc & 0xFF));\n`;
+            code += `        request.push_back(static_cast<uint8_t>(crc >> 8));\n`;
+            code += `        \n`;
+            code += `        // 发送请求并接收响应\n`;
+            code += `        std::vector<uint8_t> response = sendRequest(request);\n`;
+            code += `        \n`;
+            code += `        // 解析响应\n`;
+            code += `        std::vector<uint16_t> registers;\n`;
+            code += `        for (size_t i = 3; i < response.size() - 2; i += 2) {\n`;
+            code += `            uint16_t value = (response[i] << 8) | response[i + 1];\n`;
+            code += `            registers.push_back(value);\n`;
+            code += `        }\n`;
+            code += `        \n`;
+            code += `        return registers;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `private:\n`;
+            code += `    uint16_t calculateCRC(const std::vector<uint8_t>& data) {\n`;
+            code += `        uint16_t crc = 0xFFFF;\n`;
+            code += `        for (uint8_t byte : data) {\n`;
+            code += `            crc ^= byte;\n`;
+            code += `            for (int i = 0; i < 8; i++) {\n`;
+            code += `                if (crc & 0x0001) {\n`;
+            code += `                    crc = (crc >> 1) ^ 0xA001;\n`;
+            code += `                } else {\n`;
+            code += `                    crc >>= 1;\n`;
+            code += `                }\n`;
+            code += `            }\n`;
+            code += `        }\n`;
+            code += `        return crc;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    std::vector<uint8_t> sendRequest(const std::vector<uint8_t>& request) {\n`;
+            code += `        // 实际的串口或网络通信实现\n`;
+            code += `        return std::vector<uint8_t>();\n`;
+            code += `    }\n`;
+            code += `};\n`;
+            
+            document.getElementById('modbusCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        function generateOpcUaCode() {
+            const operation = document.getElementById('opcuaOperation').value;
+            const nodeId = document.getElementById('opcuaNodeId').value;
+            const dataType = document.getElementById('opcuaDataType').value;
+            const samplingInterval = parseInt(document.getElementById('opcuaSamplingInterval').value);
+            
+            let code = `// OPC UA协议C++实现\n`;
+            code += `#include <open62541.h>\n\n`;
+            code += `class OpcUaClient {\n`;
+            code += `private:\n`;
+            code += `    UA_Client *client;\n`;
+            code += `    \n`;
+            code += `public:\n`;
+            code += `    OpcUaClient() {\n`;
+            code += `        client = UA_Client_new();\n`;
+            code += `        UA_ClientConfig_setDefault(UA_Client_getConfig(client));\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    ~OpcUaClient() {\n`;
+            code += `        UA_Client_disconnect(client);\n`;
+            code += `        UA_Client_delete(client);\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    bool connect(const std::string& url) {\n`;
+            code += `        UA_StatusCode status = UA_Client_connect(client, url.c_str());\n`;
+            code += `        return status == UA_STATUSCODE_GOOD;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 读取节点值\n`;
+            code += `    template<typename T>\n`;
+            code += `    T readNode(const std::string& nodeIdStr) {\n`;
+            code += `        UA_NodeId nodeId = UA_NODEID_STRING(2, const_cast<char*>(nodeIdStr.c_str()));\n`;
+            code += `        UA_Variant value;\n`;
+            code += `        UA_Variant_init(&value);\n`;
+            code += `        \n`;
+            code += `        UA_StatusCode status = UA_Client_readValueAttribute(client, nodeId, &value);\n`;
+            code += `        if (status != UA_STATUSCODE_GOOD) {\n`;
+            code += `            throw std::runtime_error("Failed to read node");\n`;
+            code += `        }\n`;
+            code += `        \n`;
+            code += `        T result = *static_cast<T*>(value.data);\n`;
+            code += `        UA_Variant_clear(&value);\n`;
+            code += `        return result;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 写入节点值\n`;
+            code += `    template<typename T>\n`;
+            code += `    void writeNode(const std::string& nodeIdStr, T value) {\n`;
+            code += `        UA_NodeId nodeId = UA_NODEID_STRING(2, const_cast<char*>(nodeIdStr.c_str()));\n`;
+            code += `        UA_Variant variant;\n`;
+            code += `        UA_Variant_setScalar(&variant, &value, &UA_TYPES[UA_TYPES_${dataType}]);\n`;
+            code += `        \n`;
+            code += `        UA_StatusCode status = UA_Client_writeValueAttribute(client, nodeId, &variant);\n`;
+            code += `        if (status != UA_STATUSCODE_GOOD) {\n`;
+            code += `            throw std::runtime_error("Failed to write node");\n`;
+            code += `        }\n`;
+            code += `    }\n`;
+            code += `};\n`;
+            
+            document.getElementById('opcuaCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        function generateEthernetIpCode() {
+            const serviceCode = document.getElementById('cipServiceCode').value;
+            const classId = parseInt(document.getElementById('cipClassId').value);
+            const instanceId = parseInt(document.getElementById('cipInstanceId').value);
+            const attributeId = parseInt(document.getElementById('cipAttributeId').value);
+            
+            let code = `// Ethernet/IP协议C++实现\n`;
+            code += `#include <vector>\n`;
+            code += `#include <cstdint>\n\n`;
+            code += `class EthernetIpClient {\n`;
+            code += `public:\n`;
+            code += `    // CIP通用请求封装\n`;
+            code += `    std::vector<uint8_t> buildCipRequest(`;
+            code += `uint8_t service, uint16_t classId, uint16_t instanceId, uint16_t attributeId) {\n`;
+            code += `        std::vector<uint8_t> request;\n`;
+            code += `        \n`;
+            code += `        // 服务代码\n`;
+            code += `        request.push_back(service);\n`;
+            code += `        \n`;
+            code += `        // 请求路径\n`;
+            code += `        request.push_back(0x20); // 类ID格式\n`;
+            code += `        request.push_back(static_cast<uint8_t>(classId & 0xFF));\n`;
+            code += `        request.push_back(static_cast<uint8_t>((classId >> 8) & 0xFF));\n`;
+            code += `        \n`;
+            code += `        request.push_back(0x24); // 实例ID格式\n`;
+            code += `        request.push_back(static_cast<uint8_t>(instanceId & 0xFF));\n`;
+            code += `        request.push_back(static_cast<uint8_t>((instanceId >> 8) & 0xFF));\n`;
+            code += `        \n`;
+            code += `        request.push_back(0x30); // 属性ID格式\n`;
+            code += `        request.push_back(static_cast<uint8_t>(attributeId & 0xFF));\n`;
+            code += `        request.push_back(static_cast<uint8_t>((attributeId >> 8) & 0xFF));\n`;
+            code += `        \n`;
+            code += `        return request;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 读取属性\n`;
+            code += `    std::vector<uint8_t> readAttribute(`;
+            code += `uint16_t classId, uint16_t instanceId, uint16_t attributeId) {\n`;
+            code += `        auto request = buildCipRequest(0x0E, classId, instanceId, attributeId);\n`;
+            code += `        return sendRequest(request);\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 写入属性\n`;
+            code += `    bool writeAttribute(`;
+            code += `uint16_t classId, uint16_t instanceId, uint16_t attributeId, \n`;
+            code += `const std::vector<uint8_t>& data) {\n`;
+            code += `        auto request = buildCipRequest(0x10, classId, instanceId, attributeId);\n`;
+            code += `        request.insert(request.end(), data.begin(), data.end());\n`;
+            code += `        auto response = sendRequest(request);\n`;
+            code += `        return !response.empty();\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `private:\n`;
+            code += `    std::vector<uint8_t> sendRequest(const std::vector<uint8_t>& request) {\n`;
+            code += `        // 实际的网络通信实现\n`;
+            code += `        return std::vector<uint8_t>();\n`;
+            code += `    }\n`;
+            code += `};\n`;
+            
+            document.getElementById('ethernetipCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        function generateProfinetCode() {
+            const deviceType = document.getElementById('profinetDeviceType').value;
+            const slot = parseInt(document.getElementById('profinetSlot').value);
+            const subslot = parseInt(document.getElementById('profinetSubslot').value);
+            const moduleId = parseInt(document.getElementById('profinetModuleId').value);
+            
+            let code = `// PROFINET协议C++实现\n`;
+            code += `#include <vector>\n`;
+            code += `#include <cstdint>\n\n`;
+            code += `class ProfinetDevice {\n`;
+            code += `public:\n`;
+            code += `    // 初始化PROFINET设备\n`;
+            code += `    bool initialize(const std::string& deviceName, const std::string& stationName) {\n`;
+            code += `        // 设置设备参数\n`;
+            code += `        this->deviceName = deviceName;\n`;
+            code += `        this->stationName = stationName;\n`;
+            code += `        \n`;
+            code += `        // 初始化通信栈\n`;
+            code += `        if (!initCommunicationStack()) {\n`;
+            code += `            return false;\n`;
+            code += `        }\n`;
+            code += `        \n`;
+            code += `        // 配置模块和子模块\n`;
+            code += `        configureModules();\n`;
+            code += `        \n`;
+            code += `        return true;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 配置模块\n`;
+            code += `    void configureModules() {\n`;
+            code += `        // 添加模块\n`;
+            code += `        addModule(${slot}, ${moduleId});\n`;
+            code += `        \n`;
+            code += `        // 添加子模块\n`;
+            code += `        addSubmodule(${slot}, ${subslot}, 0x00000001);\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    // 处理实时数据\n`;
+            code += `    void processRealTimeData(const std::vector<uint8_t>& inputData) {\n`;
+            code += `        // 解析输入数据\n`;
+            code += `        parseInputData(inputData);\n`;
+            code += `        \n`;
+            code += `        // 处理数据\n`;
+            code += `        processData();\n`;
+            code += `        \n`;
+            code += `        // 生成输出数据\n`;
+            code += `        outputData = generateOutputData();\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `private:\n`;
+            code += `    std::string deviceName;\n`;
+            code += `    std::string stationName;\n`;
+            code += `    std::vector<uint8_t> outputData;\n`;
+            code += `    \n`;
+            code += `    bool initCommunicationStack() {\n`;
+            code += `        // 初始化PROFINET通信栈\n`;
+            code += `        return true;\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    void addModule(uint32_t slot, uint32_t moduleId) {\n`;
+            code += `        // 添加模块配置\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    void addSubmodule(uint32_t slot, uint32_t subslot, uint32_t submoduleId) {\n`;
+            code += `        // 添加子模块配置\n`;
+            code += `    }\n`;
+            code += `};\n`;
+            
+            document.getElementById('profinetCodeResult').innerHTML = `<div class="code-block">${code}</div>`;
+        }
+        
+        // Tab切换功能
+        function switchConvertTab(tab) {
+            const tabs = document.querySelectorAll('#jsonConvert, #xmlConvert');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            if (tab === 'json') {
+                document.getElementById('jsonConvert').classList.add('active');
+                buttons[0].classList.add('active');
+            } else if (tab === 'xml') {
+                document.getElementById('xmlConvert').classList.add('active');
+                buttons[1].classList.add('active');
+            }
+        }
+        
+        function switchMotionTab(tab) {
+            const contents = document.querySelectorAll('.motion-content');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.motion-tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            if (tab === 'motion') {
+                document.getElementById('motionCode').classList.add('active');
+                buttons[0].classList.add('active');
+            } else if (tab === 'trajectory') {
+                document.getElementById('trajectoryCode').classList.add('active');
+                buttons[1].classList.add('active');
+            } else if (tab === 'interpolation') {
+                document.getElementById('interpolationCode').classList.add('active');
+                buttons[2].classList.add('active');
+            }
+        }
+        
+        function switchProtocolTab(tab) {
+            const contents = document.querySelectorAll('#modbusCode, #opcuaCode, #ethernetipCode, #profinetCode');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            if (tab === 'modbus') {
+                document.getElementById('modbusCode').classList.add('active');
+                buttons[0].classList.add('active');
+            } else if (tab === 'opcua') {
+                document.getElementById('opcuaCode').classList.add('active');
+                buttons[1].classList.add('active');
+            } else if (tab === 'ethernetip') {
+                document.getElementById('ethernetipCode').classList.add('active');
+                buttons[2].classList.add('active');
+            } else if (tab === 'profinet') {
+                document.getElementById('profinetCode').classList.add('active');
+                buttons[3].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
